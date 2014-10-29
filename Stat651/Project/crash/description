@@ -1,0 +1,11 @@
+Arthur Lui
+Stat 651 Project
+
+Data: Car Crash datafrom Federal Highway Administration (2012)
+
+The goal of this study is to understand the relationship between X (several
+independent variables) and the log odds of having at least one fatality in a
+vehicle using bayesian statistics. The dataset consists of an indicator of
+fatality (0,1) in a car accident and 23 other independent variables, some of
+which are categorical. Logistic regression will be used for modelling the log
+odds of death.
