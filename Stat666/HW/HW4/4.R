@@ -99,4 +99,16 @@ R2 <- prod(ri) # Should be the same as det(A)
 # The first 6 ri's?
 
 #4:
-#Test23345
+Xr <- X[,-which(colnames(X)=="Pb")]
+Br <- solve(t(Xr) %*% Xr) %*% t(Xr) %*% Y
+Y.XBr <- Y - Xr%*%Br
+Er <- t(Y.XBr) %*% Y.XBr
+
+L.full.red <- det(E) / det(Er)
+h <- 1
+F.f.r <- lam.to.F(L.full.red,vh=h,ve=n-r,p=p)
+p.L.f.r <- 1-pf(F.f.r[1],F.f.r[2],F.f.r[3])
+
+# p.L.f.r < .05 => Pb is important in overall prediction of pollution source emissions.
+
+
