@@ -86,4 +86,13 @@ sum(l[1:2]) / sum(l)
 
 #3: Canonical Correlation 
 #   OBJECTIVE: Summarize the linear relationship betweem the two groups of variables, Y & X.
+Syy <- var(Y)
+Sxx <- var(X[,-1])
+Syx <- cov(Y,X[,-1])
+Sxy <- t(Syx)
+A <- solve(Syy) %*% Syx %*% solve(Sxx) %*% Sxy
+ri <- eigen(A)$values[1:s]
+R2 <- prod(ri) # Should be the same as det(A)
+#R2 <- det(A) # Should be the same as product of the eigen values of A
 
+# The first 6 ri's?
