@@ -46,8 +46,9 @@ lam.to.F <- function(lam,p,vh,ve) { # Approximation
   df <- c(p*vh, w*t-(p*vh-2)/2)
 
   F.stat <- (1-L) / L * df[2]/df[1]
-  out <- c(F.stat,df)
-  names(out) <- c("F.stat","df1","df2")
+  p <- pf(F.stat,df[1],df[2],lower.tail=F)
+  out <- c(F.stat,df,p)
+  names(out) <- c("F.stat","df1","df2","p.val")
 
   out
 }
@@ -55,18 +56,16 @@ lam.to.F <- function(lam,p,vh,ve) { # Approximation
 V.2.F <- function(V,s,N,m) { # Approximation
   F.stat <- (2*N + s + 1) / (2*m + s + 1) * V/(s-V)
   df <- s * (c(m,N) + s + 1)
-  
-  out <- c(F.stat,df)
-  names(out) <- c("F.stat","df1","df2")
+  p <- pf(F.stat,df[1],df[2],lower.tail=F)
+
+  out <- c(F.stat,df,p)
+  names(out) <- c("F.stat","df1","df2","p")
   
   out
 }
 
 F.L <- lam.to.F(lam,p=p,vh=q-1,ve=n-r)
-p.L <- 1-pf(F.L[1],F.L[2],F.L[3])
-
 F.V <- V.2.F(V,s=min(p,q),N=(n-q-p-2)/2,m=(abs(p-1)-1)/2)
-p.V <- 1-pf(F.V[1],F.V[2],F.V[3])
 
 # p.val < .05 => Yes, there is a significant contribution. H_0 B1 = O is rejected.
 
@@ -99,8 +98,6 @@ R2 <- prod(ri) # Should be the same as det(A)
 
 L.m <- apply(matrix(1:s),1,function(m) prod(1-ri[m:length(ri)]))
 F.m <- t(apply(matrix(1:s),1,function(m) lam.to.F(L.m[m],p=q-m+1,vh=p-m+1,ve=n-m-p)))
-p.m <- apply(F.m,1,function(x) 1-pf(x[1],x[2],x[3]))
-p.m
 
 #4:
 Xr <- X[,-which(colnames(X)=="Pb")]
@@ -111,8 +108,28 @@ Er <- t(Y.XBr) %*% Y.XBr
 L.full.red <- det(E) / det(Er)
 h <- 1
 F.f.r <- lam.to.F(L.full.red,p=p,vh=h,ve=n-r)
-p.L.f.r <- 1-pf(F.f.r[1],F.f.r[2],F.f.r[3])
 
-# p.L.f.r < .05 => Pb is important in overall prediction of pollution source emissions.
+# p.val < .05 => Pb is important in overall prediction of pollution source emissions.
 
+
+
+#5
+dat <- as.matrix(read.table("bodyfat.txt",header=F))
+colnames(dat) <- c(paste0("y",1:2), paste0("x",1:13))
+
+#y1  = Density determined from underwater weighing
+#y2  = Percent body fat
+#x1  = Age (years)
+#x2  = Weight (lbs)
+#x3  = Height (inches)
+#x4  = Neck circumference (cm)
+#x5  = Chest circumference (cm)
+#x6  = Abdomen 2 circumference (cm)
+#x7  = Hip circumference (cm)
+#x8  = Thigh circumference (cm)
+#x9  = Knee circumference (cm)
+#x10 = Ankle circumference (cm)
+#x11 = Biceps (extended) circumference (cm)
+#x12 = Forearm circumference (cm)
+#x13 = Wrist circumference (cm)
 
