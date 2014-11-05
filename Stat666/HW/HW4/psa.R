@@ -121,7 +121,16 @@ colnames(d) <- paste0("d",1:ncol(d))
 
 c <- c[,1:min(ncol(c),ncol(d))]
 d <- d[,1:min(ncol(c),ncol(d))]
-# Why is my answer different???
+
+#This is the same, just off by a constant, so it is really the same thing.
+#Ryy <- cor(Y)
+#Rxy <- cor(X[,-1],Y)
+#Ryx <- t(Rxy)
+#Rxx <- cor(X[,-1])
+#C <- solve(Ryy,Ryx) %*% solve(Rxx,Rxy)
+#D <- solve(Rxx,Rxy) %*% solve(Ryy,Ryx)
+#cc <- Re(diag(sqrt(diag(Ryy))) %*% eigen(C)$vector) [,1:2]
+#dd <- Re(diag(sqrt(diag(Rxx))) %*% eigen(D)$vector) [,1:2]
 
 #4:
 Xr <- X[,-which(colnames(X)=="Pb")]
