@@ -34,7 +34,7 @@ lam <- det(E) / det(E+H)
 # lam can also be calculated this way:
 s <- min(p,q)
 l <- eigen(solve(E,H))$values[1:s]
-lam <- prod(1/(1+l))
+#lam <- prod(1/(1+l))
 V <- sum(l/(1+l)) # Pillai
 
 
@@ -91,13 +91,16 @@ Sxx <- var(X[,-1])
 Syx <- cov(Y,X[,-1])
 Sxy <- t(Syx)
 A <- solve(Syy) %*% Syx %*% solve(Sxx) %*% Sxy
-ri <- eigen(A)$values[1:s]
-R2 <- prod(ri) # Should be the same as det(A)
+r2 <- eigen(A)$values[1:s]
+R2 <- prod(r2) # Should be the same as det(A)
 #R2 <- det(A) # Should be the same as product of the eigen values of A
-# The first 6 ri's?
+# The first 6 r2's?
 
-L.m <- apply(matrix(1:s),1,function(m) prod(1-ri[m:length(ri)]))
+L.m <- apply(matrix(1:s),1,function(m) prod(1-r2[m:length(r2)]))
 F.m <- t(apply(matrix(1:s),1,function(m) lam.to.F(L.m[m],p=q-m+1,vh=p-m+1,ve=n-m-p)))
+
+#r2.l <- r2/(1-r2)
+#r2.l / sum(r2.l)
 
 #4:
 Xr <- X[,-which(colnames(X)=="Pb")]
@@ -112,25 +115,3 @@ F.f.r <- lam.to.F(L.full.red,p=p,vh=h,ve=n-r)
 # p.val < .05 => Pb is important in overall prediction of pollution source emissions.
 
 
-
-#5
-dat <- as.matrix(read.table("bodyfat.txt",header=F))
-colnames(dat) <- c(paste0("y",1:2), paste0("x",1:13))
-
-#y1  = Density determined from underwater weighing
-#y2  = Percent body fat
-#x1  = Age (years)
-#x2  = Weight (lbs)
-#x3  = Height (inches)
-#x4  = Neck circumference (cm)
-#x5  = Chest circumference (cm)
-#x6  = Abdomen 2 circumference (cm)
-#x7  = Hip circumference (cm)
-#x8  = Thigh circumference (cm)
-#x9  = Knee circumference (cm)
-#x10 = Ankle circumference (cm)
-#x11 = Biceps (extended) circumference (cm)
-#x12 = Forearm circumference (cm)
-#x13 = Wrist circumference (cm)
-
-mod <- lm(dat[,1:2]~dat[,-(1:2)])
