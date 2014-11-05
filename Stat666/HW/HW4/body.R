@@ -1,4 +1,4 @@
-# I have questions at #5,#6
+# I have questions at #5,#6,#7
 #options("width"=150)
 
 lam.to.F <- function(lam,p,vh,ve) { # Approximation
@@ -88,7 +88,7 @@ L.m <- apply(matrix(1:s),1,function(m) prod(1-r2[m:length(r2)]))
 F.m <- t(apply(matrix(1:s),1,function(m) lam.to.F(L.m[m],p=q-m+1,vh=p-m+1,ve=n-m-p)))
 
 r2.l <- r2/(1-r2) # This is the "eigenvalues" of E^(-1)H in SAS = l-1. Why?
-r2.l / sum(r2.l) # 98% => essentially one dimension 
+prop.r2.l <- r2.l / sum(r2.l) # 98% => essentially one dimension 
 
 #6:
 back.sel <- function(Y,X,a=.05) {
@@ -156,3 +156,27 @@ r2.l / sum(r2.l) # 99% in eig[1]
 
 B.new <- solve(t(new.X) %*% new.X, t(new.X)%*%Y) 
 
+
+
+Syy <- var(Y)
+Syx <- var(Y,new.X[,-1])
+Sxy <- var(new.X[,-1],Y)
+Sxx <- var(new.X[,-1])
+
+A <- solve(Syy,Syx) %*% solve(Sxx,Sxy)
+B <- solve(Sxx,Sxy) %*% solve(Syy,Syx)
+
+a <- eigen(A)$vector
+b <- eigen(B)$vector
+
+(c <- diag(sqrt(diag(Syy))) %*% a) 
+(d <- diag(sqrt(diag(Sxx))) %*% b) 
+
+rownames(c) <- c("y1","y2")
+rownames(d) <- c("x2","x6","x11","x13")
+colnames(c) <- c("c1","c2")
+colnames(d) <- c("d1","d2","d3","d4")
+
+c <- c[,1:min(ncol(c),ncol(d))]
+d <- d[,1:min(ncol(c),ncol(d))]
+# Why is my answer different???
