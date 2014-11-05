@@ -38,7 +38,7 @@ lam <- prod(1/(1+l))
 V <- sum(l/(1+l)) # Pillai
 
 
-lam.to.F <- function(lam,vh,ve,p) { # Approximation
+lam.to.F <- function(lam,p,vh,ve) { # Approximation
   t <- sqrt( (p^2*vh^2-4) / (p^2+vh^2-5) )
   L <- lam^(1/t)
   w <- ve + vh - (p+vh+1)/2
@@ -62,7 +62,7 @@ V.2.F <- function(V,s,N,m) { # Approximation
   out
 }
 
-F.L <- lam.to.F(lam,vh=q-1,ve=n-r,p=p)
+F.L <- lam.to.F(lam,p=p,vh=q-1,ve=n-r)
 p.L <- 1-pf(F.L[1],F.L[2],F.L[3])
 
 F.V <- V.2.F(V,s=min(p,q),N=(n-q-p-2)/2,m=(abs(p-1)-1)/2)
@@ -106,7 +106,7 @@ Er <- t(Y.XBr) %*% Y.XBr
 
 L.full.red <- det(E) / det(Er)
 h <- 1
-F.f.r <- lam.to.F(L.full.red,vh=h,ve=n-r,p=p)
+F.f.r <- lam.to.F(L.full.red,p=p,vh=h,ve=n-r)
 p.L.f.r <- 1-pf(F.f.r[1],F.f.r[2],F.f.r[3])
 
 # p.L.f.r < .05 => Pb is important in overall prediction of pollution source emissions.
