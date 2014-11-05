@@ -1,5 +1,5 @@
 options("width"=150)
-
+library(xtable)
 # PSA
 X <- as.matrix(read.table("PSAData.txt",header=T))
 X <- cbind(1,X)
@@ -17,11 +17,7 @@ XB <- X %*% B
 Y.XB <- Y-XB
 E <- t(Y.XB) %*% Y.XB
 
-S <-  E / (n-r)
-
-library(xtable)
-xtab.B <- xtable(B,caption="\\hat{B}")
-
+xtab.B <- xtable(B,digits=4,caption="$\\hat{\\bm B}$")
 y.bar <- apply(Y,2,mean)
 H <- t(Y) %*% Y - n * y.bar %*% t(y.bar)
 
@@ -67,6 +63,7 @@ F.V <- V.2.F(V,s=min(p,q),N=(n-q-p-2)/2,m=(abs(p-1)-1)/2)
 #                H_0 B1 = O is rejected.
 
 #2 
+S <- E / (n-r)
 var.B.vec <- S %x% solve(t(X)%*%X)
 B0 <- B[1,]
 B1 <- B[-1,]
@@ -90,8 +87,8 @@ cumm <- apply(matrix(1:length(l)),1,function(x) sum(eig[1:x]/sum(eig)))
 #              the two groups of variables, Y & X.
 Syy <- var(Y)
 Sxx <- var(X[,-1])
-Syx <- cov(Y,X[,-1])
-Sxy <- t(Syx)
+Syx <- var(Y,X[,-1])
+Sxy <- var(X[,-1],Y)
 A <- solve(Syy) %*% Syx %*% solve(Sxx) %*% Sxy
 r2 <- eigen(A)$values[1:s]
 R2 <- prod(r2) # Should be the same as det(A)
@@ -104,6 +101,27 @@ F.m <- t(apply(matrix(1:s),1,function(m)
 
 #r2.l <- r2/(1-r2)
 #r2.l / sum(r2.l)
+
+A <- solve(Syy,Syx) %*% solve(Sxx,Sxy)
+B <- solve(Sxx,Sxy) %*% solve(Syy,Syx)
+
+a <- eigen(A)$vector
+b <- eigen(B)$vector
+
+(c <- diag(sqrt(diag(Syy))) %*% a) 
+(d <- diag(sqrt(diag(Sxx))) %*% b) 
+
+c <- Re(c[,1:2])
+d <- Re(d[,1:2])
+
+rownames(c) <- colnames(Y)
+rownames(d) <- colnames(X[,-1])
+colnames(c) <- paste0("c",1:ncol(c))
+colnames(d) <- paste0("d",1:ncol(d))
+
+c <- c[,1:min(ncol(c),ncol(d))]
+d <- d[,1:min(ncol(c),ncol(d))]
+# Why is my answer different???
 
 #4:
 Xr <- X[,-which(colnames(X)=="Pb")]
