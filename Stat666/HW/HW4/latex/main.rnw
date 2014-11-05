@@ -1,0 +1,89 @@
+\documentclass{article}                                                   %
+\usepackage{fullpage}                                                     %
+\usepackage{pgffor}                                                       %
+\usepackage{amssymb}                                                      %
+\usepackage{Sweave}                                                       %
+\usepackage{bm}                                                           %
+\usepackage{mathtools}                                                    %
+\usepackage{verbatim}                                                     %
+\usepackage{appendix}                                                     %
+\usepackage{graphicx}
+\usepackage[UKenglish]{isodate} % for: \today                             %
+\cleanlookdateon                % for: \today                             %
+                                                                          %
+\def\wl{\par \vspace{\baselineskip}\noindent}                             %
+\def\beginmyfig{\begin{figure}[!htbp]\begin{center}}                      %
+\def\endmyfig{\end{center}\end{figure}}                                   %
+\def\prodl{\prod\limits_{i=1}^n}                                          %
+\def\suml{\sum\limits_{i=1}^n}                                            %
+\def\ds{\displaystyle}                                                    %
+                                                                          %
+\begin{document}                                                          %
+% my title:                                                               %
+\begin{center}                                                            %
+  \section*{\textbf{Stat666 Homework 4}}                                  %
+  \subsection*{\textbf{Arthur Lui}}                                       %
+  \subsection*{\noindent\today}                                           %
+\end{center}                                                              %
+\setkeys{Gin}{width=0.5\textwidth}                                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<design,echo=F>>=
+  source("../psa.R",chdir=T)
+@
+
+%\beginmyfig
+%<<fig=T,echo=F>>=
+%  plot.1b()
+%@
+%\endmyfig
+
+
+\section{PSA}
+\subsection{Is there a significant relationship between the chemical
+            abundances (x's) and the source contributions(y's)? 
+            What is $\hat{\bm B}$?}
+
+            The Wilk's Lambda statistic,
+            $\Lambda_{p=\Sexpr{p},\nu_H=\Sexpr{q-1},\nu_E=\Sexpr{n-r}}$
+            $\approx$ \Sexpr{round(lam,4)}. The corresponding F-statistic 
+            of this Wilk's Lambda statistic is
+            $F_{df_1=\Sexpr{F.L[2]},df_2=\Sexpr{round(F.L[3],2)}}$
+            =\Sexpr{round(F.L[1])}, with p-value 
+            $\approx$ \Sexpr{round(F.L[4])} < .05. Since the p-value for 
+            the Wilk Lambda's statistic is below .05, we conclude that 
+            there is a significant relationship between the chemical 
+            abundances and the source contributions. Table 1 displays
+            $\hat{\bm{B}}$.\\
+
+<<results=tex,echo=F>>=
+  print(xtable(B,digits=4,caption="$\\hat{\\bm B}$"),
+        size="\\tiny",caption.pla="top")
+@
+
+\subsection{What is the essential dimensionality of the relationship
+            between the x's and y's? Is that dimensionality directly 
+            evident from an inspection of $\hat{\bm{B}}$ ?}
+            
+            The sum of the eigenvalues $\lambda_1 \& \lambda_2$
+            (substantially) accounts for 94\% of the sum of the 
+            eigenvalues. So, the essential dimentionality of the
+            realtionship between X and Y is 2. This is not directly
+            evident from inspecting B1 because B1 is large and seeing
+            trends within the matrix is difficult. (See Table2.)
+
+<<results=tex,echo=F>>=
+  M <- rbind(e,eig,cumm)
+  rownames(M) <- c("Eigenvalues","Proportions","Cummulative")
+  print(xtable(M,digits=4,caption="Eigenvalues of E$^{-1}$H"),
+        size="\\small",caption.pla="top")
+@
+
+           
+
+\newpage
+\section{Appendix - Code}
+  \verbatiminput{../psa.R}
+
+
+\end{document}

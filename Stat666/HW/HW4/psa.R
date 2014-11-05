@@ -19,12 +19,8 @@ E <- t(Y.XB) %*% Y.XB
 
 S <-  E / (n-r)
 
-# Q1: Is there a significant relationship between the chemical abundances (X) and 
-#     the source of contributions (Y)? What is $\hat(B)$?
-
-# What is $\hat(B)$?
 library(xtable)
-xtab.B <- xtable(B)
+xtab.B <- xtable(B,caption="\\hat{B}")
 
 y.bar <- apply(Y,2,mean)
 H <- t(Y) %*% Y - n * y.bar %*% t(y.bar)
@@ -67,25 +63,32 @@ V.2.F <- function(V,s,N,m) { # Approximation
 F.L <- lam.to.F(lam,p=p,vh=q-1,ve=n-r)
 F.V <- V.2.F(V,s=min(p,q),N=(n-q-p-2)/2,m=(abs(p-1)-1)/2)
 
-# p.val < .05 => Yes, there is a significant contribution. H_0 B1 = O is rejected.
+# p.val < .05 => Yes, there is a significant contribution. 
+#                H_0 B1 = O is rejected.
 
 #2 
 var.B.vec <- S %x% solve(t(X)%*%X)
 B0 <- B[1,]
 B1 <- B[-1,]
 
-# Another.Lambda <- det(cov(cbind(Y,X[,-1]))) / (det(var(X[,-1])) * det(var(Y))) # But why is it different?
-# We reject H0, and the first eigen value does not completely dominate the other eigen values. (See: l/sum(l))
-# l1+l2 accounts for 94% of the eigen values, which substantially dominates the other eigen values.
-# So, the essential dimensionality of the relationship between X and Y is 2.
-# This was not directly evident from inspecting B1, because B1 is large and it is difficult to see trends.
+# Another.Lambda <- det(cov(cbind(Y,X[,-1]))) / (det(var(X[,-1])) *
+# det(var(Y))). But why is it different?  We reject H0, and the first
+# eigen value does not completely dominate the other eigen values.
+# (See: l/sum(l)). l1+l2 accounts for 94% of the eigen values, which
+# substantially dominates the other eigen values.  So, the essential
+# dimensionality of the relationship between X and Y is 2.  This was
+# not directly evident from inspecting B1, because B1 is large and it
+# is difficult to see trends.
 
-sum(l[1:2]) / sum(l)
-
+e <- l-1
+eig <- e/sum(e)
+prop <- sum(eig[1:2]) / sum(eig)
+cumm <- apply(matrix(1:length(l)),1,function(x) sum(eig[1:x]/sum(eig)))
 
 #3: Canonical Correlation 
 # I don't know what to do for this problem YET.
-#   OBJECTIVE: Summarize the linear relationship betweem the two groups of variables, Y & X.
+#   OBJECTIVE: Summarize the linear relationship betweem 
+#              the two groups of variables, Y & X.
 Syy <- var(Y)
 Sxx <- var(X[,-1])
 Syx <- cov(Y,X[,-1])
@@ -97,7 +100,8 @@ R2 <- prod(r2) # Should be the same as det(A)
 # The first 6 r2's?
 
 L.m <- apply(matrix(1:s),1,function(m) prod(1-r2[m:length(r2)]))
-F.m <- t(apply(matrix(1:s),1,function(m) lam.to.F(L.m[m],p=q-m+1,vh=p-m+1,ve=n-m-p)))
+F.m <- t(apply(matrix(1:s),1,function(m) 
+         lam.to.F(L.m[m],p=q-m+1,vh=p-m+1,ve=n-m-p)))
 
 #r2.l <- r2/(1-r2)
 #r2.l / sum(r2.l)
@@ -112,6 +116,7 @@ L.full.red <- det(E) / det(Er)
 h <- 1
 F.f.r <- lam.to.F(L.full.red,p=p,vh=h,ve=n-r)
 
-# p.val < .05 => Pb is important in overall prediction of pollution source emissions.
+# p.val < .05 => Pb is important in overall 
+#                prediction of pollution source emissions.
 
 
