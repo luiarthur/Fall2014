@@ -98,8 +98,9 @@ R2 <- prod(ri) # Should be the same as det(A)
 # The first 6 ri's?
 
 L.m <- apply(matrix(1:s),1,function(m) prod(1-ri[m:length(ri)]))
-F.m <- t(apply(matrix(1:s),1,function(m) lam.to.F(L.m[m],p=q-m+1,vh=p-m+1,ve=n-m+p)))
+F.m <- t(apply(matrix(1:s),1,function(m) lam.to.F(L.m[m],p=q-m+1,vh=p-m+1,ve=n-m-p)))
 p.m <- apply(F.m,1,function(x) 1-pf(x[1],x[2],x[3]))
+p.m
 
 #4:
 Xr <- X[,-which(colnames(X)=="Pb")]
