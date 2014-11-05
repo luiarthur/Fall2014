@@ -79,7 +79,27 @@
         size="\\small",caption.pla="top")
 @
 
-           
+\subsection{Use canonical correlation analysis to identify and interpret
+            the important dimensions of the relationship between the 
+            xs and the ys.}
+
+\subsection{ Traditionally, experts have assumed that heavy metals are
+             important to the understanding of some pollution sources. 
+             In terms of the linear regression considered here, is the
+             heavy metal Pb an important factor in the overall prediction 
+             of pollution source emissions? That is, can we drop Pb from 
+             the list of measured predictors without losing significant 
+             predictive ability?}
+
+             The Wilk's Lambda statistic for this full-reduced model
+             is $\Lambda_{p=\Sexpr{p},\nu_H=\Sexpr{h},\nu_E=\Sexpr{n-r}}$ 
+             = \Sexpr{round(L.full.red,5)}. Its corresponding F-statistic
+             is $F_{\Sexpr{round(F.f.r[2],4)},\Sexpr{round(F.f.r[3],4)}}$
+             = \Sexpr{round(F.f.r,4)}. This statistic has a p-value 
+             $\approx$ \Sexpr{round(F.f.r[4],4)} < .05. So, we reject the 
+             null hypothesis that Pb (lead) is not an important factor in
+             the overall prediction of pollution source emissions.
+
 
 \newpage
 \section{Appendix - Code}

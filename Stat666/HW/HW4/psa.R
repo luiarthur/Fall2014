@@ -82,7 +82,6 @@ B1 <- B[-1,]
 
 e <- l-1
 eig <- e/sum(e)
-prop <- sum(eig[1:2]) / sum(eig)
 cumm <- apply(matrix(1:length(l)),1,function(x) sum(eig[1:x]/sum(eig)))
 
 #3: Canonical Correlation 
