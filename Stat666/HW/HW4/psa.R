@@ -133,3 +133,4 @@ colnames(dat) <- c(paste0("y",1:2), paste0("x",1:13))
 #x12 = Forearm circumference (cm)
 #x13 = Wrist circumference (cm)
 
+mod <- lm(dat[,1:2]~dat[,-(1:2)])
