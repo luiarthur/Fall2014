@@ -1,10 +1,11 @@
-options("width"=70)
+options("width"=100)
 y <- as.vector(as.matrix(read.table("faculty.dat")))
+k <- length(y)
 
 dig <- function(x,a,b,log=F) {
   out <- NULL
   if (!log) {
-    out <- 1/(gamma(a)*b^a) * x^(-a-1) * exp{-1/(b*x)}
+    out <- 1/(gamma(a)*b^a) * x^(-a-1) * exp(-1/(b*x))
   } else {
     out <- -lgamma(a)-a*log(b) -(a+1)*log(x) -1/(b*x)
   }
@@ -23,11 +24,10 @@ gibbs <- function(B=1e5,cand=c(1,1,1,1)) {
   at <- 1
   bt <- 1
 
-  k <- length(y)
-  M <- matrix(0,nrow=B,ncol=length(y)+3) # theta[1:k],mu,sig2,tau2
-  M[1,] <- 1
+  M <- matrix(0,nrow=B,ncol=k+3) # theta[1:k],mu,sig2,tau2
+  M[1,] <- 2
   
-  update.theta <- function(i,mu,sig2,tau2) {
+  update.theta <- function(i,mu,sig2,tau2) { # theta ~ N(mu,sig2)
     mu.new <- (y[i]*tau2+mu*sig2) / (tau2+sig2)
     sig2.new <- (tau2*sig2) / (tau2+sig2)
     out <- c(mu.new,sig2.new)
@@ -35,21 +35,79 @@ gibbs <- function(B=1e5,cand=c(1,1,1,1)) {
     out
   }
 
-  d.theta <- function(theta,i,mu,sig2,tau2,log=T) {
-    dnorm(theta,(y[i]*tau2+mu*sig2)/(tau2+sig2),(tau2*sig2)/(tau2+sig2),log=log)
+  update.mu <- function(theta,tau2) { # mu ~ N(m,s2)
+    theta.new <- (mean(theta)*k*s2+m*tau2)/(k*s2+tau2)
+    s2.new <- s2*tau2/(k*s2+tau2)
+    out <- c(theta.new,s2.new)
+    names(out) <- c("m","s2")
+    out
+  }
+
+  update.sig2 <- function(theta) { # sig2 ~ IG(as,bs)
+    as.new <- as+k/2 # Does not change
+    bs.new <- 1/(1/bs+sum((y-theta)^2)/2)
+    out <- c(as.new,bs.new)
+    names(out) <- c("as","bs")
+    out
   }
   
-  d.mu <- function(mu,theta,s2,log=T) {
-    dnorm(mu,(mean(theta)*k*s2+m*tau2)/(k*s2+tau2),s2*tau2/(k*s2+tau2,log=log))
+  update.tau2 <- function(theta,mu) { # tau2 ~ IG(at,bt)
+    at.new <- at+k/2 # Does not change
+    bt.new <- 1/(1/bt+sum((theta-mu)^2)/2)
+    out <- c(at.new,bt.new)
+    names(out) <- c("at","bt")
+    out
   }
 
-  d.sig2 <- function(sig2,theta,log=T) {
-    dig(sig2,as+k/2,1/(1/bs+sum((y-theta)^2)/2),log=log)
-  }
+  for (i in 2:B) {
+    M[i,] <- M[i-1,]
+    
+    # theta[1:k],mu,sig2,tau2
+    for (j in 1:k) {
+      new.theta <- update.theta(j,M[i,k+1],M[i,k+2],M[i,k+3])
+      M[i,j] <- rnorm(1,new.theta[1],new.theta[2])
+    }
 
-  d.tau2 <- function(tau2,theta,mu,log=T) {
-    dig(tau2,at+k/2,1/(1/bt+sum((theta-mu)^2)/2))
-  }
+    new.mu <- update.mu(M[i,1:k],M[i,k+3])
+    M[i,k+1] <- rnorm(1,new.mu[1],new.mu[2])
 
-  # Now write the draw functions.
+    new.sig2 <- update.sig2(M[i,1:k])
+    M[i,k+2] <- rig(1,new.sig2[1],new.sig2[2])
+
+    new.tau2 <- update.tau2(M[i,1:k],M[i,k+1])
+    M[i,k+3] <- rig(1,new.tau2[1],new.tau2[2])
+    
+    #print(M[i,(k+1):(k+3)])
+    #print(new.tau2)
+    #Sys.sleep(1)
+    cat(paste("\r",i/B))
+  }
+  
+  M
 }
+
+#1: Posterior
+M <- gibbs(1000)
+N <- nrow(M)
+
+#par(mfrow=c(3,2))
+#for (i in 1:ncol(M)){
+#  plot(M[,i],main=i)
+#}
+#par(mfrow=c(1,1))
+#2: E[theta|Y]
+
+M.mean <- apply(M,2,mean)
+
+#3: V[theta|Y]
+M.cov <- var(M)
+#sum(M.cov > .05) / prod(dim(M.cov))
+
+#4: Posterior Predictive
+theta.pred <- rnorm(N,M[,k+1],sqrt(M[,k+3]))
+post.pred <- rnorm(N,theta.pred,sqrt(M[,k+2]))
+
+plot(density(post.pred),lwd=3,col="blue")
+p.gt.5 <- mean(post.pred>5)
+
+
