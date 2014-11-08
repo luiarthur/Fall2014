@@ -104,10 +104,14 @@ M.cov <- var(M)
 #sum(M.cov > .05) / prod(dim(M.cov))
 
 #4: Posterior Predictive
+source("../3/color.R")
 theta.pred <- rnorm(N,M[,k+1],sqrt(M[,k+3]))
 post.pred <- rnorm(N,theta.pred,sqrt(M[,k+2]))
-
-plot(density(post.pred),lwd=3,col="blue")
+post.pred.den <- density(post.pred)
 p.gt.5 <- mean(post.pred>5)
+m <- max(post.pred.den$x)-.01
+plot(post.pred.den,lwd=3,col="blue",main="Posterior Predictive")
+color.den(post.pred.den,5,m,col="blue")
+text(5.8,.2,p.gt.5,cex=2)
 
 
