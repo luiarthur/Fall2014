@@ -26,6 +26,14 @@ gibbs <- function(B=1e5,cand=c(1,1,1,1)) {
   k <- length(y)
   M <- matrix(0,nrow=B,ncol=length(y)+3) # theta[1:k],mu,sig2,tau2
   M[1,] <- 1
+  
+  update.theta <- function(i,mu,sig2,tau2) {
+    mu.new <- (y[i]*tau2+mu*sig2) / (tau2+sig2)
+    sig2.new <- (tau2*sig2) / (tau2+sig2)
+    out <- c(mu.new,sig2.new)
+    names(out) <- c("mu","sig2")
+    out
+  }
 
   d.theta <- function(theta,i,mu,sig2,tau2,log=T) {
     dnorm(theta,(y[i]*tau2+mu*sig2)/(tau2+sig2),(tau2*sig2)/(tau2+sig2),log=log)
