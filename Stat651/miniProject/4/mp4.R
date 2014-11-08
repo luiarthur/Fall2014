@@ -80,23 +80,24 @@ gibbs <- function(B=1e5,cand=c(1,1,1,1)) {
     #print(M[i,(k+1):(k+3)])
     #print(new.tau2)
     #Sys.sleep(1)
-    cat(paste("\r",i/B))
+    cat(paste0("\r",round(i/B*100),"%"))
   }
   
   M
 }
 
 #1: Posterior
-M <- gibbs(1000)
+M <- gibbs(B=1e5)
+M <- M[-(1:200),]
 N <- nrow(M)
 
-#par(mfrow=c(3,2))
-#for (i in 1:ncol(M)){
-#  plot(M[,i],main=i)
-#}
-#par(mfrow=c(1,1))
-#2: E[theta|Y]
+for (i in 1:ncol(M)){
+  plot(M[,i],main=i,type="l")
+  scan()
+}
 
+
+#2: E[theta|Y]
 M.mean <- apply(M,2,mean)
 
 #3: V[theta|Y]
@@ -109,9 +110,9 @@ theta.pred <- rnorm(N,M[,k+1],sqrt(M[,k+3]))
 post.pred <- rnorm(N,theta.pred,sqrt(M[,k+2]))
 post.pred.den <- density(post.pred)
 p.gt.5 <- mean(post.pred>5)
-m <- max(post.pred.den$x)-.01
+mx <- max(post.pred.den$x)-.01
 plot(post.pred.den,lwd=3,col="blue",main="Posterior Predictive")
-color.den(post.pred.den,5,m,col="blue")
-text(5.8,.2,p.gt.5,cex=2)
+color.den(post.pred.den,5,mx,col="blue")
+text(5.8,.2,round(p.gt.5,4),cex=2)
 
 
