@@ -106,7 +106,9 @@ M.cov <- var(M)
 
 #4: Posterior Predictive
 source("../3/color.R")
+#                     mu           tau2
 theta.pred <- rnorm(N,M[,k+1],sqrt(M[,k+3]))
+#                                    sig2
 post.pred <- rnorm(N,theta.pred,sqrt(M[,k+2]))
 post.pred.den <- density(post.pred)
 p.gt.5 <- mean(post.pred>5)
