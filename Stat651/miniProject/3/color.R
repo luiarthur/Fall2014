@@ -12,7 +12,7 @@ my.color <- function(dat,from,to) {
 color.den <- function(den,from,to,col="red") {
   # Colors area under a density within an interval
   # den has to be a density object
-  polygon(c(from, den$x[den$x> from & den$x < to], to),
+  polygon(c(from, den$x[den$x>= from & den$x <= to], to),
           c(0, den$y[den$x>=from & den$x <= to], 0),col=col)
 }
 

@@ -91,18 +91,48 @@ M <- gibbs(B=1e5)
 M <- M[-(1:200),]
 N <- nrow(M)
 
-for (i in 1:ncol(M)){
-  plot(M[,i],main=i,type="l")
-  scan()
-}
+#for (i in 1:ncol(M)){
+#  plot(M[,i],main=i,type="l")
+#  scan()
+#}
 
 
 #2: E[theta|Y]
 M.mean <- apply(M,2,mean)
+M.upper <- apply(M,2,function(x) quantile(x,.975))
+M.lower <- apply(M,2,function(x) quantile(x,.025))
 
 #3: V[theta|Y]
 M.cov <- var(M)
 #sum(M.cov > .05) / prod(dim(M.cov))
+
+# Plots for mean and variance
+plot(M.mean[1:23],col="blue",pch=20,ylim=c(4.7,6.5),type="o",main="Posterior Mean Theta's")
+lines(M.upper[1:23],col="red",type="b",pch=20)
+lines(M.lower[1:23],col="red",type="b",pch=20)
+
+plot.hyper <- function(m,names=NULL) {
+  library(MASS)
+  k <- ncol(m)
+  par(mfrow=c(k,k))
+  for (i in 1:k) {
+    for (j in 1:k) {
+      if (i<j) {
+        name <- ifelse(is.null(names),"",paste("Bivariate Trace Plot for",names[i],"&",names[j]))
+        K <- kde2d(m[,i],m[,j])
+        contour(K,col="red",main=name,cex.main=.9,xlab=names[i],ylab=names[j])
+      } else if (i>j) {
+        name <- ifelse(is.null(names),"",paste("Bivariate Contour Plot for",names[i],"&",names[j]))
+        plot(m[,i],m[,j],type="l",col="pink",main=name,cex.main=.9,xlab=names[i],ylab=names[j])
+      } else {
+        name <- ifelse(is.null(names),"",paste("Posterior Density for",names[i]))
+        plot(density(m[,i]),col="blue",lwd=3,main=name)
+      }
+    }
+  }
+  par(mfrow=c(1,1))
+}
+plot.hyper(m<-M[80000:nrow(M),24:26],c("mu","sigma2","tau2"))
 
 #4: Posterior Predictive
 source("../3/color.R")
@@ -110,10 +140,13 @@ source("../3/color.R")
 theta.pred <- rnorm(N,M[,k+1],sqrt(M[,k+3]))
 #                                    sig2
 post.pred <- rnorm(N,theta.pred,sqrt(M[,k+2]))
+#post.pred <- ifelse(post.pred>7,7,post.pred)
+#post.pred <- ifelse(post.pred<0,0,post.pred)
+#post.pred.den <- density(post.pred,from=0,to=7)
 post.pred.den <- density(post.pred)
 p.gt.5 <- mean(post.pred>5)
-mx <- max(post.pred.den$x)-.01
-plot(post.pred.den,lwd=3,col="blue",main="Posterior Predictive")
+mx <- max(post.pred.den$x)
+plot(post.pred.den,lwd=3,col="blue",main="Posterior Predictive for Next Average Faculty Evaluation")
 color.den(post.pred.den,5,mx,col="blue")
 text(5.8,.2,round(p.gt.5,4),cex=2)
 
