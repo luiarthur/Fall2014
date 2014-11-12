@@ -101,7 +101,7 @@ gibbs <- function(B=1e5) {
 }
 
 #1: Posterior
-M <- gibbs(B=1e5)
+M <- gibbs(B=1e4)
 M <- M[-(1:200),]
 N <- nrow(M)
 
@@ -146,7 +146,7 @@ plot.hyper <- function(m,names=NULL) {
   }
   par(mfrow=c(1,1))
 }
-plot.hyper(m<-M[80000:nrow(M),24:26],c("mu","sigma2","tau2"))
+plot.hyper(m<-M[(nrow(M)*.8):nrow(M),24:26],c("mu","sigma2","tau2"))
 
 #4: Posterior Predictive
 source("../3/color.R")
