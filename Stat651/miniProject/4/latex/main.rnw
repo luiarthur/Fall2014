@@ -121,6 +121,10 @@
       \includegraphics[scale=2]{../out/postMean.pdf}
       %\caption{}
     \endmyfig
+    \beginmyfig
+      \includegraphics[scale=2]{../out/cov.pdf}
+      %\caption{}
+    \endmyfig
     \input{../out/meanVar.tex}
     %\input{../out/postMeanMu.tex}
 
