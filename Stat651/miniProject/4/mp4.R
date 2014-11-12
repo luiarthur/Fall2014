@@ -1,4 +1,6 @@
 source("countdown.R")
+source("../3/color.R")
+library(xtable)
 options("width"=100)
 
 system("mkdir -p out")
@@ -36,7 +38,9 @@ rig <- function(n,a,b) 1/rgamma(n,a,scale=b)
 
   pdf("out/priorPred.pdf")
     plot(density(prior.y),lwd=3,col="red",main="Prior Predictive")
-    abline(v=mean(prior.y)) # mean about 4.5
+    color.den(density(prior.y),5,max(density(prior.y)$x),"red")
+    text(6,.1,round(mean(prior.y>5),4),cex=2)
+    #abline(v=mean(prior.y)) # mean about 4.5
   dev.off()
 
 gibbs <- function(B=1e5) {
@@ -125,11 +129,19 @@ M.cov <- var(M)
 #sum(M.cov > .05) / prod(dim(M.cov))
 
 # Plots for mean and variance
-pdf("postMean.pdf")  
-  plot(M.mean[1:23],col="blue",pch=20,ylim=c(4.7,6.5),type="o",main="Posterior Mean Theta's")
+pdf("out/postMean.pdf")  
+  plot(M.mean[1:23],col="blue",pch=20,
+       ylim=c(min(M.lower[1:23]),max(M.upper[1:23])),
+       type="o",main="Posterior Mean Theta's")
   lines(M.upper[1:23],col="red",type="b",pch=20)
   lines(M.lower[1:23],col="red",type="b",pch=20)
 dev.off()
+sink("out/postMeanMu.tex")
+  P <- cbind(M.mean[24:26],M.lower[24:26],M.upper[24:26],diag(M.cov)[24:26])
+  colnames(P) <- c("Mean","CI.lower","CI.upper","Var")
+  rownames(P) <- c("$\\mu$","$\\sigma^2$","$\\tau^2$")
+  xtable(P,digits=6)
+sink()
 
 plot.hyper <- function(m,names=NULL) {
   library(MASS)
@@ -138,26 +150,36 @@ plot.hyper <- function(m,names=NULL) {
   for (i in 1:k) {
     for (j in 1:k) {
       if (i<j) {
-        name <- ifelse(is.null(names),"",paste("Bivariate Trace Plot for",names[i],"&",names[j]))
+        name <- ifelse(is.null(names),"",paste("Bivariate Contour Plot for \n",names[i],"&",names[j]))
         K <- kde2d(m[,i],m[,j])
         contour(K,col="red",main=name,cex.main=.9,xlab=names[i],ylab=names[j])
       } else if (i>j) {
-        name <- ifelse(is.null(names),"",paste("Bivariate Contour Plot for",names[i],"&",names[j]))
-        plot(m[,i],m[,j],type="l",col="pink",main=name,cex.main=.9,xlab=names[i],ylab=names[j])
+        #plot(m[,i],m[,j],type="l",col="pink",main=name,cex.main=.9,xlab=names[i],ylab=names[j])
+        plot.new()
+        par(usr=c(0,1,0,1))
+        text(.5,.5,round(cov(m[,i],m[,j]),4))
+        box()
+        name <- ifelse(is.null(names),"",paste("Covariance between \n",names[i],"&",names[j]))
+        title(name,cex.main=.9)
+
       } else {
         name <- ifelse(is.null(names),"",paste("Posterior Density for",names[i]))
-        plot(density(m[,i]),col="blue",lwd=3,main=name)
+        plot(density(m[,i]),col="blue",lwd=3,main=name,cex.main=.9,xlab=names[i])
       }
     }
   }
   par(mfrow=c(1,1))
 }
-pdf("postVarTrace.pdf")
+
+
+
+pdf("out/postVarTrace.pdf")
   plot.hyper(m<-M[(nrow(M)*.8):nrow(M),24:26],c("mu","sigma2","tau2"))
+  #plot.hyper(m<-M[(nrow(M)*.8):nrow(M),22:26],c("theta22","theta23","mu","sigma2","tau2"))
+  #plot.hyper(m<-M[(nrow(M)*.8):nrow(M),23:26],c("theta23","mu","sigma2","tau2"))
 dev.off()
 
 #4: Posterior Predictive
-source("../3/color.R")
 #                     mu           tau2
 theta.pred <- rnorm(N,M[,k+1],sqrt(M[,k+3]))
 #                                    sig2
@@ -169,7 +191,7 @@ post.pred.den <- density(post.pred)
 p.gt.5 <- mean(post.pred>5)
 mx <- max(post.pred.den$x)
 
-pdf("postPred.pdf")
+pdf("out/postPred.pdf")
   plot(post.pred.den,lwd=3,col="blue",main="Posterior Predictive for Next Average Faculty Evaluation")
   color.den(post.pred.den,5,mx,col="blue")
   text(5.8,.2,round(p.gt.5,4),cex=2)
