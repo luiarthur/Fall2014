@@ -1,8 +1,9 @@
+source("countdown.R")
 options("width"=100)
 y <- as.vector(as.matrix(read.table("faculty.dat")))
 k <- length(y)
 
-dig <- function(x,a,b,log=F) {
+dig <- function(x,a,b,log=F) { # b is rate. 1/b is scale.
   out <- NULL
   if (!log) {
     out <- 1/(gamma(a)*b^a) * x^(-a-1) * exp(-1/(b*x))
@@ -15,15 +16,26 @@ dig <- function(x,a,b,log=F) {
 
 rig <- function(n,a,b) 1/rgamma(n,a,scale=b)
 
-gibbs <- function(B=1e5,cand=c(1,1,1,1)) {
+# Prior Speicifications
+  n <- 1e5
   #Priors:
-  m <- 1
-  s2 <- 1
-  as <- 1
-  bs <- 1
-  at <- 1
-  bt <- 1
+  m <- 4.5 # => E[mu] = 4.5
+  s2 <- 2  # => V[mu] = 2
+  as <- 5/2 # => E[sig2] = 1
+  bs <- 3/2 # => V[sig2] = 2
+  at <- 13/2 # => E[tau2] = 3
+  bt <- 2/33 # => V[tau2] = 2
 
+  prior.tau2 <- rig(n,at,sqrt(bt))
+  prior.sig2 <- rig(n,as,sqrt(bs))
+  prior.mu <- rnorm(n,m,sqrt(s2))
+  prior.theta <- rnorm(n,prior.mu,sqrt(prior.tau2))
+  prior.y <- rnorm(n,prior.theta,sqrt(prior.sig2))
+
+  plot(density(prior.y),lwd=3,col="red",main="Prior Predictive")
+  abline(v=mean(prior.y)) # mean about 4.5
+
+gibbs <- function(B=1e5) {
   M <- matrix(0,nrow=B,ncol=k+3) # theta[1:k],mu,sig2,tau2
   M[1,] <- 2
   
@@ -60,6 +72,7 @@ gibbs <- function(B=1e5,cand=c(1,1,1,1)) {
   }
 
   for (i in 2:B) {
+    old.time <- Sys.time()
     M[i,] <- M[i-1,]
     
     # theta[1:k],mu,sig2,tau2
@@ -80,7 +93,8 @@ gibbs <- function(B=1e5,cand=c(1,1,1,1)) {
     #print(M[i,(k+1):(k+3)])
     #print(new.tau2)
     #Sys.sleep(1)
-    cat(paste0("\r",round(i/B*100),"%"))
+    #cat(paste0("\r",round(i/B*100),"%"))
+    count.down(old.time,i,B)
   }
   
   M
