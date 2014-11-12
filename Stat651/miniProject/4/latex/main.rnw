@@ -32,7 +32,55 @@
 %  source("../mp4.R",chdir=T)
 %@
 
+\section{Introduction}
+  Student evaluations of professors are made on a 7 point scale (1=poor,
+  7=outstanding). One measure of faculty performance is the evaluation score 
+  average across all students for a given professor. We are provided with a
+  data set containing 23 average evaluation scores (for 23 professors). 
+  We would like to make inference on professor evaluation scores. 
+
+\section{Model}
+  While evaluation scores are discrete, averaged evaluation scores are 
+  continuous. And by the Central Limit Theorem, we know that sample means
+  are distributed normally when our data are approximately normal and 
+  we have a large enough sample size. Therefore, using the model
+  \[
+    Y_i \sim N(\theta_i,\sigma^2), \text{ where i = 1,...,23}
+  \]
+  is appropriate. This model implies that each professor has their own mean
+  but the same variance. This is a reasonable \& flexible assumption as 
+  professors teaching varies from teacher to teacher. \\
+  \noindent
+  Note that while $Y_i$ is normal, and may take on values less than 1 and greater
+  than 7, which are beyond the range of faculty scores. Therefore, we should 
+  take care when specifying hyper priors for our model, so that we do not 
+  frequently draw values beyond [1,7].
+
+
+
 \section{Prior Distributions}
+  \subsection{Prior Specification \& Justification}
+    I have chosen the following prior distributions for my model. And I will
+    explain my choice in the following paragraphs.
+
+    \[
+      \begin{array}{rcl}
+        Y_i|\theta_i,\sigma^2\ & \sim & N(\theta_i,\sigma^2)\\
+        \sigma^2& \sim & IG(a_{\sigma^2},b_{\sigma^2})\\
+        & & \\
+        \theta_i|\mu,\tau^2& \sim & N(\mu,\tau^2)\\
+        \mu& \sim & N(m,s^2)\\
+        \tau^2& \sim & IG(a_{\tau^2},b_{\tau^2}), \text{ where}\\
+        & & \\
+        m & = & 4.5 \\
+        s^2 & = & 2 \\
+        a_{\sigma^2} & = & 2.5 \\
+        b_{\sigma^2} & = & 2/3 \\
+        a_{\tau^2} & = & 6.5 \\
+        b_{\tau^2} & = & 2/33 \\
+      \end{array}
+    \]
+
   \subsection{Prior Predictive}
      \beginmyfig
         \includegraphics{../out/priorPred.pdf}
@@ -41,9 +89,29 @@
 
 \section{Posterior Distributions}
   \newpage
+  \subsection{Trace Plot for $\theta_1$}
+    \beginmyfig
+      \includegraphics[scale=2]{../out/traceUni.pdf}
+      %\caption{}
+    \endmyfig
+  \subsection{Posterior Distribution for $\theta_1$}  
+    \beginmyfig
+      \includegraphics[scale=2]{../out/postDistUni.pdf}
+      %\caption{}
+    \endmyfig
+
+  \newpage
+  \subsection{Trace Plots}
+    \beginmyfig
+      \includegraphics[scale=2]{../out/trace.pdf}
+      %\caption{}
+    \endmyfig
+
+
+  \newpage
   \subsection{Posterior Distributions}
     \beginmyfig
-      \includegraphics[scale=2]{../out/postVarTrace.pdf}
+      \includegraphics[scale=2]{../out/postDist.pdf}
       %\caption{}
     \endmyfig
 
@@ -53,7 +121,8 @@
       \includegraphics[scale=2]{../out/postMean.pdf}
       %\caption{}
     \endmyfig
-    \input{../out/postMeanMu.tex}
+    \input{../out/meanVar.tex}
+    %\input{../out/postMeanMu.tex}
 
 
   \newpage
