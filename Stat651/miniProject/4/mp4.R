@@ -1,5 +1,7 @@
 source("countdown.R")
 options("width"=100)
+
+system("mkdir -p out")
 y <- as.vector(as.matrix(read.table("faculty.dat")))
 k <- length(y)
 
@@ -32,8 +34,10 @@ rig <- function(n,a,b) 1/rgamma(n,a,scale=b)
   prior.theta <- rnorm(n,prior.mu,sqrt(prior.tau2))
   prior.y <- rnorm(n,prior.theta,sqrt(prior.sig2))
 
-  plot(density(prior.y),lwd=3,col="red",main="Prior Predictive")
-  abline(v=mean(prior.y)) # mean about 4.5
+  pdf("out/priorPred.pdf")
+    plot(density(prior.y),lwd=3,col="red",main="Prior Predictive")
+    abline(v=mean(prior.y)) # mean about 4.5
+  dev.off()
 
 gibbs <- function(B=1e5) {
   M <- matrix(0,nrow=B,ncol=k+3) # theta[1:k],mu,sig2,tau2
@@ -101,7 +105,7 @@ gibbs <- function(B=1e5) {
 }
 
 #1: Posterior
-M <- gibbs(B=1e4)
+M <- gibbs(B=1e5)
 M <- M[-(1:200),]
 N <- nrow(M)
 
@@ -121,9 +125,11 @@ M.cov <- var(M)
 #sum(M.cov > .05) / prod(dim(M.cov))
 
 # Plots for mean and variance
-plot(M.mean[1:23],col="blue",pch=20,ylim=c(4.7,6.5),type="o",main="Posterior Mean Theta's")
-lines(M.upper[1:23],col="red",type="b",pch=20)
-lines(M.lower[1:23],col="red",type="b",pch=20)
+pdf("postMean.pdf")  
+  plot(M.mean[1:23],col="blue",pch=20,ylim=c(4.7,6.5),type="o",main="Posterior Mean Theta's")
+  lines(M.upper[1:23],col="red",type="b",pch=20)
+  lines(M.lower[1:23],col="red",type="b",pch=20)
+dev.off()
 
 plot.hyper <- function(m,names=NULL) {
   library(MASS)
@@ -146,7 +152,9 @@ plot.hyper <- function(m,names=NULL) {
   }
   par(mfrow=c(1,1))
 }
-plot.hyper(m<-M[(nrow(M)*.8):nrow(M),24:26],c("mu","sigma2","tau2"))
+pdf("postVarTrace.pdf")
+  plot.hyper(m<-M[(nrow(M)*.8):nrow(M),24:26],c("mu","sigma2","tau2"))
+dev.off()
 
 #4: Posterior Predictive
 source("../3/color.R")
@@ -160,8 +168,11 @@ post.pred <- rnorm(N,theta.pred,sqrt(M[,k+2]))
 post.pred.den <- density(post.pred)
 p.gt.5 <- mean(post.pred>5)
 mx <- max(post.pred.den$x)
-plot(post.pred.den,lwd=3,col="blue",main="Posterior Predictive for Next Average Faculty Evaluation")
-color.den(post.pred.den,5,mx,col="blue")
-text(5.8,.2,round(p.gt.5,4),cex=2)
+
+pdf("postPred.pdf")
+  plot(post.pred.den,lwd=3,col="blue",main="Posterior Predictive for Next Average Faculty Evaluation")
+  color.den(post.pred.den,5,mx,col="blue")
+  text(5.8,.2,round(p.gt.5,4),cex=2)
+dev.off()
 
 
