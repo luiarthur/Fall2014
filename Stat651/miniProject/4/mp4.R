@@ -139,7 +139,7 @@ dev.off()
 sink("out/postMeanMu.tex")
   P <- cbind(M.mean[24:26],M.lower[24:26],M.upper[24:26],diag(M.cov)[24:26])
   colnames(P) <- c("Mean","CI.lower","CI.upper","Var")
-  rownames(P) <- c("$\\mu$","$\\sigma^2$","$\\tau^2$")
+  rownames(P) <- c("\\mu","\\sigma^2","\\tau^2")
   xtable(P,digits=6)
 sink()
 
