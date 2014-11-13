@@ -23,10 +23,10 @@ rig <- function(n,a,b) 1/rgamma(n,a,scale=b)
 # Prior Speicifications
   n <- 1e5
   #Priors:
-  m <- 4.5 # => E[mu] = 4.5
-  s2 <- 2  # => V[mu] = 2
-  as <- 5/2 # => E[sig2] = 1
-  bs <- 2/3 # => V[sig2] = 2
+  m <- 4.5   # => E[mu] = 4.5
+  s2 <- 2    # => V[mu] = 2
+  as <- 5/2  # => E[sig2] = 1
+  bs <- 2/3  # => V[sig2] = 2
   at <- 13/2 # => E[tau2] = 3
   bt <- 2/33 # => V[tau2] = 2
 
@@ -38,8 +38,9 @@ rig <- function(n,a,b) 1/rgamma(n,a,scale=b)
 
   pdf("out/priorPred.pdf")
     plot(density(prior.y),lwd=3,col="red",main="Prior Predictive")
-    color.den(density(prior.y),5,max(density(prior.y)$x),"red")
-    text(6,.1,round(mean(prior.y>5),4),cex=2)
+    color.den(density(prior.y),1,7,"red")
+    #text(6,.1,round(mean(prior.y>5),4),cex=2)
+    text(4.5,.1,round(mean(prior.y>1 & prior.y<7),4),cex=2)
     #abline(v=mean(prior.y)) # mean about 4.5, var about 3.56
   dev.off()
 
@@ -251,7 +252,7 @@ cov.M <- cov(M)
 rownames(cov.M) <- c(paste0("theta",1:23),"mu","sig2","tau2")
 colnames(cov.M) <- rownames(cov.M)
 
-pdf("cov.pdf")
+pdf("out/cov.pdf")
   a.image(cov.M,col=tim.colors(12))
 dev.off()
 
