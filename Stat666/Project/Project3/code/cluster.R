@@ -65,5 +65,16 @@ my.manova <- function(ys) {# a list of matrices
  vH <- k-1
  vE <- N-k
  
+ t <- sqrt(((p*vH)^2-4)/(p^2+vH^2-5))
+ w <- vE+vH-.5*(p+vH+1)
+ df1 <- p*vH
+ df2 <- w*t-.5*(p*vH-2)
+ lam.th.rt <- lam^(1/t)
+ F.stat <- (1-lam.th.rt)*df2/(lam.th.tr*df1)
  #see p.185 of 666 (373)
+ out <- c(F.stat,df1,df2,p(F.stat,df1,df2,lower.tail=F))
+ names(out) <- c("F.stat","df1","df2","p.val")
+ out
 }
+
+
