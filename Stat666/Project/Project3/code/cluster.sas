@@ -1,10 +1,10 @@
-data collin;
-  infile 'cleanData.txt';
-  input text $
+DATA collin;
+  INFILE 'cleanData.txt';
+  INPUT text $
         frstPrsn inrThnk thnkPstv thnkNgtv thnkAhd thnkBck reason socTies
         drctAct intract notify lnrGuide wrdPict spceInt motion pastEvnt timeInt
         shftEvnt txtCvrg genre counter corpus corpGen;
-run;  
+RUN;  
 *proc print;
 
 *proc factor corr mineigin=1 scree preplot rotate=varimax reorder plot;
@@ -13,8 +13,8 @@ run;
 *  shftEvnt;
 *run;  
 
-PROC DISCRIM method=normal pool=yes list crosslist manova;
+PROC DISCRIM method=NORMAL pool=yes LIST crosslist manova;
    CLASS group;
-   var wdim circum fbeye eyehd earhd jaw;
-   title 'LINEAR Classification Analysis';
-run;
+   VAR wdim circum fbeye eyehd earhd jaw;
+   TITLE 'LINEAR Classification Analysis';
+RUN;
