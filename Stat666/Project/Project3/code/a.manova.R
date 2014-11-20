@@ -34,5 +34,6 @@ a.manova <- function(ys) {# a list of matrices
   #see p.185 of 666 (373)
   out <- c(F.stat,df1,df2,pf(F.stat,df1,df2,lower.tail=F))
   names(out) <- c("F.stat","df1","df2","p.val")
+  out <- list("stats"=out,"E"=E,"H"=H)
   out
 }

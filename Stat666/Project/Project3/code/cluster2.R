@@ -43,20 +43,47 @@ clus.z <- lapply(clusters,function(x) x$z)
 clus.km <- lapply(clusters,function(x) x$km)
 
 manova.result <- rapply(clus.z,a.manova)
-colnames(manova.result) <- c("F.stat","df1","df2","p.val")
+
+# Changes:
+temp <- a.manova(clus.z[[1]])
+E.in.H <- solve(temp$E,temp$H)
+eig.vec <- Re(eigen(E.in.H)$vec[,1:2])
+
+x <- Z %*% eig.vec
+library(xtable)
+rownames(eig.vec) <- colnames(Z)
+sink("EH.tex")
+  xtable(eig.vec)
+sink()
+
+
+colnames(manova.result) <- c("F.stat","df1","df2","p.val","E","H")
 rownames(manova.result) <- paste0("k=",3:7)
 manova.result
 
 
 #V2:
+#Changes:
+  par(mfrow=c(1,1))
+pdf("disc.pdf")
+  plot(x, type="n", xlab="Discriminant Func. Score 1", 
+                    ylab="Discriminant Func. Score 2",main="K-means")
+  text(x, labels=clus.km[[k]]$cluster, col=clus.km[[k]]$cluster,cex=.7,lwd=9)
+  #text(x, labels=labels(Z)[[1]],col=clus.km[[k]]$cluster,cex=.6)
+  #points(cen[,1:2], pch=3, cex=3,col="blue",lwd=3)
+dev.off()
+
+
 pca <- princomp(Z)
 px <- predict(pca)
 k <- 1
 cen <- predict(pca,clus.km[[k]]$centers)
-plot(px[,1:2], type="n", xlab="PC1", ylab="PC2",main="K-means")
-text(px[,1:2], labels=clus.km[[k]]$cluster, col=clus.km[[k]]$cluster,cex=.5,lwd=9)
-text(px[,1:2], labels=labels(Z)[[1]],col=clus.km[[k]]$cluster,cex=.6)
-points(cen[,1:2], pch=3, cex=3,col="blue",lwd=3)
+pdf("pca.pdf")
+  plot(px[,1:2], type="n", xlab="PC1", ylab="PC2",main="K-means")
+  text(px[,1:2], labels=clus.km[[k]]$cluster, col=clus.km[[k]]$cluster,cex=.7,lwd=9)
+  #text(px[,1:2], labels=labels(Z)[[1]],col=clus.km[[k]]$cluster,cex=.6)
+  points(cen[,1:2], pch=3, cex=3,col="blue",lwd=3)
+dev.off()
 
 
 library(clue) # for cl_predict
@@ -88,6 +115,8 @@ library(doMC)
 registerDoMC(strtoi(system("nproc",intern=T))/2)
 error.rate <- foreach(i=1:length(ks),.combine=cbind) %dopar% (1-mean(clus.cv(Z,ks[i])) )
 colnames(error.rate) <- paste0("k=",ks)
+rownames(error.rate) <- "Error.Rate"
+
 #  error.rate
 #  k=3   k=4   k=5   k=6   k=7 
 #  0.008 0.234 0.245 0.307 0.330 
@@ -116,6 +145,26 @@ gen.prop
 a.image(gen.prop,cex.axis=.8,col=rev(heat.colors(20)),lasx=0)
 
 
+supGen.k5.cluster <- table(supGen,clus.km[[3]]$cluster)
+supGen.k5.prop <- t(apply(supGen.k5.cluster,1,function(x) x/sum(x)))
+rownames(supGen.k5.prop) <- c("Press","Non-press","Biography","Scholarship","Fiction")
+colnames(supGen.k5.prop) <- paste0("Cluster",1:5)
+supGen.k5.prop
+a.image(supGen.k5.prop,cex.axis=.8,lasx=0,col=rev(heat.colors(20)))
+
+
+gen.k5.cluster <- table(gen,clus.km[[3]]$cluster)
+gen.k5.prop <- t(apply(gen.k5.cluster,1,function(x) x/sum(x)))
+colnames(gen.k5.prop) <- paste0("Cluster",1:5)
+rownames(gen.k5.prop) <- c("Press:\nReporting","Press:\nEditorial","Press:\nReviews",
+                        "Religion","Skills\n& Hobbies","Popular\nLore","Biography",
+                        "Official\nComm.","Learned","General\nFiction",
+                        "Mystery","Science\nFiction","Adventure","Romance","Humor")
+gen.k5.prop
+a.image(gen.k5.prop,cex.axis=.8,col=rev(heat.colors(20)),lasx=0)
+
+
+
 gen <- Y$Genre
 supGen <- ifelse(gen %in% 1:3,1, ifelse(gen %in% 4:6,2, ifelse(gen == 7,3, ifelse(gen %in% 8:9,4,5))))
 
@@ -140,9 +189,18 @@ cv.supGen <- function(Z) {
 
 error.rate.supGen <- cv.supGen(Z)
 err.natural.v.supGen <- c(error.rate.supGen,error.rate[3])
-names(err.natural.v.supGen) <- c("Super.Genres","Natural,k=5")
+err.natural.v.supGen <- matrix(err.natural.v.supGen,1)
+colnames(err.natural.v.supGen) <- c("Super.Genres","Natural,k=5")
+rownames(err.natural.v.supGen) <- c("Error Rate")
+err.natural.v.supGen
 #  err.natural.v.supGen
 #  Super.Genres  Natural,k=5 
 #         0.363        0.245
 
+sink("errRate.tex")
+  xtable(error.rate)
+sink()  
 
+sink("errVS.tex")
+  xtable(err.natural.v.supGen)
+sink()
