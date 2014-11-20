@@ -13,6 +13,13 @@
 \definecolor{rose}{rgb}{1.0, 0.01, 0.24}
 \definecolor{blue}{rgb}{0.0, 0.0, 1.0}
 \definecolor{green}{rgb}{0.0, 1.0, 0.0}
+\definecolor{orange}{rgb}{1,0.5,0}
+\definecolor{violet}{rgb}{0.58, 0.0, 0.83}
+\def\green#1{\textcolor{green}{#1}}
+\def\blue#1{\textcolor{blue}{#1}}
+\def\red#1{\textcolor{red}{#1}}
+\def\orange#1{\textcolor{orange}{#1}}
+\def\violet#1{\textcolor{violet}{#1}}
 
 
 \begin{document}
@@ -201,9 +208,11 @@ Press: Reporting & \textcolor{rose}{0.86} & 0.11 & 0.02 \\
   Adventure & 0.03 & 0.00 & \textcolor{green}{0.97} \\ 
   Romance & 0.02 & 0.02 & \textcolor{green}{0.97} \\ 
   Humor & 0.06 & 0.06 & \textcolor{green}{0.89} \\ 
-   \hline
+  \hline
 \end{tabular}
 \end{table}
+
+\input fifteenByFive.tex
 
 \noindent Notice that texts for some of the genre's fall predominately into one
 cluster.  In some sense, our natural clusters have classified some genre's
@@ -216,4 +225,3 @@ cluster 1 the somewhat subjective non-fiction.
 
 
 \end{document}
-
