@@ -36,7 +36,7 @@ get.clusters <- function(Z,k=3) { #z=standardized data, k=num of clusters
 }
 
 ks <- 3:7 # number of clusters
-clusters <- lapply(as.list(ks),function(x) get.clusters(Z,x))
+clusters <- lapply(as.list(ks),function(x) get.clusters(Z[,1:15],x))
 clus.z <- lapply(clusters,function(x) x$z)
 clus.km <- lapply(clusters,function(x) x$km)
 
@@ -70,13 +70,44 @@ clus.cv <- function(Z,k=3) { # Z is your standardized data, k is # of clusters
   out
 }
 
-error.rate <- NULL
-for (i in 1:length(ks)) {
-  print(paste0("Iteration ",i,":"))
-  error.rate[i] <- 1-mean(clus.cv(Z,ks[i]))
+library(doMC)
+registerDoMC(strtoi(system("nproc",intern=T))/2)
+error.rate <- foreach(i=1:length(ks),.combine=cbind) %dopar% (1-mean(clus.cv(Z,ks[i])) )
+colnames(error.rate) <- paste0("k=",ks)
+error.rate
+#  error.rate
+#  k=3   k=4   k=5   k=6   k=7 
+#  0.008 0.234 0.245 0.307 0.330 
+
+#1: Press
+#2: Non-press
+#3: Biography
+#4: Scholarship
+#5: Fiction
+
+gen <- Y$Genre
+supGen <- ifelse(gen %in% 1:3,1, ifelse(gen %in% 4:6,2, ifelse(gen == 7,3, ifelse(gen %in% 8:9,4,5))))
+
+cv.supGen <- function(Z) {
+  euclid.dist <- function(x,y) sum((x-y)^2)
+
+  one.out.centroid <- function(i) {
+    z <- as.list(unique(supGen))
+    z <- lapply(z,function(x) Z[which(supGen[-i]==x),])
+    centroid <- rapply(z,function(x) apply(x,2,mean))
+    centroid
+  }
+
+  n <- nrow(Z) 
+  clust <- NULL
+  for (i in 1:n) {
+    centroid <- one.out.centroid(i)
+    clust[i] <- which.min(apply(centroid,1,function(x) euclid.dist(x,Z[i,])))
+  }
+  1-mean(clust==supGen)
 }
 
-names(error.rate) <- paste0("k=",ks)
-error.rate
-
-
+error.rate.supGen <- cv.supGen(Z)
+err.natural.v.supGen <- c(error.rate.supGen,error.rate[3])
+names(err.natural.v.supGen) <- c("Super.Genres","Natural,k=5")
+err.natural.v.supGen
