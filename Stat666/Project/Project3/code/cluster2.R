@@ -3,6 +3,7 @@ source("a.manova.R")
 source("lrbind.R")
 source("rapply.R")
 source("countdown.R")
+source("a.image.R")
 
 X <- read.table("collins.txt",header=T)
 write.table(X,quote=F,col.names=F,row.names=F,file="cleanData.txt")
@@ -89,16 +90,17 @@ supGen.prop <- t(apply(supGen.k3.cluster,1,function(x) x/sum(x)))
 rownames(supGen.prop) <- c("Press","Non-press","Biography","Scholarship","Fiction")
 colnames(supGen.prop) <- paste0("Cluster",1:3)
 supGen.prop
-
+a.image(supGen.prop,cex.axis=.8,lasx=0,col=rev(heat.colors(20)))
 
 gen.k3.cluster <- table(gen,clus.km[[1]]$cluster)
 gen.prop <- t(apply(gen.k3.cluster,1,function(x) x/sum(x)))
 colnames(gen.prop) <- colnames(supGen.prop)
-rownames(gen.prop) <- c("Press: Reporting","Press: Editorial","Press: Reviews",
-                        "Religion","Skills & Hobbies","Popular Lore","Biography",
-                        "Official Communications","Learned","General Fiction",
-                        "Mystery","Science Fiction","Adventure","Romance","Humor")
+rownames(gen.prop) <- c("Press:\nReporting","Press:\nEditorial","Press:\nReviews",
+                        "Religion","Skills\n& Hobbies","Popular\nLore","Biography",
+                        "Official\nComm.","Learned","General\nFiction",
+                        "Mystery","Science\nFiction","Adventure","Romance","Humor")
 gen.prop
+a.image(gen.prop,cex.axis=.8,col=rev(heat.colors(20)),lasx=0)
 
 
 gen <- Y$Genre
