@@ -12,9 +12,9 @@ rownames(X) <- X[,1]
 Y <- X[,-1]
 Z <- scale(Y[,1:18])
 
-get.clusters <- function(Z,k=3) { #z=standardized data, k=num of clusters
+get.clusters <- function(Z,k=3,meth="ward.D") { #z=standardized data, k=num of clusters
   D <- dist(Z)
-  link <- hclust(D,method="ward.D")
+  link <- hclust(D,method=meth)
   grp <- cutree(link,k=k)
 
   z <- as.list(1:k)
@@ -37,7 +37,8 @@ get.clusters <- function(Z,k=3) { #z=standardized data, k=num of clusters
 }
 
 ks <- 3:7 # number of clusters
-clusters <- lapply(as.list(ks),function(x) get.clusters(Z[,1:15],x))
+clusters <- lapply(as.list(ks),function(x) get.clusters(Z,x,"ward.D2"))
+#clusters <- lapply(as.list(ks),function(x) get.clusters(Z,x,"complete"))
 clus.z <- lapply(clusters,function(x) x$z)
 clus.km <- lapply(clusters,function(x) x$km)
 
@@ -45,6 +46,18 @@ manova.result <- rapply(clus.z,a.manova)
 colnames(manova.result) <- c("F.stat","df1","df2","p.val")
 rownames(manova.result) <- paste0("k=",3:7)
 manova.result
+
+
+#V2:
+pca <- princomp(Z)
+px <- predict(pca)
+k <- 1
+cen <- predict(pca,clus.km[[k]]$centers)
+plot(px[,1:2], type="n", xlab="PC1", ylab="PC2",main="K-means")
+text(px[,1:2], labels=clus.km[[k]]$cluster, col=clus.km[[k]]$cluster,cex=.5,lwd=9)
+text(px[,1:2], labels=labels(Z)[[1]],col=clus.km[[k]]$cluster,cex=.6)
+points(cen[,1:2], pch=3, cex=3,col="blue",lwd=3)
+
 
 library(clue) # for cl_predict
 clus.cv <- function(Z,k=3) { # Z is your standardized data, k is # of clusters
