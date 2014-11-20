@@ -74,7 +74,6 @@ library(doMC)
 registerDoMC(strtoi(system("nproc",intern=T))/2)
 error.rate <- foreach(i=1:length(ks),.combine=cbind) %dopar% (1-mean(clus.cv(Z,ks[i])) )
 colnames(error.rate) <- paste0("k=",ks)
-error.rate
 #  error.rate
 #  k=3   k=4   k=5   k=6   k=7 
 #  0.008 0.234 0.245 0.307 0.330 
@@ -84,6 +83,23 @@ error.rate
 #3: Biography
 #4: Scholarship
 #5: Fiction
+
+supGen.k3.cluster <- table(supGen,clus.km[[1]]$cluster)
+supGen.prop <- t(apply(supGen.k3.cluster,1,function(x) x/sum(x)))
+rownames(supGen.prop) <- c("Press","Non-press","Biography","Scholarship","Fiction")
+colnames(supGen.prop) <- paste0("Cluster",1:3)
+supGen.prop
+
+
+gen.k3.cluster <- table(gen,clus.km[[1]]$cluster)
+gen.prop <- t(apply(gen.k3.cluster,1,function(x) x/sum(x)))
+colnames(gen.prop) <- colnames(supGen.prop)
+rownames(gen.prop) <- c("Press: Reporting","Press: Editorial","Press: Reviews",
+                        "Religion","Skills & Hobbies","Popular Lore","Biography",
+                        "Official Communications","Learned","General Fiction",
+                        "Mystery","Science Fiction","Adventure","Romance","Humor")
+gen.prop
+
 
 gen <- Y$Genre
 supGen <- ifelse(gen %in% 1:3,1, ifelse(gen %in% 4:6,2, ifelse(gen == 7,3, ifelse(gen %in% 8:9,4,5))))
@@ -110,4 +126,8 @@ cv.supGen <- function(Z) {
 error.rate.supGen <- cv.supGen(Z)
 err.natural.v.supGen <- c(error.rate.supGen,error.rate[3])
 names(err.natural.v.supGen) <- c("Super.Genres","Natural,k=5")
-err.natural.v.supGen
+#  err.natural.v.supGen
+#  Super.Genres  Natural,k=5 
+#         0.363        0.245
+
+
