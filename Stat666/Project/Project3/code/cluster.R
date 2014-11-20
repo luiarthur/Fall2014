@@ -10,7 +10,6 @@ lrbind <- function(L) { #rbinds a list of matrices
   out
 }
 
-
 X <- read.table("collins.txt",header=T)
 write.table(X,quote=F,col.names=F,row.names=F,file="cleanData.txt")
 
@@ -23,16 +22,16 @@ D <- dist(Z)
 wardlink <- hclust(D,method="ward.D")
 plot(wardlink,labels=rownames(Y),cex=.0001)
 
-grps <- as.list(1:7)
+grps <- as.list(3:7)
 grps <- lapply(grps,function(x) cutree(wardlink,k=x))
 
-centers <- as.list(1:7)
-z <- as.list(1:7)
-for (i in 1:7) {
-  z[[i]] <- as.list(1:i)
-  centers[[i]] <- matrix(0,i,ncol(Z))
-  for (j in 1:i){
-    # e.g. z[[3]][[2]] <- for k=3, get the 2nd cluster
+centers <- as.list(3:7)
+z <- as.list(3:7)
+for (i in 1:5) {#3:7
+  z[[i]] <- as.list(1:(i+2))
+  centers[[i]] <- matrix(0,i+2,ncol(Z))
+  for (j in 1:(i+2)){
+    # e.g. z[[1]][[2]] <- for k=3, get the 2nd cluster
     z[[i]][[j]] <- Z[which(grps[[i]]==j),]
     centers[[i]][j,] <- apply(z[[i]][[j]],2,mean)
   }
@@ -40,7 +39,7 @@ for (i in 1:7) {
 
 km <- as.list(3:7)
 for (i in 3:7) {
-  km[[i-2]] <- kmeans(Z,centers[[i]])
+  km[[i-2]] <- kmeans(Z,centers[[i-2]])
 }
 km.grps <- lapply(km,function(x) x$cluster) #k=3:7
 
@@ -101,4 +100,9 @@ for (i in 3:7) {
 colnames(manova.result) <- c("F.stat","df1","df2","p.val")
 rownames(manova.result) <- paste0("k=",3:7)
 manova.result
+
+
+# Test predict.kmean
+library(clue)
+cl_predict(km[[1]],Z[999:1000,])
 
