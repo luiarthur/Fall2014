@@ -1,0 +1,142 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath}
+\usepackage[margin =1 in]{geometry}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{times}
+\usepackage{rotating}
+%\usepackage[pdftex]{hyperref}
+\usepackage{hyperref}
+\usepackage{setspace}
+\newcommand{\overbar}[1]{\mkern 1mu\overline{\mkern-1mu#1\mkern-1mu}\mkern 1mu}
+\usepackage[usenames,dvipsnames]{xcolor}
+\definecolor{rose}{rgb}{1.0, 0.01, 0.24}
+\definecolor{blue}{rgb}{0.0, 0.0, 1.0}
+\definecolor{green}{rgb}{0.0, 1.0, 0.0}
+
+
+\begin{document}
+\onehalfspacing
+
+\title{Mini Project IV \\
+Clustering Texts} 
+\author{Arthur Lui \and Jared Ward}
+
+\maketitle
+
+\section*{Introduction}
+Recent interest in identifying authorship of written text by an analytical analysis of the text has opened the doors to some interesting research in this arena. In this study, we compare categorical clusterings of texts by genre to the unsupervised clusterings. These unsupervised clusterings are created through usage of summary statistics that summarize a writers style. We have 18 indicators of style, including how much an author writes in first person, the motion or spacing of the text, and others.  Jeff Collins \footnote{https://tofu.byu.edu/stat666/assignments/DissertationOn18RhetoricalCategories.pdf} study on textual analysis contains a more complete listing of the variables used and how they are quantified. 
+\\
+\\
+We have 1000 texts, with 15 common genres for which these texts fall under. We wish to analyze how natural groupings compare to the way the texts are currently classified, as well as compare how 5 clusters grouped naturally compare to 5 "super genres" comprising the following: Press, Non-press Nonfiction, Biography, Scholarship and Official Documents, Fiction. 
+\\
+\\
+How well do authors styles within a genre categorize texts? Do Authors writing styles stick to genre or is there significant overlap? This analysis will help uncover some statistics governing these phenomenon.  
+
+\section*{Clustering the Texts}
+We begin by clustering the texts into groups of 3,4,5,6, and 7. That is we create 3 clusters of the 1000 texts, then a separate 4 clusters, and so on to 7. The clusters are initially created using Ward's Linkage, then bettered using an iterative algorithm called k-means.
+
+\subsection*{Ward's Linkage}
+There are a variety of ways to create clusters. One reasonable method to get clusters is using Ward's Linkage. This method begins by taking the closest 2 points using squared euclidean distance and makes a cluster of them (closest in 18 space). The algorithm then considers the next two closets points, now considering the centroid of the pair just created as a point. So if the closest 2 points of the data (excluding the pair made in the last step) is the centroid of the couplet just created and another point, the cluster created in the first step becomes a triplet. Otherwise, another couplet is formed, and centroid is considered as a "point" when considering the next cluster to create. This process is continued and tell specified number of clusters are created. 
+
+\subsection*{K-means}
+Another way to calculate clusters is using the k-means method. K-means creates clusters by moving observations across groups until the sums of squares for each observations euclidian distance to its group mean is minimized. The process begins by selecting an initial set of clusters. Observations are then moved to the group with the nearest centroid (using the metric of euclidian distance). Centroids are recalculated, and the process repeated until none of the observations move clusters.  
+\\
+\\
+A criticism of this method is that you need to select initial starting groups, and different starting groups don't necessarily converge to the same final groups. To utilize this idea of maximizing distance between groups, some propose beginning with multiple sets of random starts then choosing the best set of final groups. We instead use Ward's Linkage to get a decent starting set of groupings, and better the better the classification of observations into groups by using the k-means algorithm.
+
+\subsection*{Selecting the Best Set of Clusters}
+Now we have a best set of clusters for k$=$3,4,5,6, and 7 clusters. Choosing how many clusters we should use is a somewhat subjective procedure. We first conduct a manova test of the following form: 
+\\
+\indent $H_0$: There is no difference of means: $\bf{\mu}_{1} = \bf{\mu}_{2} = ... = \bf{\mu}_{k}$ VS 
+\\
+\indent $H_0$: At least one $\bf{\mu}_{j}$ is different from the others: $\bf{\mu}_{j} \ne \bf{\mu}_{i}$ for some $i \ne j$
+\\
+where k is the number of clusters, $\bf{\mu}_{j}$ is the cluster mean for the $j^{th}$ cluster, and $i$, $j$ $\in$ 1,...,k.
+\\
+\\ 
+However, in each case the null hypothesis is rejected with $p<.0001$. This is expected, we hope the clustering are statistically different. As a second selection method, we look at misclassification rates for each set of clusters. This is done by calculating the best clusters, then (using the same calculating procedure) recalculating clusters holding out one observation. 
+\\
+\\
+Once new clusters are obtained, we then see if the hold-out observation is predicted back into the same group it was originally a part of, i.e. is the observation still closest to the mean of the original cluster it was in. If it is not the case, we say this point has been misclassified. This method demonstrates the stability of the clusters. We repeat this process for all 1000 data points and calculate the percentage misclassified for each of the clusters of 3,4,5,6, and 7. The results are included in the following table.
+
+%INCLUDE TABLE OF MISCLASSIFICATION RATES FOR CLUSTERS OF SIZE K
+
+\noindent Cluster 3 has the lowest misclassification rate. We would expect grouping to be more distinct for smaller sets of groups, and in fact we see that misclassification rates increase with number of clusters. This procedure is again somewhat objective, but group 3 seems to have a much lower misclassification rate than the others, so we choose $k=3$.
+
+\section*{Attributes of Clusters}
+Our clusters live in $s-space$ defined by $min(p,k-1)$ where $p$ is the number of variables in each observation (18) and $k$ is the number of clusters (3). So $s=2$. This implies there is a plane that spans the space of best separation for the group means, unless their means are somewhat collinear in which case the plane that best separates the means can be collapsed to essentially a line. In Our case the eigenvalues of the matrix containing the 3 sets of means are 3.36, 1.69, and 0. 
+\\
+\\
+This implies $\lambda_1$, and corresponding eigenvector contains 66 percent of the variation of the plane in one direction. This certainly means there is more separation in one direction than in the perpendicular direction defined by $\lambda_2$ and corresponding eigenvector, but that to span the space of best separation, we really need this 2-D plane.
+
+% latex table generated in R 3.0.2 by xtable 1.7-1 package
+% Thu Nov 20 07:01:23 2014
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrlrr}
+  \hline
+ & vector 1 &  &  & vector 2 \\ 
+  \hline
+1 & \bf{0.28} &  & 1 & -0.21 \\ 
+  2 & -0.02 &  & 2 & \bf{-0.52} \\ 
+  3 & 0.01 &  & 3 & -0.04 \\ 
+  4 & -0.02 &  & 4 & \bf{-0.31} \\ 
+  5 & -0.10 &  & 5 & -0.16 \\ 
+  6 & \bf{0.20} &  & 6 & -0.15 \\ 
+  7 & -0.08 &  & 7 & \bf{-0.52} \\ 
+  8 & \bf{-0.32} &  & 8 & -0.25 \\ 
+  9 & -0.08 &  & 9 & -0.04 \\ 
+  10 & \bf{0.24} &  & 10 & \bf{-0.30} \\ 
+  11 & \bf{-0.31} &  & 11 & -0.04 \\ 
+  12 & \bf{0.36} &  & 12 & -0.24 \\ 
+  13 & \bf{0.26} &  & 13 & 0.19 \\ 
+  14 & \bf{0.35} &  & 14 & -0.01 \\ 
+  15 & \bf{0.25} &  & 15 & 0.10 \\ 
+  16 & \bf{0.36} &  & 16 & -0.00 \\ 
+  17 & -0.14 &  & 17 & 0.07 \\ 
+  18 & \bf{0.25} &  & 18 & 0.08 \\ 
+   \hline
+\end{tabular}
+\caption{Significant Components of Eigenvectors} 
+\end{table}
+
+\noindent More variability in the variables corresponding to the bolded components for each eigenvector are going to best separate texts in each direction of the plane respectively.
+\\
+\newpage
+Note the table below that shows which proportion of the 15 genre's were put into each of the 3 groups. 
+
+% latex table generated in R 3.0.2 by xtable 1.7-1 package
+% Thu Nov 20 07:18:46 2014
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrr}
+  \hline
+ & Cluster 1 & Cluster 2 & Cluster 3 \\ 
+  \hline
+Press: Reporting & \textcolor{rose}{0.86} & 0.11 & 0.02 \\ 
+  Press: Editorial & 0.17 & \textcolor{blue}{0.80} & 0.04 \\ 
+  Press: Reviews & \textcolor{rose}{0.79} & 0.18 & 0.03 \\ 
+  Religion & 0.09 & \textcolor{blue}{0.88} & 0.03 \\ 
+  Skills and Hobbies & \textcolor{rose}{0.67} & 0.29 & 0.04 \\ 
+  Popular Lore & 0.42 & 0.49 & 0.09 \\ 
+  Biography & 0.33 & 0.51 & 0.16 \\ 
+  Official Communications & 0.53 & 0.47 & 0.00 \\ 
+  Learned & 0.40 & 0.59 & 0.01 \\ 
+  General Fiction & 0.02 & 0.02 & \textcolor{green}{0.97} \\ 
+  Mystery & 0.02 & 0.00 & \textcolor{green}{0.98} \\ 
+  Science Fiction & 0.00 & 0.08 & \textcolor{green}{0.92} \\ 
+  Adventure & 0.03 & 0.00 & \textcolor{green}{0.97} \\ 
+  Romance & 0.02 & 0.02 & \textcolor{green}{0.97} \\ 
+  Humor & 0.06 & 0.06 & \textcolor{green}{0.89} \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+\noindent Notice that texts for some of the genre's fall predominately into one cluster.  In some sense, our natural clusters have classified some genre's primarily into one cluster, and similar genre's have been grouped together. Cluster 3 seems to be the fiction cluster, while cluster 2 and 3 seem to kind of share the rest. There seems to be more objective non-fiction in cluster 2, and cluster 1 the somewhat subjective non-fiction.
+
+
+
+\end{document}
+
+
