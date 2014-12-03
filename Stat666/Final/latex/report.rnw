@@ -21,7 +21,7 @@
 \begin{document}                                                          %
 % my title:                                                               %
 \begin{center}                                                            %
-  \section*{\textbf{Stat651 Mini Project 4}}                              %
+  \section*{\textbf{Stat666 Final Project - The Indian Buffet Process}}   %
   \subsection*{\textbf{Arthur Lui}}                                       %
   \subsection*{\noindent\today}                                           %
 \end{center}                                                              %
