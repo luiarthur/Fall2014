@@ -1,7 +1,7 @@
 #rm(list=ls())
 library(expm)
 library(MASS)
-source("a.image.R")
+source("rfunctions.R")
 
 tr <- function(m) sum(diag(m))
 
