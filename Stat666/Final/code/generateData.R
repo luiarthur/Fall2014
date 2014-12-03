@@ -44,3 +44,5 @@ sigX <- .5
 E <- matrix(rnorm(prod(dim(ZA)),0,sigX),dim(ZA)[1],dim(ZA)[2])
 Y <- ZA + E
 
+
+
