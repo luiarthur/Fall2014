@@ -1,3 +1,4 @@
+source("rfunctions.R")
 source("ibp.R")
 source("generateData.R")
 source("gibbs.R")

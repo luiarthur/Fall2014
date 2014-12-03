@@ -1,3 +1,4 @@
+source("rfunctions.R")
 gibbs.post <- function(X=Y,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
                        a.a=1,a.b=1,plotProgress=F) {
   B <- ceiling(B/50)*50 
