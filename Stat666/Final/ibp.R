@@ -1,11 +1,7 @@
 #rm(list=ls())
 library(expm)
 library(MASS)
-
-a.image <- function(Q,color=paste0("gray",0:100),...) {
-  image(t(apply(Q,2,rev)),yaxt="n",xaxt="n",col=color,...)
-}
-
+source("a.image.R")
 
 tr <- function(m) sum(diag(m))
 
