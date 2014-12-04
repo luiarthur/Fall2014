@@ -166,14 +166,17 @@ binary image. Gaussian noise was added to the same image to generate 10 $6
 these images were stacked together to form one large $90 \times 36$ matrix.
 (Note that I did not know the design of these images before hand. The images
 could be letters, numbers, interesting patterns, pokemon faces, etc.) Figure2
-displays the data from the nine Stat666 students.
+displays the data from the nine Stat666 students.\\
 
 \beginmyfig
   \caption{Data From Nine Stat666 Students}
   \includegraphics{../code/draw.post.out/Y.pdf}
 \endmyfig
 
-
+\noindent
+Using a Gibbs sampler, with initial $\alpha=1$, initial $\bm Z$ = a random draw
+from an IBP(.5), after 1000 iterations, I get the following results.
+\textbf{I STOPPED HERE. PICK UP HERE!!!}
 
 
 \section{Conclusion}
