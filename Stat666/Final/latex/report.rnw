@@ -8,11 +8,13 @@
 \usepackage{verbatim}                                                     %
 \usepackage{appendix}                                                     %
 \usepackage{graphicx}
+\usepackage{float}
 \usepackage[UKenglish]{isodate} % for: \today                             %
 \cleanlookdateon                % for: \today                             %
                                                                           %
 \def\wl{\par \vspace{\baselineskip}\noindent}                             %
-\def\beginmyfig{\begin{figure}[!htbp]\begin{center}}                      %
+%\def\beginmyfig{\begin{figure}[!Htbp]\begin{center}}                     %
+\def\beginmyfig{\begin{figure}[H]\begin{center}}                          %
 \def\endmyfig{\end{center}\end{figure}}                                   %
 \def\prodl{\prod\limits_{i=1}^n}                                          %
 \def\suml{\sum\limits_{i=1}^n}                                            %
@@ -28,18 +30,75 @@
 \setkeys{Gin}{width=0.5\textwidth}                                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%<<design,echo=F>>=
-%  source("../mp4.R",chdir=T)
-%@
+<<design,echo=F>>=
+  source("../code/ibp.R",chdir=T)
+@
 
+% Between 6 & 8 pages
 \section{Introduction} % < 1 page
+One key problem in recovering the latent structure responsible for generating
+observed data is determining the number of latent features. The Indian Buffet
+process (IBP) provides a flexible distribution for sparse binary matrices with
+infinite dimensions (i.e. finite number of rows, and infinite number of columns).
+When used as a prior distribution in a latent feature model, the IBP can
+learn the number of latent features generating the observations because it can
+draw binary matrices which have a potentially infinite number of columns. I will
+use the IBP as a prior distribution in a Gaussian latent feature model to
+recover the latent structures generating the observations.\\
 
 \section{Model} % 3-4 pages
+The IBP is a distribution for sparse binary matrices with finite number of rows
+and potentially infinite number of columns. The process of generating a
+realization from the IBP can be described by an analogy involving Indian buffet
+restaurants.\\
+
+\noindent
+Let $Z$ be an $N \times \infty$ binary matrix. Each row in $Z$ represents a
+customer which enters an Indian buffet and each column represents a dish in the
+buffet. Customers enter the restaurant one after another. The first customer
+samples an $r=Poisson(\alpha)$ number of dishes, where $\alpha > 0$ is a mass
+parameter which influences the final number of sampled dishes. This is
+indicated in by setting the first r columns of the first row in $Z$ to be $1$.
+The other values in the row are set to $0$. Each subsequent customer samples
+each previously sampled dish with probability proportional to its popularity.
+That is, the next customer samples dish $k$ with probability $\frac{m_k}{i}$,
+where $m_k$ is the number of customers that sampled dish $k$, and $i$ is the
+current customer number (or row number in $Z$). Each customer also samples an
+additional $Poisson(\alpha/i)$ number of new dishes. Once all the $N$ customers
+have gone through this process, the resulting $Z$ matrix will be a draw from
+the Indian buffet process with mass parameter $\alpha$. In other words, $Z \sim
+IBP(\alpha)$. Note that $\alpha \propto K$, where $K$ is the final number of
+sampled dishes (occupied columns). Figure1 shows a draw from an IBP(10) with 50
+rows. The white squares are 1, indicating that a dish was taken; black squares
+are0, indicating that a dish was not taken. \\
+\beginmyfig
+\caption{IBP($N=50$, $\alpha=10$)}
+<<fig=T,echo=F,height=3.7>>=
+  opts <- par()
+    #par(bg="blue",mar=c(1,1,1,1))
+    par(mar=c(0,0,0,0))
+    a.image(rIBP(50,10))
+  par(opts)
+@
+\endmyfig
 
 \section{Example (Data Analysis)} % 2-3 pages
 
 \section{Conclusion}
 
 \section{Appendix -  Data \& Code}
-  %\verbatiminput{}
+  \subsection{generateData.R}
+  \verbatiminput{../code/generateData.R}
+  \subsection{ibp.R}
+  \verbatiminput{../code/ibp.R}
+  \subsection{gibbs.R}
+  \verbatiminput{../code/gibbs.R}
+  \subsection{rfunctions.R}
+  \verbatiminput{../code/rfunctions.R}
+  \subsection{patterns.R}
+  \verbatiminput{../code/patterns.R}
+  \subsection{Data}
+  \verbatiminput{../Y.dat}
+
+
 \end{document}
