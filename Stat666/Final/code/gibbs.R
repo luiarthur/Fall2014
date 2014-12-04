@@ -149,7 +149,7 @@ gibbs.post <- function(X=Y,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
     #a.a <- a.a+ncol(z)
     #a.b <- (1/a.b+Hn)^(-1)
     #alpha[b] <- rgamma(1,a.a,scale=a.b)
-    alpha[b] <- rgamma(1,1+ncol(z),scale=1/(1+Hn))
+    alpha[b] <- rgamma(1,a.a+ncol(z),scale=1/(1/a.b+Hn))
     Zs[[b]] <- z
     
     if (b %% 50 == 0) {
