@@ -127,9 +127,11 @@ Note that a conjugate prior for $\alpha$ is a Gamma distribution.
     p(\alpha|\bm Z) & \propto & \alpha^{K_+} e^{-\alpha H_N}  
                                 \alpha^{a-1} e^{-\alpha/b}\\
     p(\alpha|\bm Z) & \propto & \alpha^{a+K_+-1} e^{-\alpha(1/b+H_N)}\\
-    \alpha|\bm Z & \sim & Gamma(a+K_+, (1/b+H_N)^{-1})
   \end{array}
 \]
+\begin{equation}
+  \alpha|\bm Z  \sim  Gamma(a+K_+, (1/b+H_N)^{-1})
+\end{equation}
 
 \noindent
 %\section{Example (Data Analysis)} % 2-3 pages
@@ -140,9 +142,9 @@ Suppose, we observe an $N \times D$ matrix $\bm X$, and we believe
 \]
 where $\bm Z|\alpha \sim IBP(\alpha)$, 
 $\bm A \sim MVN(\bm 0,{\sigma_A}^2\textbf{I})$, 
-$\bm E \sim MVN(\bm 0,{\sigma_X}^2\textbf{I})$, 
-$alpha ~ Gamma(1,1)$,
-$\sigma_A=1$, and $\sigma_X=.5$.\\
+$\bm E \sim MVN(\bm 0,{\sigma_X}^2\textbf{I})$. 
+%$\alpha ~ Gamma(1,1)$,
+%$\sigma_A=1$, and $\sigma_X=.5$.\\
 
 \noindent
 It can be shown that
@@ -156,27 +158,60 @@ It can be shown that
                 \bm X\}            
 \end{equation}
 Now, we can use equation (2) to implement a Gibbs sampler to draw from the 
-posterior $\bm Z|X,\alpha$.
+posterior $\bm{Z|X},\alpha$.
 
-\subsection{Data}
-Each of nine Stat666 students created a $6 \times 6$ binary image. To the
+\subsection{Data \& Results}
+Each of ten Stat666 students created a $6 \times 6$ binary image. To the
 image, Gaussian noise (mean=0,variance=.25) was added to each cell of the
 binary image. Gaussian noise was added to the same image to generate 10 $6
 \times 6$ images. These images were turned into row $1 \times 36$ vectors. All
 these images were stacked together to form one large $90 \times 36$ matrix.
 (Note that I did not know the design of these images before hand. The images
 could be letters, numbers, interesting patterns, pokemon faces, etc.) Figure2
-displays the data from the nine Stat666 students.\\
+displays the data from the ten Stat666 students.\\
 
 \beginmyfig
-  \caption{Data From Nine Stat666 Students}
+  \caption{Data From Ten Stat666 Students}
   \includegraphics{../code/draw.post.out/Y.pdf}
 \endmyfig
 
 \noindent
-Using a Gibbs sampler, with initial $\alpha=1$, initial $\bm Z$ = a random draw
-from an IBP(.5), after 1000 iterations, I get the following results.
-\textbf{I STOPPED HERE. PICK UP HERE!!!}
+A Gibbs sampler was implemented to retrieve Posterior distributions for $\bm Z$
+$\bm A$, and $\alpha$. $\alpha$ was initially set to $1$, and the posterior for
+$\alpha$ was obtained by equation (3) with prior distribution $Gamma(3,2)$.
+The parameters were chosen such that $alpha$ was centered at 6 and had a
+variance of 12, as I believed I may have many latent features, but my
+uncertainty was high.  Equation(2) was used to retrieve the posterior
+distribution (a collection of binary matrices). After 1000 iterations, the
+trace plot for the number of columns in the binary matrices drawn were plotted.
+(See Figure 3.) Diagnostics for a cell by cell trace plot could also be
+plotted, but may be too difficult to analyze as the dimensions of the matrices
+are changing.\\
+\beginmyfig
+  \caption{}
+  \includegraphics{../code/draw.post.out/traceplot.pdf}
+\endmyfig
+\beginmyfig
+  \caption{}
+  \includegraphics{../code/draw.post.out/tracealpha.pdf}
+\endmyfig
+\noindent
+The number of columns in $\bm Z$ appears to have converged to 8. This means that
+the number of latent features discovered appears to be 8. This is reasonable as
+the image $\bm X$ is comprised of 10 students' images. A burn-in of the first
+200 draws were removed. Then, the 800 $\bm Z$ matrices were superimposed, summed
+element by element, and divided by 800. Cells that had values $> .9$ were set
+to 1; and 0 otherwise. This is not necessary, but this removes the columns that
+were not likely to exist. For instance, from the trace plot (Figure3), we see
+that there are three instances where the number of columns in $\bm Z$ was $9$.
+Three instances out of 800 is not significantly large enough to say that those
+latent features are generating the observed data. So, the nineth column was
+removed. The resulting matrix, I will call the posterior mean for $\bm Z$. 
+The trace plot for $\alpha$ (Figure 4) shows that $\alpha$ appears to have
+converged, with mean $=1.92$ and variance $=.324$. Below are the posterior 
+mean for $\bm Z$, posterior for $\alpha$, and posterior for $\bm A$, calculated
+as $E[\bm{A|X,Z}] = (\bm Z^T\bm Z + \frac{\sigma_X^2}{\sigma_A^2}
+\textbf{I})^{-1}\bm Z^T \bm X$.
 
 
 \section{Conclusion}

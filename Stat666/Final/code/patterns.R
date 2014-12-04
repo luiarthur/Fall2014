@@ -17,10 +17,25 @@ n.col <- unlist(lapply(M,ncol))
 
 pdf("draw.post.out/traceplot.pdf")
   plot(n.col,type="l",main="Trace Plot: Number of Columns in Z",lwd=1,cex=.1,
-       col="blue",pch=20)
-  abline(h=mean(n.col[-(1:burn)]),lwd=2,col="red")
+       col="gray30",pch=20)
+  mean.col <- round(mean(n.col[-(1:burn)]),4)
+  var.col <-  round(var(n.col[-(1:burn)]),5)
+  abline(h=mean.col,lwd=2,col="red")
+  legend("bottomright",legend=c(paste("Mean=",mean.col), 
+                                paste("Variance =",var.col)),title.col="gray30",
+                                title=paste("After Burn-in of",burn,":"),bty="n")
 dev.off()
 
+pdf("draw.post.out/tracealpha.pdf")
+  plot(alpha,type="l",main="Trace Plot: Alpha",lwd=1,cex=.1,
+       col="gray30",pch=20)
+  mean.a <- round(mean(alpha[-(1:burn)]),4)
+  var.a <-  round(var(alpha[-(1:burn)]),5)
+  abline(h=mean.a,lwd=2,col="red")
+  legend("topleft",legend=c(paste("Mean=",mean.a),
+                                paste("Variance =",var.a)),title.col="gray30",
+                                title=paste("After Burn-in of",burn,":"),bty="n")
+dev.off()
 
 EAXZ <- function(X,Z,siga=1,sigx=sigX) {
   k <- ncol(Z)
@@ -34,7 +49,7 @@ EAXZ <- function(X,Z,siga=1,sigx=sigX) {
 Z.post <- M[-(1:burn)] # Burn in about 100
 Z.post.mean <- sum.matrices(Z.post) / length(Z.post)
 #Z.post.mean <- ifelse(Z.post.mean>runif(length(Z.post.mean)),1,0)
-Z.post.mean <- ifelse(Z.post.mean>.9,1,0)
+Z.post.mean <- ifelse(Z.post.mean>.5,1,0)
 col0.ind <- which(apply(Z.post.mean,2,function(x) sum(x)==0))
 Z.post.mean <- Z.post.mean[,-col0.ind]
 a.image(Z.post.mean)
@@ -64,11 +79,16 @@ pdf("draw.post.out/postA66.pdf")
 dev.off()
 
 pdf("draw.post.out/Y.pdf")
-  a.image(Y,main="Y")
+  a.image(Y,main="X")
 dev.off()
 
 pdf("draw.post.out/postZ.pdf")
   a.image(Z.post.mean,main="Posterior Estimate for Z")
+dev.off()
+
+pdf("draw.post.out/postAlpha.pdf")
+  plot(density(alpha[-(1:burn)]),main="Posterior for Alpha",col="cornflowerblue",
+       lwd=3)
 dev.off()
 
 
@@ -81,8 +101,8 @@ plot.post.ZA <- function(n) {
   par(mfrow=c(1,1))
 }
 
-plot.post.ZA(90)
+plot.post.ZA(10)
 
-#a.image(matrix(apply(y9,2,mean),6,6))
+a.image(matrix(apply(y2,2,mean),6,6))
 a.image(Z.post.mean)
 plot.post.As(one.A)
