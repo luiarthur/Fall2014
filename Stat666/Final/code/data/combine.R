@@ -9,3 +9,5 @@ for (i in 1:length(x)) {
 }
 
 Y <- as.matrix(Y)
+write.table(Y,sep="\t",file="Y.dat",quote=F,col.names=F,row.names=F)
+system("mv Y.dat ../")
