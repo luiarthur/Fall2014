@@ -11,7 +11,7 @@ elapsed.time <- system.time(out <- gibbs.post(Y,a=1,B=5000,burn=0,showProgress=T
 
 M <- out$Zs
 alpha <- out$alpha
-burn <- round(length(M) * .1)
+burn <- 1000#round(length(M) * .1)
 
 n.col <- unlist(lapply(M,ncol))
 
@@ -87,7 +87,7 @@ pdf("draw.post.out/postZ.pdf")
 dev.off()
 
 pdf("draw.post.out/postAlpha.pdf")
-  plot.post(alpha,"Alpha")
+  plot.post(alpha,"Alpha (after 1000 Burn)")
   #plot(density(alpha[-(1:burn)]),main="Posterior for Alpha",col="cornflowerblue",
   #     lwd=3)
 dev.off()
