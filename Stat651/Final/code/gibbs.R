@@ -154,11 +154,11 @@ gibbs.post <- function(X=Y,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
     
     if (b %% 50 == 0) {
       gp <- b%/%50
-      sink("draw.post.out/Z.post.results",append=T)
+      sink("out/Z.post.results",append=T)
         Zs[ ((gp-1)*50+1) : (gp*50) ]
       sink()  
     } else if (b==1) {
-      sink("draw.post.out/Z.post.results")
+      sink("out/Z.post.results")
       sink()  
     }
 
