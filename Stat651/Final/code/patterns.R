@@ -2,12 +2,10 @@ source("rfunctions.R")
 source("ibp.R")
 source("gibbs.R")
 
-Y <- read.table("phil2.dat")
+Y <- as.matrix(read.table("phil2.dat"))
 elapsed.time <- system.time(out <- gibbs.post(Y,a=1,B=5000,burn=0,showProgress=T,
-                                              plotProgress=T,a.a=3,a.b=2,
+                                              plotProgress=T,a.a=3,a.b=4,
                                               siga=1,sigx=.5))
-
-# What Next?
 
 M <- out$Zs
 alpha <- out$alpha
@@ -15,7 +13,7 @@ burn <- 1000#round(length(M) * .1)
 
 n.col <- unlist(lapply(M,ncol))
 
-pdf("draw.post.out/traceplot.pdf")
+pdf("out/traceplot.pdf")
   plot(n.col,type="l",main="Trace Plot: Number of Columns in Z",lwd=1,cex=.1,
        col="gray30",pch=20)
   mean.col <- round(mean(n.col[-(1:burn)]),4)
@@ -26,7 +24,7 @@ pdf("draw.post.out/traceplot.pdf")
                                 title=paste("After Burn-in of",burn,":"),bty="n")
 dev.off()
 
-pdf("draw.post.out/tracealpha.pdf")
+pdf("out/tracealpha.pdf")
   plot(alpha,type="l",main="Trace Plot: Alpha",lwd=1,cex=.1,
        col="gray30",pch=20)
   mean.a <- round(mean(alpha[-(1:burn)]),4)
@@ -60,7 +58,7 @@ d2 <- 2
 d1 <- ceiling(nrow(one.A)/d2)
 
 
-pdf("draw.post.out/postA.pdf")
+pdf("out/postA.pdf")
   a.image(one.A,main="Posterior Mean for A")
 dev.off()
 
@@ -74,19 +72,19 @@ plot.post.As <- function(one.A) {
   par(mfrow=c(1,1))
 }
 
-pdf("draw.post.out/postA66.pdf")
+pdf("out/postA66.pdf")
   plot.post.As(one.A)
 dev.off()
 
-pdf("draw.post.out/Y.pdf")
+pdf("out/Y.pdf")
   a.image(Y,main="X")
 dev.off()
 
-pdf("draw.post.out/postZ.pdf")
+pdf("out/postZ.pdf")
   a.image(Z.post.mean,main="Posterior Estimate for Z")
 dev.off()
 
-pdf("draw.post.out/postAlpha.pdf")
+pdf("out/postAlpha.pdf")
   plot.post(alpha,"Alpha (after 1000 Burn)")
   #plot(density(alpha[-(1:burn)]),main="Posterior for Alpha",col="cornflowerblue",
   #     lwd=3)
@@ -113,7 +111,7 @@ plot.post.each <- function() {
   par(opts)
 }
 
-pdf("draw.post.out/postFriends.pdf")
+pdf("out/postFriends.pdf")
   plot.post.each()
 dev.off()
 
