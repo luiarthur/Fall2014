@@ -1,4 +1,5 @@
 source("rfunctions.R")
+
 gibbs.post <- function(X=Y,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
                        a.a=1,a.b=1,plotProgress=F) {
   B <- ceiling(B/50)*50 
@@ -148,7 +149,6 @@ gibbs.post <- function(X=Y,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
     # a|Z ~ Gamma(a+K,(1/b+Hn)^(-1)) 
     #a.a <- a.a+ncol(z)
     #a.b <- (1/a.b+Hn)^(-1)
-    #alpha[b] <- rgamma(1,a.a,scale=a.b)
     alpha[b] <- rgamma(1,a.a+ncol(z),scale=1/(1/a.b+Hn))
     Zs[[b]] <- z
     
@@ -167,6 +167,8 @@ gibbs.post <- function(X=Y,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
       plot(n.col,xlab="Iteration",ylab="K+",
            main=paste0("Columns of Z ","(",b,")"),col="pink",lwd=3,type="b",pch=20)
       abline(h=mean(n.col),col="blue",lwd=3)     
+      minor <- function() { plot(alpha,type="l",col="gray30") } 
+      plot.in.plot(minor,"bottomright")
     }
 
     if (showProgress) count.down(old.time,b,B)#pb(b,B)

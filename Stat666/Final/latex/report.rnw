@@ -73,6 +73,7 @@ rows. The white squares are 1, indicating that a dish was taken; black squares
 are 0, indicating that a dish was not taken. \\
 \beginmyfig
 \caption{IBP($N=50$, $\alpha=10$)}
+%\vspace{-5mm}
 <<fig=T,echo=F,height=3.7>>=
   opts <- par()
     #par(bg="blue",mar=c(1,1,1,1))
@@ -117,7 +118,7 @@ where $\bm Z \sim IBP(\alpha)$ by sampling from the complete conditional
 
 
 \noindent
-Note that a conjugate prior for $\alpha$ is a Gamma distribution.
+Note that the conjugate prior for $\alpha$ is a Gamma distribution.
 \[
   \begin{array}{rcl}
     \bm Z|\alpha & \sim & IBP(\alpha)\\
@@ -142,8 +143,8 @@ Suppose, we observe an $N \times D$ matrix $\bm X$, and we believe
 \]
 where $\bm Z|\alpha \sim IBP(\alpha)$, 
 $\bm A \sim MVN(\bm 0,{\sigma_A}^2\textbf{I})$, 
-$\bm E \sim MVN(\bm 0,{\sigma_X}^2\textbf{I})$. 
-%$\alpha ~ Gamma(1,1)$,
+$\bm E \sim MVN(\bm 0,{\sigma_X}^2\textbf{I})$.\\ 
+$\alpha ~ Gamma(a,b)$,
 %$\sigma_A=1$, and $\sigma_X=.5$.\\
 
 \noindent
@@ -164,57 +165,100 @@ posterior $\bm{Z|X},\alpha$.
 Each of ten Stat666 students created a $6 \times 6$ binary image. To the
 image, Gaussian noise (mean=0,variance=.25) was added to each cell of the
 binary image. Gaussian noise was added to the same image to generate 10 $6
-\times 6$ images. These images were turned into row $1 \times 36$ vectors. All
-these images were stacked together to form one large $90 \times 36$ matrix.
-(Note that I did not know the design of these images before hand. The images
-could be letters, numbers, interesting patterns, pokemon faces, etc.) Figure2
-displays the data from the ten Stat666 students.\\
+\times 6$ images. These images were turned into $1 \times 36$ row vectors. All
+these vectorized images were stacked together to form one large $100 \times 36$
+matrix.  (Note that I did not know the design of these images before hand. The
+images could be letters, numbers, interesting patterns, pokemon faces, etc.)
+Figure2 displays the data from the ten Stat666 students.\\
 
 \beginmyfig
+  \vspace{-5mm}
   \caption{Data From Ten Stat666 Students}
+  \vspace{-2mm}
   \includegraphics{../code/draw.post.out/Y.pdf}
+  \vspace{-15mm}
 \endmyfig
 
 \noindent
-A Gibbs sampler was implemented to retrieve Posterior distributions for $\bm Z$
+A Gibbs sampler was implemented to retrieve posterior distributions for $\bm Z$,
 $\bm A$, and $\alpha$. $\alpha$ was initially set to $1$, and the posterior for
 $\alpha$ was obtained by equation (3) with prior distribution $Gamma(3,2)$.
 The parameters were chosen such that $alpha$ was centered at 6 and had a
 variance of 12, as I believed I may have many latent features, but my
 uncertainty was high.  Equation(2) was used to retrieve the posterior
-distribution (a collection of binary matrices). After 1000 iterations, the
-trace plot for the number of columns in the binary matrices drawn were plotted.
-(See Figure 3.) Diagnostics for a cell by cell trace plot could also be
-plotted, but may be too difficult to analyze as the dimensions of the matrices
-are changing.\\
+distribution for $\bm Z$ (a collection of binary matrices). After 5000
+iterations, the trace plot for the number of columns in the binary matrices
+drawn were plotted.  (See Figure 3.) Diagnostics for a cell by cell trace plot
+could also be plotted, but may be too difficult to analyze as the dimensions of
+the matrices are changing, and the matrices are large.\\
 \beginmyfig
   \caption{}
   \includegraphics{../code/draw.post.out/traceplot.pdf}
+  \vspace{-15mm}
 \endmyfig
 \beginmyfig
   \caption{}
-  \includegraphics{../code/draw.post.out/tracealpha.pdf}
+  \includegraphics{../code/draw.post.out/postAlpha.pdf}
 \endmyfig
 \noindent
-The number of columns in $\bm Z$ appears to have converged to 8. This means that
-the number of latent features discovered appears to be 8. This is reasonable as
-the image $\bm X$ is comprised of 10 students' images. A burn-in of the first
-200 draws were removed. Then, the 800 $\bm Z$ matrices were superimposed, summed
-element by element, and divided by 800. Cells that had values $> .9$ were set
-to 1; and 0 otherwise. This is not necessary, but this removes the columns that
-were not likely to exist. For instance, from the trace plot (Figure3), we see
-that there are three instances where the number of columns in $\bm Z$ was $9$.
-Three instances out of 800 is not significantly large enough to say that those
-latent features are generating the observed data. So, the nineth column was
-removed. The resulting matrix, I will call the posterior mean for $\bm Z$. 
-The trace plot for $\alpha$ (Figure 4) shows that $\alpha$ appears to have
-converged, with mean $=1.92$ and variance $=.324$. Below are the posterior 
-mean for $\bm Z$, posterior for $\alpha$, and posterior for $\bm A$, calculated
-as $E[\bm{A|X,Z}] = (\bm Z^T\bm Z + \frac{\sigma_X^2}{\sigma_A^2}
-\textbf{I})^{-1}\bm Z^T \bm X$.
+The number of columns in $\bm Z$ appears to have converged to 8. This means
+that the number of latent features discovered appears to be 8. This is
+reasonable as the image $\bm X$ is comprised of 10 students' images. A burn-in
+of the first 200 draws were removed. Then, the 800 $\bm Z$ matrices were
+superimposed, summed element by element, and divided by 800. Cells that had
+values $> .9$ were set to 1; and 0 otherwise. This is not necessary, but this
+removes the columns that were not likely to exist. To elaborate, from the trace
+plot (Figure3), we see that there are three instances where the number of
+columns in $\bm Z$ was $9$.  Three instances out of 800 is not significantly
+large enough to say that those latent features are generating the observed
+data. So, the nineth column was removed. The resulting matrix, I will call the
+posterior mean for $\bm Z$.  The trace plot for $\alpha$ (Figure 4) shows that
+$\alpha$ appears to have converged, with mean $=1.87$ and variance $=.321$.
+Below are the posterior mean for $\bm Z$ and posterior mean for $\bm A$
+calculated as $E[\bm{A|X,Z}] = (\bm Z^T\bm Z + \frac{\sigma_X^2}{\sigma_A^2}
+\textbf{I})^{-1}\bm Z^T \bm X$. \\
+
+\beginmyfig
+  \caption{}
+  \includegraphics{../code/draw.post.out/postZ.pdf}
+\endmyfig
+
+\beginmyfig
+  \caption{}
+  \includegraphics{../code/draw.post.out/postA.pdf}
+\endmyfig
+\beginmyfig
+  \caption{The latent features turned back into $6 \times 6$ images.}
+  %\includegraphics[height=1\textwidth]{../code/draw.post.out/postA66.pdf}
+  \includegraphics{../code/draw.post.out/postA66.pdf}
+\endmyfig
+
+\noindent
+Now, we can predict the latent features generating each observation by
+multiplying the posterior mean of $\bm Z$ by the posterior mean of $\bm A$. We
+will call this matrix the posterior mean of $\bm {ZA}$. Each row in this matrix
+will reveal the latent structures generating the observation in the respective
+row of $\bm X$. Figure 8 shows the latent structure learned from the data. 
+For each observation, the data and latent structures are layed side by side
+for a visual comparison. The features learned were similar to the images
+created by the ten Stat666 students.
+
+
+\beginmyfig
+  \caption{The latent features for each student.}
+  %\includegraphics[height=1\textwidth]{../code/draw.post.out/postA66.pdf}
+  \includegraphics[height=1\textwidth]{../code/draw.post.out/postFriends.pdf}
+\endmyfig
 
 
 \section{Conclusion}
+The IBP provides a flexible distribution on sparse binary matrices. The
+distribution can be extremely valuable when used as a prior on binary matrices
+in latent feature models. Using Gibbs sampling, the number of latent features can
+be quickly learned and the features can be discovered. Prior distributions can
+be set on $\sigma_X$ and $\sigma_A$ to improve performance. Morever, in reality,
+these parameters are unknown so they need to be modeled. 
+
 
 \newpage
 \section{Appendix -  Code \& Data}

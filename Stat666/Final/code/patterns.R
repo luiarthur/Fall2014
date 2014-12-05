@@ -3,7 +3,7 @@ source("ibp.R")
 source("gibbs.R")
 
 source("data/combine.R",chdir=T)
-elapsed.time <- system.time(out <- gibbs.post(Y,a=1,B=1000,burn=0,showProgress=T,
+elapsed.time <- system.time(out <- gibbs.post(Y,a=1,B=5000,burn=0,showProgress=T,
                                               plotProgress=T,a.a=3,a.b=2,
                                               siga=1,sigx=.5))
 
@@ -65,7 +65,7 @@ pdf("draw.post.out/postA.pdf")
 dev.off()
 
 plot.post.As <- function(one.A) {
-  par(mfrow=c(d1,d2))
+  par(mfrow=c(d2,d1),mar=c(.5,.5,1,.5))
   for (i in 1:nrow(one.A)) {
     one.Ai <- matrix(one.A[i,],6,6) # matrix(Y[n,],6,6) = X[[n]]
     a.image(one.Ai,main=paste0("Posterior Mean A",i))
@@ -87,8 +87,9 @@ pdf("draw.post.out/postZ.pdf")
 dev.off()
 
 pdf("draw.post.out/postAlpha.pdf")
-  plot(density(alpha[-(1:burn)]),main="Posterior for Alpha",col="cornflowerblue",
-       lwd=3)
+  plot.post(alpha,"Alpha")
+  #plot(density(alpha[-(1:burn)]),main="Posterior for Alpha",col="cornflowerblue",
+  #     lwd=3)
 dev.off()
 
 
@@ -101,8 +102,21 @@ plot.post.ZA <- function(n) {
   par(mfrow=c(1,1))
 }
 
-plot.post.ZA(10)
+plot.post.each <- function() {
+  opts <- par(no.readonly=T)
+  par(mfrow=c(5,4),mar=c(.1,.1,1,.1))
+    for (n in 10*(1:(nrow(Y)/10))) {
+      a.image(matrix(Y[n,],6,6),main=paste0("n=",n,": ",label[n]),cex.main=.8)
+      a.image(matrix(post.ZA[n,],6,6),
+              main=paste0("n=",n,":  ",toString(Z.post.mean[n,])),cex.main=.8)
+     }       
+  par(opts)
+}
 
-a.image(matrix(apply(y2,2,mean),6,6))
+pdf("draw.post.out/postFriends.pdf")
+  plot.post.each()
+dev.off()
+
+#a.image(matrix(apply(y2,2,mean),6,6))
 a.image(Z.post.mean)
 plot.post.As(one.A)
