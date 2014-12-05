@@ -2,7 +2,7 @@ source("rfunctions.R")
 source("ibp.R")
 source("gibbs.R")
 
-source("data/combine.R",chdir=T)
+Y <- read.table("phil2.dat")
 elapsed.time <- system.time(out <- gibbs.post(Y,a=1,B=5000,burn=0,showProgress=T,
                                               plotProgress=T,a.a=3,a.b=2,
                                               siga=1,sigx=.5))
