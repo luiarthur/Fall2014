@@ -1,0 +1,5 @@
+#!/bin/bash
+
+pdflatex report.tex
+firefox report.pdf
+#system("rm -f report-*.pdf *.log *.aux *.tex")
