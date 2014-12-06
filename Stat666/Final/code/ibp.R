@@ -1,5 +1,5 @@
 #rm(list=ls())
-library(expm)
+#library(expm)
 library(MASS)
 source("rfunctions.R")
 
