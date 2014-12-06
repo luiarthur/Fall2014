@@ -1,12 +1,8 @@
 \documentclass{beamer}                                                    
-\usepackage{fullpage}                                                     
-\usepackage{pgffor}                                                       
 \usepackage{amssymb}                                                      
 \usepackage{Sweave}                                                       
 \usepackage{bm}                                                           
 \usepackage{mathtools}                                                    
-\usepackage{verbatim}                                                     
-\usepackage{appendix}                                                     
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage[UKenglish]{isodate} % for: \today                             
@@ -25,7 +21,7 @@
 \usecolortheme{seahorse}         % Determines the Color
 
 % my title:                                                               
-\title{Stat666 Final Project - The Indian Buffet Process}
+\title{The Indian Buffet Process}
 \author[Arthur Lui]{Arthur Lui}
 \institute[Brigham Young University]{
   Department of Statistics\\
@@ -38,54 +34,32 @@
 <<design,echo=F>>=
   source("../code/ibp.R",chdir=T)
 @
-
-
-  \frame{\titlepage}
-
-  \section{Introduction} % Sorah
-      \frame{
-        \frametitle{Introduction}
-         Hello
-      }
+  % 8 minutes
+\frame{\titlepage}
+\section{Introduction}
+  \frame{
+    \frametitle{Introduction}
+      One key problem in recovering the latent structure responsible for
+      generating observed data is determining the number of latent features.
+      The Indian Buffet process (IBP) provides a flexible distribution for
+      sparse binary matrices with infinite dimensions (i.e. finite number of
+      rows, and infinite number of columns).  When used as a prior
+      distribution in a latent feature model, the IBP can learn the number
+      of latent features generating the observations because it can draw
+      binary matrices which have a potentially infinite number of columns. I
+      will use the IBP as a prior distribution in a Gaussian latent feature
+      model to recover the latent structures generating the observations.\\
+  }
       
-  \section{Data}    
-      \frame{
-      \frametitle{Tulip Germination Experiment}
-        \begin{itemize}
-          \item Goal: Understand the effect of chilling time on germination of 
-                tulip bulbs.
-          \wl
-          \item 
-            Data: 
-            \begin{itemize}
-              \item 12 populations each with 210 tulips (2005-2009)
-              \item Each population randomly and evenly split into 7 groups 
-                    and assigned to one of 7 chilling times 
-                    (0, 2, 4, \ldots, 12 weeks).
-              \item Response Variable: Indicator (bulb germinated or not).
-              \item Population 12 did not germinate at all, so it was removed from
-                    the analysis.
-            \end{itemize}
-        \end{itemize}    
-      }
-% Between 6 & 8 pages
-%\section{Introduction} % < 1 page
-%One key problem in recovering the latent structure responsible for generating
-%observed data is determining the number of latent features. The Indian Buffet
-%process (IBP) provides a flexible distribution for sparse binary matrices with
-%infinite dimensions (i.e. finite number of rows, and infinite number of columns).
-%When used as a prior distribution in a latent feature model, the IBP can
-%learn the number of latent features generating the observations because it can
-%draw binary matrices which have a potentially infinite number of columns. I will
-%use the IBP as a prior distribution in a Gaussian latent feature model to
-%recover the latent structures generating the observations.\\
-%
-%\section{Model} % 3-4 pages
-%The IBP is a distribution for sparse binary matrices with finite number of rows
-%and potentially infinite number of columns. The process of generating a
-%realization from the IBP can be described by an analogy involving Indian buffet
-%restaurants.\\
-%
+\section{Model}
+  \frame{
+    \frametitle{IBP}
+      The IBP is a distribution for sparse binary matrices with finite number of
+      rows and potentially infinite number of columns. The process of generating
+      a realization from the IBP can be described by an analogy involving Indian
+      buffet restaurants.\\
+  }
+
 %\noindent
 %Let $Z$ be an $N \times \infty$ binary matrix. Each row in $Z$ represents a
 %customer which enters an Indian buffet and each column represents a dish in the
