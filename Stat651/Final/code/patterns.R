@@ -4,7 +4,7 @@ source("gibbs.R")
 
 Y <- as.matrix(read.table("phil2.dat"))
 elapsed.time <- system.time(out <- gibbs.post(Y,a=1,B=5000,burn=0,showProgress=T,
-                                              plotProgress=T,a.a=3,a.b=4,
+                                              plotProgress=T,a.a=.5,a.b=1,
                                               siga=1,sigx=.5))
 
 M <- out$Zs
@@ -66,7 +66,7 @@ plot.post.As <- function(one.A) {
   par(mfrow=c(d2,d1),mar=c(.5,.5,1,.5))
   for (i in 1:nrow(one.A)) {
     one.Ai <- matrix(one.A[i,],6,6) # matrix(Y[n,],6,6) = X[[n]]
-    a.image(one.Ai,main=paste0("Posterior Mean A",i))
+    a.image(one.Ai,main=paste0("Latent Feat.",i),cex.main=.8)
     #a.image(one.Ai,main=paste0("Posterior Mean A",i),col=BLUE)
   }
   par(mfrow=c(1,1))
@@ -92,6 +92,7 @@ dev.off()
 
 
 post.ZA <- Z.post.mean %*% one.A
+
 plot.post.ZA <- function(n) {
   par(mfrow=c(1,2))
     a.image(matrix(Y[n,],6,6),main=paste0("n=",n,": ",label[n]))
@@ -115,6 +116,8 @@ pdf("out/postFriends.pdf")
   plot.post.each()
 dev.off()
 
+
 #a.image(matrix(apply(y2,2,mean),6,6))
 a.image(Z.post.mean)
 plot.post.As(one.A)
+a.image(matrix(post.ZA[70,],6,6))
