@@ -1,5 +1,6 @@
 \documentclass{beamer}                                                    
 \usepackage{amssymb}                                                      
+%\usepackage{pgffor}
 \usepackage{Sweave}                                                       
 \usepackage{bm}                                                           
 \usepackage{mathtools}                                                    
@@ -53,11 +54,8 @@
       
 \section{Model}
   \frame{
-    \frametitle{IBP}
-      The IBP is a distribution for sparse binary matrices with finite number of
-      rows and potentially infinite number of columns. The process of generating
-      a realization from the IBP can be described by an analogy involving Indian
-      buffet restaurants.\\
+    \frametitle{Indian Buffet Process (IBP)}
+      $\underset{N \times \infty}{\bm Z} \sim \text{IBP}(\alpha)$
   }
 
 %\noindent
