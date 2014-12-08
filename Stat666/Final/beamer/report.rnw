@@ -1,6 +1,7 @@
 \documentclass{beamer}                                                    
 \usepackage{amssymb}                                                      
 %\usepackage{pgffor}
+%\usepackage{subcaption}
 \usepackage{Sweave}                                                       
 \usepackage{bm}                                                           
 \usepackage{mathtools}                                                    
@@ -55,7 +56,75 @@
 \section{Model}
   \frame{
     \frametitle{Indian Buffet Process (IBP)}
-      $\underset{N \times \infty}{\bm Z} \sim \text{IBP}(\alpha)$
+    \beginmyfig
+
+<<fig=T,echo=F,height=5>>=
+    par(mfrow=c(1,2))
+      a.image(rIBP(50,2),main="Figure 1: IBP(N=50,a=2)",cex.main=.8)
+      a.image(rIBP(50,10),main="Figure 2: IBP(N=50,a=10)",cex.main=.8)
+    par(mfrow=c(1,1))
+@
+    \endmyfig
+  }
+
+  \frame{
+    \frametitle{Indian Buffet Process (IBP)}
+    In the IBP, a customer ($i$) taking a dish ($k$) is analogous to an
+    observation possessing a feautre. This is indicated by setting the value of
+    $z_{ik}$ to 1 if the customer takes the dish, and 0 otherwise. \\
+    \wl\noindent
+    An IBP($\alpha$) for $N$ observations can be simulate as follows:
+    \begin{enumerate}
+      \item The $1^{st}$ customer takes Poisson($\alpha$) number of dishes
+      \item For customers $i=2 \text{ to } N$,
+      \begin{itemize}
+        \item For each presiously sampled dish,
+              customer $i$ takes dish $k$ with probability $m_k / i$
+        \item after sampling the last sampled dish, customer $i$ samples 
+              Poisson($\alpha/i$) new dishes
+      \end{itemize}
+    \end{enumerate}
+  }
+
+  \frame{
+    \frametitle{Indian Buffet Process (IBP)}
+    %GIBBS:
+    To draw from $\bm Z \sim \text{IBP}(\alpha)$ using a \textbf{Gibbs} sampler,
+    \begin{enumerate}
+      \item Start with an arbitrary binary matrix of $N$ rows
+      \item For each row, $i$,
+      \begin{enumerate}
+        \item For each column, $k$,
+        \item if $m_{-i,k}$ = $0$, delete column $k$. Otherwise,
+        \begin{itemize}
+          \item set $z_{ik}$ to $0$
+          \item set $z_{ik}$ to $1$ with probability 
+                $P(z_{ik}=1|\bm{z_{-i,k}}) = m_{-i,k}/i$
+        \end{itemize}      
+        \item at the end of row $i$, add Poisson($\alpha/N$) 
+              columns of $1$'s
+      \end{enumerate}
+      \item iterate step 2 a large number of times
+    \end{enumerate}
+  }
+
+  \frame{
+    \frametitle{Indian Buffet Process (IBP)}
+      \[
+      \begin{array}{rcl}
+        \underset{N \times \infty}{\bm Z} &\sim& \text{IBP}(\alpha),
+           \text{ where $z_{ik} \in \{0,1\}$} \\
+        \implies \text{P}(\bm Z) & = & \frac{\alpha^{K_+}}{\prodl{i}{1}{N} 
+                                       {K_1}^{(i)}!} 
+                                       exp\{-\alpha H_N\}\prodl{k}{1}{K_+}
+                                       \frac{(N-m_k)!(m_k-1)!}{N!},
+
+      \end{array}  
+      \]
+      where $H_N$ is the harmonic number, $\suml{i}{1}{N}i^{-1}$, $K_+$
+      is the number of non-zero columns in $\bm Z$, $m_k$ is the $k^{th}$
+      column sum of $\bm Z$, and $K_1^{(i)}$ is the ``number of new dishes"
+      sampled by customer $i$.\\
   }
 
 %\noindent
