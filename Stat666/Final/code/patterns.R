@@ -120,3 +120,20 @@ dev.off()
 #a.image(matrix(apply(y2,2,mean),6,6))
 a.image(Z.post.mean)
 plot.post.As(one.A)
+
+A <- matrix(c(0,1,0,0,1,0,
+              0,1,0,0,1,0,
+              0,0,0,0,0,0,
+              1,0,0,0,0,1,
+              1,0,0,0,0,1,
+              1,1,1,1,1,1),6,6,byrow=T)
+
+pdf("draw.post.out/oneObs.pdf")
+  a.image(A)
+dev.off()
+
+pdf("draw.post.out/oneObsWithNoise.pdf")
+  a.image(A)
+dev.off()
+
+

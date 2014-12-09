@@ -42,12 +42,19 @@
   \frame{
     \frametitle{Introduction}
       \begin{itemize}
-        \item One challenge in latent feature modelling is predetermining
-              the number of latent features generating the observations
+        \item One challenge in latent variable modelling is predetermining
+              the number of latent variables generating the observations
+              % a type of latent variable model.
+              % Factor Analysis: Quant, Quant
+              % Latent Feature Model: Quant Obs, Cat Latent.
+              \wl
+        \item One type of latent variable model is the latent \textit{feature}
+              model, which consists of quantitative observations and binary latent
+              variables
               \wl
         \item The Indian Buffet Process offers a distribution for sparse
               infinite binary matrices, which can serve as a prior distribution
-              in latent feature modelling
+              for feature matrices in latent feature models
       \end{itemize}  
   }
       
@@ -157,12 +164,15 @@
     \frametitle{Example: Linear-Gaussian Latent Feature Model with Binary Features}
     Suppose, we observe an $N \times D$ matrix $\bm X$, and we believe
     \[
-      \bm X = \bm{ZA} + \bm E,
+    \begin{array}{rcl}
+      \bm X &=& \bm{ZA} + \bm E,\\
+      & & \\
+      \text{where }~\bm Z|\alpha & \sim & \text{IBP}(\alpha), \\
+      \bm A_i & \sim & MVN(\bm 0,{\sigma_A}^2\textbf{I}), \\
+      \bm E_i & \sim & MVN(\bm 0,{\sigma_X}^2\textbf{I}).\\ 
+      \alpha & \sim & \text{Gamma}(a,b),
+    \end{array}
     \]
-    where $\bm Z|\alpha \sim IBP(\alpha)$, 
-    $\bm A \sim MVN(\bm 0,{\sigma_A}^2\textbf{I})$, 
-    $\bm E \sim MVN(\bm 0,{\sigma_X}^2\textbf{I})$.\\ 
-    $\alpha ~ Gamma(a,b)$,
     %$\sigma_A=1$, and $\sigma_X=.5$.\\
   }
 
@@ -187,11 +197,40 @@
     We can now use equation (1) to implement a Gibbs sampler to draw from
     the posterior posterior $\bm{Z|X},\alpha$.
   }
-%%\section{Example (Data Analysis)} % 2-3 pages
-%\section{Example: Linear-Gaussian Latent Feature Model with Binary Features}
-%Now, we can use equation (2) to implement a Gibbs sampler to draw from the 
-%posterior $\bm{Z|X},\alpha$.
-%
+  
+  \frame{
+    \frametitle{Data}
+    \beginmyfig
+      \vspace{-5mm}
+      \caption{Data From One Stat666 Students}
+      \vspace{-2mm}
+      \includegraphics{../code/draw.post.out/oneObs.pdf}
+      \vspace{-15mm}
+    \endmyfig
+  }
+
+  \frame{
+    \frametitle{Data}
+    \beginmyfig
+      \vspace{-5mm}
+      \caption{Data From One Stat666 Students + N(0,.5) Noise}
+      \vspace{-2mm}
+      \includegraphics{../code/draw.post.out/oneObsWithNoise.pdf}
+      \vspace{-15mm}
+    \endmyfig
+  }
+
+  \frame{
+    \frametitle{Data}
+    \beginmyfig
+      \vspace{-5mm}
+      \caption{Data From Ten Stat666 Students + N(0,.5) Noise}
+      \vspace{-2mm}
+      \includegraphics{../code/draw.post.out/Y.pdf}
+      \vspace{-15mm}
+    \endmyfig
+  }
+
 %\subsection{Data \& Results}
 %Each of ten Stat666 students created a $6 \times 6$ binary image. To the
 %image, Gaussian noise (mean=0,variance=.25) was added to each cell of the
@@ -223,15 +262,21 @@
 %could also be plotted, but may be too difficult to analyze as the dimensions of
 %the matrices are changing, and the matrices are large. The execution time was
 %about 4 hours.\\
-%\beginmyfig
-%  \caption{}
-%  \includegraphics{../code/draw.post.out/traceplot.pdf}
-%  \vspace{-15mm}
-%\endmyfig
-%\beginmyfig
-%  \caption{}
-%  \includegraphics{../code/draw.post.out/postAlpha.pdf}
-%\endmyfig
+  \frame{
+    \frametitle{Diagnostics}
+    \beginmyfig
+      \includegraphics{../code/draw.post.out/traceplot.pdf}
+      \vspace{-15mm}
+    \endmyfig
+  }
+
+  \frame {
+    \frametitle{Diagnostics}
+    \beginmyfig
+      \includegraphics{../code/draw.post.out/postAlpha.pdf}
+    \endmyfig
+  }  
+
 %\noindent
 %The number of columns in $\bm Z$ appears to have converged to 9. This means
 %that the number of latent features discovered appears to be 9. This is
@@ -256,21 +301,38 @@
 %Figure 7 shows the matrix in $6 \times 6$ form. That is, each row in $\bm A$
 %were back-transformed into its matrix form.\\
 %
-%\beginmyfig
-%  \caption{}
-%  \includegraphics{../code/draw.post.out/postZ.pdf}
-%  \vspace{-10mm}
-%\endmyfig
-%
-%\beginmyfig
-%  \caption{}
-%  \includegraphics{../code/draw.post.out/postA.pdf}
-%\endmyfig
-%\beginmyfig
-%  \caption{The latent features turned back into $6 \times 6$ images.}
-%  %\includegraphics[height=1\textwidth]{../code/draw.post.out/postA66.pdf}
-%  \includegraphics{../code/draw.post.out/postA66.pdf}
-%\endmyfig
+  \frame{
+    \frametitle{Posterior}
+    \beginmyfig
+      \vspace{-5mm}
+      \includegraphics{../code/draw.post.out/postZ.pdf}
+      \vspace{-15mm}
+      \caption{The posterior mean for $\bm Z$ computed by summing across
+               all the $\bm Z$ matrices drawn, then dividing by $4000$, the
+               the number of draws.}
+    \endmyfig
+  }
+
+  \frame{
+    \frametitle{Posterior}
+    \beginmyfig
+      \vspace{-5mm}
+      \includegraphics{../code/draw.post.out/postA.pdf}
+      \vspace{-15mm}
+      \caption{The posterior mean for $\bm A$ was computed by calculating 
+               $E[\bm{A|Z}] = (\bm Z^T\bm Z + \frac{\sigma_X^2}{\sigma_A^2}
+               \textbf{I})^{-1}\bm Z^T \bm X$}.
+    \endmyfig
+  }
+
+  \frame{
+    \frametitle{Posterior}
+    \beginmyfig
+      \includegraphics[height=.5\textwidth]{../code/draw.post.out/postA66.pdf}
+      %\includegraphics{../code/draw.post.out/postA66.pdf}
+      \caption{The latent features turned back into $6 \times 6$ images.}
+    \endmyfig
+  }
 %
 %\noindent
 %Now, we can predict the latent features generating each observation by
@@ -283,11 +345,27 @@
 %created by the ten Stat666 students.
 %
 %
-%\begin{figure}\begin{center}
-%  \caption{The latent features for each student.}
-%  %\includegraphics[height=1\textwidth]{../code/draw.post.out/postA66.pdf}
-%  \includegraphics[height=1\textwidth]{../code/draw.post.out/postFriends.pdf}
-%\end{center}\end{figure}
+  \frame{
+  \frametitle{Posterior}
+  \begin{figure}\begin{center}
+    %\includegraphics[height=1\textwidth]{../code/draw.post.out/postA66.pdf}
+    \includegraphics[height=.7\textwidth]{../code/draw.post.out/postFriends.pdf}
+    \caption{The latent features for each student $=\text{PostMean}(\bm {Z_iA})$.}
+  \end{center}\end{figure}
+  }
+
+  \frame{
+    \frametitle{Conclusions}
+    \begin{itemize}
+      \item The IBP is flexible distribution on sparse binary matrices \wl
+      \item Number of latent features can be quickly learned, and latent features
+            discovered in a Gaussian latent feature model \wl
+      \item Prior distributions can be set on $sigma_X$ and $sigma_A$ when the
+            variance is unknown \wl
+      \item Distance information can be incorporated to enhance performance
+            of the algorithm
+    \end{itemize}
+  }
 %
 %
 %\section{Conclusions}
