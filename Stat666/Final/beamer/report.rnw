@@ -41,16 +41,14 @@
 \section{Introduction}
   \frame{
     \frametitle{Introduction}
-      One key problem in recovering the latent structure responsible for
-      generating observed data is determining the number of latent features.
-      The Indian Buffet process (IBP) provides a flexible distribution for
-      sparse binary matrices with infinite dimensions (i.e. finite number of
-      rows, and infinite number of columns).  When used as a prior
-      distribution in a latent feature model, the IBP can learn the number
-      of latent features generating the observations because it can draw
-      binary matrices which have a potentially infinite number of columns. I
-      will use the IBP as a prior distribution in a Gaussian latent feature
-      model to recover the latent structures generating the observations.\\
+      \begin{itemize}
+        \item One challenge in latent feature modelling is predetermining
+              the number of latent features generating the observations
+              \wl
+        \item The Indian Buffet Process offers a distribution for sparse
+              infinite binary matrices, which can serve as a prior distribution
+              in latent feature modelling
+      \end{itemize}  
   }
       
 \section{Model}
@@ -88,6 +86,25 @@
 
   \frame{
     \frametitle{Indian Buffet Process (IBP)}
+      \[
+      \begin{array}{rcl}
+        \underset{N \times \infty}{\bm Z} &\sim& \text{IBP}(\alpha),
+           \text{ where $z_{ik} \in \{0,1\}$} \\
+        \implies \text{P}(\bm Z) & = & \frac{\alpha^{K_+}}{\prodl{i}{1}{N} 
+                                       {K_1}^{(i)}!} 
+                                       exp\{-\alpha H_N\}\prodl{k}{1}{K_+}
+                                       \frac{(N-m_k)!(m_k-1)!}{N!},
+
+      \end{array}  
+      \]
+      where $H_N$ is the harmonic number, $\suml{i}{1}{N}i^{-1}$, $K_+$
+      is the number of non-zero columns in $\bm Z$, $m_k$ is the $k^{th}$
+      column sum of $\bm Z$, and $K_1^{(i)}$ is the ``number of new dishes"
+      sampled by customer $i$.\\
+  }
+
+  \frame{
+    \frametitle{Indian Buffet Process (IBP)}
     %GIBBS:
     To draw from $\bm Z \sim \text{IBP}(\alpha)$ using a \textbf{Gibbs} sampler,
     \begin{enumerate}
@@ -106,133 +123,72 @@
       \end{enumerate}
       \item iterate step 2 a large number of times
     \end{enumerate}
+    \wl\noindent
+    We can use this sampling algorithm to sample from the posterior
+    distribution P($\bm{Z|X}$) where $\bm Z \sim IBP(\alpha)$ by sampling from
+    the complete conditional
+    \begin{equation}
+      P(z_{ik}=1|\bm{Z_{-(ik)},X})  \propto p(\bm{X|Z}) P(z_{ik}=1|\bm{Z_{-(ik)}}).
+    \end{equation}  
   }
+
 
   \frame{
     \frametitle{Indian Buffet Process (IBP)}
-      \[
+    Note that the conjugate prior for $\alpha$ is a Gamma distribution.
+    \[
       \begin{array}{rcl}
-        \underset{N \times \infty}{\bm Z} &\sim& \text{IBP}(\alpha),
-           \text{ where $z_{ik} \in \{0,1\}$} \\
-        \implies \text{P}(\bm Z) & = & \frac{\alpha^{K_+}}{\prodl{i}{1}{N} 
-                                       {K_1}^{(i)}!} 
-                                       exp\{-\alpha H_N\}\prodl{k}{1}{K_+}
-                                       \frac{(N-m_k)!(m_k-1)!}{N!},
-
-      \end{array}  
-      \]
-      where $H_N$ is the harmonic number, $\suml{i}{1}{N}i^{-1}$, $K_+$
-      is the number of non-zero columns in $\bm Z$, $m_k$ is the $k^{th}$
-      column sum of $\bm Z$, and $K_1^{(i)}$ is the ``number of new dishes"
-      sampled by customer $i$.\\
+        \bm Z|\alpha & \sim & IBP(\alpha)\\
+              \alpha & \sim & Gamma(a,b), \text{where $b$ is the scale parameter}\\
+        & & \\
+        p(\alpha|\bm Z) & \propto & p(\bm Z|\alpha) p(\alpha)\\
+        p(\alpha|\bm Z) & \propto & \alpha^{K_+} e^{-\alpha H_N}  
+                                    \alpha^{a-1} e^{-\alpha/b}\\
+        p(\alpha|\bm Z) & \propto & \alpha^{a+K_+-1} e^{-\alpha(1/b+H_N)}\\
+      \end{array}
+    \]
+    \begin{equation}
+      \alpha|\bm Z  \sim  Gamma(a+K_+, (1/b+H_N)^{-1})
+    \end{equation}
   }
 
-%\noindent
-%Let $Z$ be an $N \times \infty$ binary matrix. Each row in $Z$ represents a
-%customer which enters an Indian buffet and each column represents a dish in the
-%buffet. Customers enter the restaurant one after another. The first customer
-%samples an $r=Poisson(\alpha)$ number of dishes, where $\alpha > 0$ is a mass
-%parameter which influences the final number of sampled dishes. This is
-%indicated in by setting the first r columns of the first row in $Z$ to be $1$.
-%The other values in the row are set to $0$. Each subsequent customer samples
-%each previously sampled dish with probability proportional to its popularity.
-%That is, the next customer samples dish $k$ with probability $\frac{m_k}{i}$,
-%where $m_k$ is the number of customers that sampled dish $k$, and $i$ is the
-%current customer number (or row number in $Z$). Each customer also samples an
-%additional $Poisson(\alpha/i)$ number of new dishes. Once all the $N$ customers
-%have gone through this process, the resulting $Z$ matrix will be a draw from
-%the Indian buffet process with mass parameter $\alpha$. In other words, $Z \sim
-%IBP(\alpha)$. Note that $\alpha \propto K_+$, where $K_+$ is the final number of
-%sampled dishes (occupied columns). Figure1 shows a draw from an IBP(10) with 50
-%rows. The white squares are 1, indicating that a dish was taken; black squares
-%are 0, indicating that a dish was not taken. \\
-%\beginmyfig
-%\caption{IBP($N=50$, $\alpha=10$)}
-%%\vspace{-5mm}
-%<<fig=T,echo=F,height=3.7>>=
-%  opts <- par()
-%    #par(bg="blue",mar=c(1,1,1,1))
-%    par(mar=c(0,0,0,0))
-%    a.image(rIBP(50,10))
-%  par(opts)
-%@
-%\endmyfig
-%
-%\noindent
-%The probability of any particular matrix produced from this process is
-%\begin{equation}
-%  P(\bm{Z}) = \frac{\alpha^{K_+}}{\prodl{i}{1}{N} {K_1}^{(i)}!} 
-%              exp\{-\alpha H_N\}\prodl{k}{1}{K_+}
-%              \frac{(N-m_k)!(m_k-1)!}{N!},
-%\end{equation}
-%where $H_N$ is the harmonic number, $\suml{i}{1}{N}\ds\frac{1}{i}$, $K_+$ is
-%the number of non-zero columns in $\bm Z$, $m_k$ is the $k^{th}$ column sum of
-%$\bm Z$, and $K_1^{(i)}$ is the ``number of new dishes" sampled by customer $i$.\\
-%
-%\noindent
-%One way to get a draw from the IBP($\alpha$) is to simulate the process according to 
-%the description above. Another way is to implement a Gibbs sampler as follows:
-%
-%\begin{enumerate}
-%  \item Start with an arbitrary binary matrix of $N$ rows
-%  \item For each row, $i$,
-%  \begin{enumerate}
-%    \item For each column, $k$,
-%    \item if $m_{-i,k}$ = $0$, delete column $k$. Otherwise,
-%    \item set $z_{ik}$ to $0$
-%    \item set $z_{ik}$ to $1$ with probability $P(z_{ik}=1|\bm{z_{-i,k}}) = \frac{m_{-i,k}}{i}$
-%    \item at the end of row $i$, add Poisson($\ds\frac{\alpha}{N}$) columns of $1$'s
-%  \end{enumerate}
-%  \item iterate step 2 a large number of times
-%\end{enumerate}
-%We can likewise incorporate this Gibbs sampler to sample from the posterior distribution P($\bm{Z|X}$)
-%where $\bm Z \sim IBP(\alpha)$ by sampling from the complete conditional
-%\begin{equation}
-%  P(z_{ik}=1|\bm{Z_{-(ik)},X})  \propto p(\bm{X|Z}) P(z_{ik}=1|\bm{Z_{-(ik)}}).
-%\end{equation}\\
-%
-%
-%\noindent
-%Note that the conjugate prior for $\alpha$ is a Gamma distribution.
-%\[
-%  \begin{array}{rcl}
-%    \bm Z|\alpha & \sim & IBP(\alpha)\\
-%          \alpha & \sim & Gamma(a,b), \text{where $b$ is the scale parameter}\\
-%    & & \\
-%    p(\alpha|\bm Z) & \propto & p(\bm Z|\alpha) p(\alpha)\\
-%    p(\alpha|\bm Z) & \propto & \alpha^{K_+} e^{-\alpha H_N}  
-%                                \alpha^{a-1} e^{-\alpha/b}\\
-%    p(\alpha|\bm Z) & \propto & \alpha^{a+K_+-1} e^{-\alpha(1/b+H_N)}\\
-%  \end{array}
-%\]
-%\begin{equation}
-%  \alpha|\bm Z  \sim  Gamma(a+K_+, (1/b+H_N)^{-1})
-%\end{equation}
-%
-%\noindent
+  \section{Example}
+  \frame{
+    \frametitle{Example: Linear-Gaussian Latent Feature Model with Binary Features}
+    Suppose, we observe an $N \times D$ matrix $\bm X$, and we believe
+    \[
+      \bm X = \bm{ZA} + \bm E,
+    \]
+    where $\bm Z|\alpha \sim IBP(\alpha)$, 
+    $\bm A \sim MVN(\bm 0,{\sigma_A}^2\textbf{I})$, 
+    $\bm E \sim MVN(\bm 0,{\sigma_X}^2\textbf{I})$.\\ 
+    $\alpha ~ Gamma(a,b)$,
+    %$\sigma_A=1$, and $\sigma_X=.5$.\\
+  }
+
+  \frame{
+    \frametitle{Example: Linear-Gaussian Latent Feature Model with Binary Features}
+    It can be shown that
+    \begin{equation}  
+      \begin{split}
+      p(\bm{X|Z}) = \ds\frac{1}{(2\pi)^{ND/2}\sigma_X^{(N-K)D}\sigma_A^{KD}
+                                |\bm Z^T \bm Z+({\frac{\sigma_X}{\sigma_A}})^2
+                                \textbf{I}|^{D/2}} \\
+                    \exp\{-\frac{1}{2\sigma_X^2}tr(\bm X^T
+                    (\textbf{I}-\bm Z(\bm Z^T\bm Z+({\frac{\sigma_X}{\sigma_A}})^2
+                                \textbf{I})^{-1}\bm Z))
+                    \bm X\}            
+      \end{split}              
+    \end{equation}
+  }
+
+  \frame{
+    \frametitle{Example: Linear-Gaussian Latent Feature Model with Binary Features}
+    We can now use equation (1) to implement a Gibbs sampler to draw from
+    the posterior posterior $\bm{Z|X},\alpha$.
+  }
 %%\section{Example (Data Analysis)} % 2-3 pages
 %\section{Example: Linear-Gaussian Latent Feature Model with Binary Features}
-%Suppose, we observe an $N \times D$ matrix $\bm X$, and we believe
-%\[
-%  \bm X = \bm{ZA} + \bm E,
-%\]
-%where $\bm Z|\alpha \sim IBP(\alpha)$, 
-%$\bm A \sim MVN(\bm 0,{\sigma_A}^2\textbf{I})$, 
-%$\bm E \sim MVN(\bm 0,{\sigma_X}^2\textbf{I})$.\\ 
-%$\alpha ~ Gamma(a,b)$,
-%%$\sigma_A=1$, and $\sigma_X=.5$.\\
-%
-%\noindent
-%It can be shown that
-%\begin{equation}  
-%  p(\bm{X|Z}) = \ds\frac{1}{(2\pi)^{ND/2}\sigma_X^{(N-K)D}\sigma_A^{KD}
-%                            |\bm Z^T \bm Z+({\frac{\sigma_X}{\sigma_A}})^2
-%                            \textbf{I}|^{D/2}}
-%                \exp\{-\frac{1}{2\sigma_X^2}tr(\bm X^T
-%                (\textbf{I}-\bm Z(\bm Z^T\bm Z+({\frac{\sigma_X}{\sigma_A}})^2
-%                            \textbf{I})^{-1}\bm Z))
-%                \bm X\}            
-%\end{equation}
 %Now, we can use equation (2) to implement a Gibbs sampler to draw from the 
 %posterior $\bm{Z|X},\alpha$.
 %
