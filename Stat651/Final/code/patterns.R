@@ -107,7 +107,7 @@ plot.post.ZA <- function(n) {
 plot.post.each <- function() {
   opts <- par(no.readonly=T)
   par(mfrow=c(5,4),mar=c(.1,.1,1,.1))
-    for (n in 15*(1:(nrow(Y)/15))) {
+    for (n in 10*(1:(nrow(Y)/10))) {
       a.image(matrix(Y[n,],6,6),main=paste0("n=",n,": ",toString(Z[n,])),cex.main=.8)
       a.image(matrix(post.ZA[n,],6,6),
               main=paste0("n=",n,":  ",toString(Z.post.mean[n,])),cex.main=.8)
