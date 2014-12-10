@@ -15,6 +15,29 @@ burn <- 1000#round(length(M) * .1)
 
 n.col <- unlist(lapply(M,ncol))
 
+pdf("draw.post.out/trace.pdf")
+par(mfrow=c(1,2))
+  plot(n.col,type="l",main="Trace Plot: Number of Columns in Z",lwd=1,cex=.1,
+       col="gray30",pch=20)
+  mean.col <- round(mean(n.col[-(1:burn)]),4)
+  var.col <-  round(var(n.col[-(1:burn)]),5)
+  abline(h=mean.col,lwd=2,col="red")
+  legend("bottomright",legend=c(paste("Mean=",mean.col), 
+                                paste("Variance =",var.col)),title.col="gray30",
+                                title=paste("After Burn-in of",burn,":"),bty="n")
+
+  plot.post(alpha[-(1:burn)])
+  #plot(alpha,type="l",main="Trace Plot: Alpha",lwd=1,cex=.1,
+  #     col="gray30",pch=20)
+  #mean.a <- round(mean(alpha[-(1:burn)]),4)
+  #var.a <-  round(var(alpha[-(1:burn)]),5)
+  #abline(h=mean.a,lwd=2,col="red")
+  #legend("topleft",legend=c(paste("Mean=",mean.a),
+  #                              paste("Variance =",var.a)),title.col="gray30",
+  #                              title=paste("After Burn-in of",burn,":"),bty="n")
+par(mfrow=c(1,1))
+dev.off()
+
 pdf("draw.post.out/traceplot.pdf")
   plot(n.col,type="l",main="Trace Plot: Number of Columns in Z",lwd=1,cex=.1,
        col="gray30",pch=20)
@@ -37,7 +60,7 @@ pdf("draw.post.out/tracealpha.pdf")
                                 title=paste("After Burn-in of",burn,":"),bty="n")
 dev.off()
 
-EAXZ <- function(X,Z,siga=1,sigx=sigX) {
+EAXZ <- function(X,Z,siga=1,sigx=.5) {
   k <- ncol(Z)
   Ik <- diag(k)
   ZT <- t(Z)
@@ -133,7 +156,43 @@ pdf("draw.post.out/oneObs.pdf")
 dev.off()
 
 pdf("draw.post.out/oneObsWithNoise.pdf")
-  a.image(A)
+  set.seed(18)
+  a.image(A+rnorm(36,0,.5))
 dev.off()
 
+pdf("draw.post.out/Z11postpred.pdf")
+  X.post.pred <- lapply(as.list((burn+1):length(Z.post)),
+                        function(i) Z.post[[i]]%*%EAXZ(Y,Z.post[[i]])+
+                                    rnorm(prod(dim(Y)),0,.5))
 
+  X.post.pred.11 <- unlist(lapply(X.post.pred,function(z) z[1,1]))
+  plot.post(X.post.pred.11,main="Posterior Predictive for X[1,1]")
+dev.off()
+
+pdf("draw.post.out/qq.pdf")
+  qq <- mean(X.post.pred.11<Y[1,1])
+  #qq <- apply(as.matrix(X.post.pred.11),1,function(x) mean(x<X.post.pred.11))
+  plot(density(qq[-1],from=0,to=1),col=col.mult("cornflowerblue","grey80"),lwd=1,
+        main="Density of Posterior Predictive Quantiles for X")
+  for (i in 1:10) {
+    old.time <- Sys.time()
+    for (j in 1:ncol(Y)) {
+      if (i>1 & j>1) {
+        X.pp <- unlist(lapply(X.post.pred,function(z) z[i,j]))
+        qq <- apply(as.matrix(X.pp),1,function(x) mean(x<X.pp))
+        lines(density(qq[-i],from=0,to=1),col=col.mult("cornflowerblue","grey80"))
+        ks.test(qq,"punif")
+      }
+    }
+    count.down(old.time,i,10)
+  }
+dev.off()
+
+resid <- c(post.ZA-Y)
+plot(c(Y),type="l")
+lines(c(post.ZA),col="dodgerblue")
+lines(resid,col="pink")
+
+pdf("draw.post.out/resid.pdf")
+  plot(resid,col="pink",type="l",main="Residuals = PostMean(ZA) - X")
+dev.off()

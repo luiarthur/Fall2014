@@ -353,6 +353,14 @@
     \caption{The latent features for each student $=\text{PostMean}(\bm {Z_iA})$.}
   \end{center}\end{figure}
   }
+  
+  \section{Model Checking}
+  \frame{
+    \frametitle{Residuals}
+    \beginmyfig
+      \includegraphics{../code/draw.post.out/resid.pdf}
+    \endmyfig
+  }
 
   \frame{
     \frametitle{Conclusions}
@@ -360,7 +368,7 @@
       \item The IBP is flexible distribution on sparse binary matrices \wl
       \item Number of latent features can be quickly learned, and latent features
             discovered in a Gaussian latent feature model \wl
-      \item Prior distributions can be set on $sigma_X$ and $sigma_A$ when the
+      \item Prior distributions can be set on $\sigma_X$ and $\sigma_A$ when the
             variance is unknown \wl
       \item Distance information can be incorporated to enhance performance
             of the algorithm

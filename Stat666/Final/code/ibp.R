@@ -13,12 +13,14 @@ dmatnorm <- function(X,M,U,V){
   ( (2*pi)^(n*p) * det(V)^n * det(U)^p )^(.5)
 }
 
-ldmatnorm <- function(X,M,U,V){
+ldmatnorm <- function(X,M=0,U=diag(nrow(X)),V=diag(ncol(X))){
   n <- nrow(X)
   p <- ncol(X)
 
+  #(-.5 * tr(solve(V) %*% t(X-M) %*% solve(U) %*% (X-M))) - 
+  #.5 * log((2*pi)^(n*p) * det(V)^n * det(U)^p)
   (-.5 * tr(solve(V) %*% t(X-M) %*% solve(U) %*% (X-M))) - 
-  .5 * log((2*pi)^(n*p) * det(V)^n * det(U)^p)
+  .5 * n*p*(log(2)+log(pi)) + n*log(det(V)) + p*log(det(U))
 }
 
 #rmatnorm1 <- function(M,U,V){ # This Works! Not as fast.

@@ -2,10 +2,13 @@ source("rfunctions.R")
 source("ibp.R")
 source("gibbs.R")
 
-Y <- as.matrix(read.table("phil3.dat"))
-elapsed.time <- system.time(out <- gibbs.post(Y,a=1,B=5000,burn=0,showProgress=T,
+#Y <- as.matrix(read.table("phil3.dat"))
+source("genDat.R")
+Y <- Y[1:100,]
+elapsed.time <- system.time(out <- gibbs.post(Y,a=1,B=2000,burn=0,showProgress=T,
                                               plotProgress=T,a.a=3,a.b=2,
                                               siga=1,sigx=.5))
+
 
 M <- out$Zs
 alpha <- out$alpha
@@ -49,7 +52,7 @@ Z.post.mean <- sum.matrices(Z.post) / length(Z.post)
 #Z.post.mean <- ifelse(Z.post.mean>runif(length(Z.post.mean)),1,0)
 Z.post.mean <- ifelse(Z.post.mean>.5,1,0)
 col0.ind <- which(apply(Z.post.mean,2,function(x) sum(x)==0))
-Z.post.mean <- Z.post.mean[,-col0.ind]
+if (length(col0.ind)>0) Z.post.mean <- Z.post.mean[,-col0.ind]
 a.image(Z.post.mean)
 
 
@@ -104,8 +107,8 @@ plot.post.ZA <- function(n) {
 plot.post.each <- function() {
   opts <- par(no.readonly=T)
   par(mfrow=c(5,4),mar=c(.1,.1,1,.1))
-    for (n in 10*(1:(nrow(Y)/10))) {
-      a.image(matrix(Y[n,],6,6),main=paste0("n=",n,": ",label[n]),cex.main=.8)
+    for (n in 15*(1:(nrow(Y)/15))) {
+      a.image(matrix(Y[n,],6,6),main=paste0("n=",n,": ",toString(Z[n,])),cex.main=.8)
       a.image(matrix(post.ZA[n,],6,6),
               main=paste0("n=",n,":  ",toString(Z.post.mean[n,])),cex.main=.8)
      }       
@@ -121,3 +124,21 @@ dev.off()
 a.image(Z.post.mean)
 plot.post.As(one.A)
 a.image(matrix(post.ZA[70,],6,6))
+
+
+pdf("out/Z11postpred.pdf")
+  X.post.pred <- lapply(as.list((burn+1):length(Z.post)),
+                        function(i) Z.post[[i]]%*%EAXZ(Y,Z.post[[i]])+
+                                    rnorm(prod(dim(Y)),0,.5))
+  X.post.pred.11 <- unlist(lapply(X.post.pred,function(z) z[1,1]))
+  plot.post(X.post.pred.11,main="Posterior Predictive for Z[1,1]")
+dev.off()
+
+pdf("out/qq.pdf")
+  qq <- apply(as.matrix(X.post.pred.11),1,function(x) mean(x<X.post.pred.11))
+  plot(density(qq,from=0,to=1),col=col.mult("cornflowerblue","grey80"),lwd=5,
+       main="Density of Posterior Predictive Quantiles for Z")
+  ks <- ks.test(qq,"punif")
+  legend("bottomleft",legend=paste("P-val for KS-stat =",ks$p.value),bty="n")
+dev.off()     
+
