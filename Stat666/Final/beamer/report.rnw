@@ -41,21 +41,21 @@
 \section{Introduction}
   \frame{
     \frametitle{Introduction}
-      \begin{itemize}
-        \item One challenge in latent variable modelling is predetermining
-              the number of latent variables generating the observations
-              % a type of latent variable model.
-              % Factor Analysis: Quant, Quant
-              % Latent Feature Model: Quant Obs, Cat Latent.
-              \wl
-        \item One type of latent variable model is the latent \textit{feature}
-              model, which consists of quantitative observations and binary latent
-              variables
-              \wl
-        \item The Indian Buffet Process offers a distribution for sparse
-              infinite binary matrices, which can serve as a prior distribution
-              for feature matrices in latent feature models
-      \end{itemize}  
+    \begin{itemize}
+      \item One challenge in latent variable modelling is predetermining
+            the number of latent variables generating the observations
+            % a type of latent variable model.
+            % Factor Analysis: Quant, Quant
+            % Latent Feature Model: Quant Obs, Cat Latent.
+            \wl
+      \item One type of latent variable model is the latent \textit{feature}
+            model, which consists of quantitative observations and binary latent
+            variables
+            \wl
+      \item The Indian Buffet Process offers a distribution for sparse
+            infinite binary matrices, which can serve as a prior distribution
+            for feature matrices in latent feature models
+    \end{itemize}  
   }
       
 \section{Model}
@@ -202,7 +202,7 @@
     \frametitle{Data}
     \beginmyfig
       \vspace{-5mm}
-      \caption{Data From One Stat666 Students}
+      \caption{One Observation Without Noise}
       \vspace{-2mm}
       \includegraphics{../code/draw.post.out/oneObs.pdf}
       \vspace{-15mm}
@@ -213,7 +213,7 @@
     \frametitle{Data}
     \beginmyfig
       \vspace{-5mm}
-      \caption{Data From One Stat666 Students + N(0,.5) Noise}
+      \caption{One Observation + N(0,.5) Noise}
       \vspace{-2mm}
       \includegraphics{../code/draw.post.out/oneObsWithNoise.pdf}
       \vspace{-15mm}
