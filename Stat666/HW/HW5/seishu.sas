@@ -56,12 +56,12 @@ proc calis method=ml cov maxiter=5000 maxfunc=5000;
     ph       =                    f2                         + e03,
     totsugar =                                f3             + e08,
     alcohol  =                                            f4 + e09,
-    odor     = lam021 f1 +        f2 +        f3 + lam024 f4 + e02,
-    acid1    =        f1 + lam042 f2 + lam043 f3 + lam044 f4 + e04,
-    acid2    =        f1 + lam052 f2 +        f3 + lam054 f4 + e05,
+    odor     = lam021 f1 +                         lam024 f4 + e02,
+    acid1    =             lam042 f2 + lam043 f3 + lam044 f4 + e04,
+    acid2    =             lam052 f2 +             lam054 f4 + e05,
     sake     = lam061 f1 + lam062 f2 + lam063 f3 + lam064 f4 + e06,
     drsugar  = lam071 f1 + lam072 f2 + lam073 f3 + lam074 f4 + e07,
-    fn       =        f1 + lam102 f2 +        f3 + lam104 f4 + e10;
+    fn       =             lam102 f2 +             lam104 f4 + e10;
   std
     e01-e10 = psi01-psi10,
     f1-f4   = phi1-phi4;
