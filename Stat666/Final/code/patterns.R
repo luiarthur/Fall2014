@@ -101,6 +101,13 @@ pdf("draw.post.out/postA66.pdf")
   plot.post.As(one.A)
 dev.off()
 
+pdf("draw.post.out/postA.pdf")
+  par(mfrow=c(1,2))
+    a.image(one.A,main="Posterior Mean for A")
+    plot.post.As(one.A)
+  par(mfrow=c(1,1))
+dev.off()
+
 pdf("draw.post.out/Y.pdf")
   a.image(Y,main="X")
 dev.off()
