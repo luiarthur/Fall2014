@@ -1,0 +1,57 @@
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{pgffor}
+\usepackage{amssymb}
+\usepackage{Sweave}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{verbatim}
+\usepackage{appendix}
+\usepackage[UKenglish]{isodate} % for: \today
+\cleanlookdateon                % for: \today
+
+\def\wl{\par \vspace{\baselineskip}\noindent}
+\def\beginmyfig{\begin{figure}[htbp]\begin{center}}
+\def\endmyfig{\end{center}\end{figure}}
+\def\prodl{\prod\limits_{i=1}^n}
+\def\suml{\sum\limits_{i=1}^n}
+
+\begin{document}
+% my title:
+\begin{center}
+  \section*{\textbf{Stat637 Homework 1-2}}
+  \subsection*{\textbf{Arthur Lui}}
+  \subsection*{\noindent\today}
+\end{center}
+
+\section{AIDS Data}
+<<design,echo=F>>=
+  source("../poisRegression/aids.R",chdir=T)
+@
+\subsection{Plot of Number of Cases Against Time Period}
+\beginmyfig
+%\caption{}
+%\vspace{-5mm}
+<<fig=T,echo=F,height=3.7>>=
+  plotall()
+@
+\endmyfig
+
+
+\section{Computing Estimates for $b^{(t)}$}
+With starting values of $b^{(0)}=(0,0)$, the aliterative weighted least squares
+algorithm computed esitmates that converged to (\Sexpr{round(out$b[1],6)},
+\Sexpr{round(out$b[2],6)}). Using the \textit{glm} function in R, the estimate
+computed were also (\Sexpr{round(poismod$coef[1],6)},
+\Sexpr{round(poismod$coef[2],6)}). The table below summarizes the value of the
+estimates and their $95\%$ confidence intervals.
+<<xtable1,results=tex,echo=F>>=
+  library(xtable)
+  xtable(M,digits=6)
+@
+
+
+
+
+\end{document}
+

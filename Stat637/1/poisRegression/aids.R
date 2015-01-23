@@ -5,12 +5,26 @@ y <- c(1,6,16,23,27,39,31,30,43,51,63,70,88,97,91,104,110,113,149,159)
 par(mfrow=c(1,2),cex.main=.9)
 
 # 1a)
-plot(x,y,pch=20,cex=1.5,main="Number of Cases Vs. Time Period",
-     xlab="Time Period",ylab="Number of Cases")
+plot1a <- function() {
+  plot(x,y,pch=20,cex=1.5,main="Number of Cases Vs. Time Period",
+       xlab="Time Period",ylab="Number of Cases",cex.main=.9)
+}
+plot1a()
 
 # 1b)
-plot(log(x),log(y),pch=20,cex=1.5,main="Log Number of Cases Vs. 
-     \n Log Time Period", xlab="Log Time Period",ylab="Log Number of Cases")
+plot1b <- function() {
+  plot(log(x),log(y),pch=20,cex=1.5,cex.main=.9,main="Log Number of Cases Vs. 
+       \n Log Time Period", xlab="Log Time Period",ylab="Log Number of Cases")
+}
+plot1b()
+
+plotall <- function() {
+  par(mfrow=c(1,2))
+    plot1a()
+    plot1b()
+  par(mfrow=c(1,1))
+}
+plotall()
 ############################################################################
 
 # 1c)
@@ -32,11 +46,11 @@ iwls <- function(X,y,b=NULL,eps=1e-5,maxits=500) {
   }
 
   rownames(b) <- c("Intercept","Slope")
-  cat("Iterations: ",its,"\n")
+  #cat("Iterations: ",its,"\n")
   cov.b <- solve(tW%*%X)
   colnames(cov.b) <- rownames(cov.b) <- rownames(b)
 
-  list("b"=b,"cov"=cov.b)
+  list("b"=b,"cov"=cov.b,"its"=its)
 }
 
 out <- iwls(log(x),y)
@@ -51,7 +65,7 @@ out$cov
 M <- matrix(0,2,3)
 M[1,] <- c(out$b[1],qnorm(c(.025,.975),out$b[1],sqrt(diag(out$cov)[1])))
 M[2,] <- c(out$b[2],qnorm(c(.025,.975),out$b[2],sqrt(diag(out$cov)[2])))
-colnames(M) <- c("Estimate","Lower.CI","Upper.CI")
+colnames(M) <- c("Estimate","Lower 95% CI","Upper 95% CI")
 rownames(M) <- c("Intercept","Slope")
 M
 

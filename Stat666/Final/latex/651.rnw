@@ -72,7 +72,7 @@ sampled dishes (occupied columns). Figure1 shows a draw from an IBP(10) with 50
 rows. The white squares are 1, indicating that a dish was taken; black squares
 are 0, indicating that a dish was not taken. \\
 \beginmyfig
-\caption{IBP($N=50$, $\alpha=10$)}
+%\caption{}
 %\vspace{-5mm}
 <<fig=T,echo=F,height=3.7>>=
   opts <- par()
