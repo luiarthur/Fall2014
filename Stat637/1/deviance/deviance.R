@@ -24,7 +24,7 @@ bh.int <- mod.int$coef
 D.0 <- sum((y-bh.int)^2)
 mod.int
 D.0 
-pchisq(D.int,n-1)
+pchisq(D.0,n-1)
 
 # 2ii) Intercept, normal
 norm.int <- glm(x~1)
@@ -44,10 +44,10 @@ D.1.norm
 pchisq(D.1.norm,n-1)
 
 # 2b: How do the 4 models compare to the corresponding saturated models?
-pchisq(D.0,n-1,lower=F) # significantly different from saturated model
-pchisq(D.1,n-2,lower=F) # not significantly different from sat. model
-pchisq(D.0.norm,n-1,lower=F) # not significantly different from sat. model 
-pchisq(D.1.norm,n-2,lower=F) # not significantly different from sat. model
+p1 <- pchisq(D.0,n-1,lower=F) # significantly different from saturated model
+p2 <- pchisq(D.1,n-2,lower=F) # not significantly different from sat. model
+p3 <- pchisq(D.0.norm,n-1,lower=F) # not significantly different from sat. model 
+p4 <- pchisq(D.1.norm,n-2,lower=F) # not significantly different from sat. model
 
 # 2c:
 d.D <- D.0 - D.1
