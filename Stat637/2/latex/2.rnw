@@ -20,7 +20,9 @@
 \begin{document}
 % my title:
 \begin{center}
-  \section*{\textbf{Stat637 Homework 3}}
+  \section*{\textbf{Stat637 Homework 3}
+    \footnote{https://github.com/luiarthur/Fall2014/blob/master/Stat637/2/sleep.R}
+  }  
   \subsection*{\textbf{Arthur Lui}}
   \subsection*{\noindent\today}
 \end{center}
@@ -72,8 +74,7 @@ c) 26.07\\
 \noindent
 d) The 95\% confidence interval for the chance of remission given an L1 of 8 is
    (0.01121483, 0.31924807). So, we are 95\% confident that the true chance of 
-   remission given an L1 of 8 is in between 0.01121483 and 0.31924807.\\
+   remission given an L1 of 8 is in between 0.01121483 and 0.31924807.
 
-\section{Code} 
 \end{document}
 
