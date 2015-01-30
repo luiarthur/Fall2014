@@ -1,3 +1,5 @@
+library(xtable)
+
 y1 <- sleep$extra[which(sleep$group==1)]
 y2 <- sleep$extra[which(sleep$group==2)]
 
@@ -84,12 +86,12 @@ smod.log
 #            in L1. The coefficient is significant for predicting probability of 
 #            remission.
 new.dat <- data.frame(x=seq(28,29,len=1000))
-pred <- predict(mod,newdat=new.dat,type="response",se.fit=T)
+pred <- predict(mod.log,newdat=new.dat,type="response",se.fit=T)
 l1.5 <- new.dat[which.min(abs(pred$fit-.5)),]
 l1.5
 
 
-pred.8 <- predict(mod,newdat=data.frame(x=8),se.fit=T)
+pred.8 <- predict(mod.log,newdat=data.frame(x=8),se.fit=T)
 est <- pred.8$fit
 est.se <- pred.8$se.fit
 eta.ci <- calc.ci(est,est.se)
