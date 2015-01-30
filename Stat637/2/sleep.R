@@ -4,7 +4,7 @@ y2 <- sleep$extra[which(sleep$group==2)]
 y1 <- ifelse(y1>0,1,0)
 y2 <- ifelse(y2>0,1,0)
 
-n <- length(p1)
+n <- length(y1)
 
 #1a) 
 calc.ci <- function(p,sd) {
@@ -63,4 +63,35 @@ calc.ci <- function(p,sd) {
 #1c) Do any of the ci types provide wvidence that one of the drugs is significantly
 #    better?
 
+#3)
+dat <- read.table("case.txt",header=T)
+y <- dat$Rem
+m <- dat$Cases
+x <- dat$L1
 
+#a)
+mod.clog <- glm(y/m~x,weights=m,family=binomial(link="cloglog"))
+mod.log  <- glm(y/m~x,weights=m,family=binomial(link="logit"))
+mod.prob <- glm(y/m~x,weights=m,family=binomial(link="probit"))
+
+# logit has slightly higher resid dev. than probit. But logit is easier to 
+# interpret, so I choose logit.
+
+#b)
+smod.log <- summary(mod.log)
+smod.log
+# Interpret: The expected increase in log odds is .14486 for a one level increase
+#            in L1. The coefficient is significant for predicting probability of 
+#            remission.
+new.dat <- data.frame(x=seq(28,29,len=1000))
+pred <- predict(mod,newdat=new.dat,type="response",se.fit=T)
+l1.5 <- new.dat[which.min(abs(pred$fit-.5)),]
+l1.5
+
+
+pred.8 <- predict(mod,newdat=data.frame(x=8),se.fit=T)
+est <- pred.8$fit
+est.se <- pred.8$se.fit
+eta.ci <- calc.ci(est,est.se)
+pred.8.ci <- exp(eta.ci) / (1+exp(eta.ci))
+pred.8.ci
