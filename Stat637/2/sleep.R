@@ -85,9 +85,9 @@ smod.log
 # Interpret: The expected increase in log odds is .14486 for a one level increase
 #            in L1. The coefficient is significant for predicting probability of 
 #            remission.
-new.dat <- data.frame(x=seq(28,29,len=1000))
-pred <- predict(mod.log,newdat=new.dat,type="response",se.fit=T)
-l1.5 <- new.dat[which.min(abs(pred$fit-.5)),]
+new.dat <- data.frame(x=seq(26,26.1,len=1000))
+pred <- predict(mod.log,newdat=new.dat,type="response")
+l1.5 <- new.dat[which.min(abs(pred-.5)),]
 l1.5
 
 
