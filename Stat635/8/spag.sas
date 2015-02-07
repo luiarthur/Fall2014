@@ -23,7 +23,6 @@ run;
 data corn;
   set 'sasDat/corn.sas7bdat';
 run;
-proc print; run;
 
 data carbon;
   set 'sasDat/carbon.sas7bdat';
@@ -46,3 +45,4 @@ proc sgpanel data=carbon;
   series y=wt x=day/group=ID;
 run;
 
+proc print data=carbon; run;
