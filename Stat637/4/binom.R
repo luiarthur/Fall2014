@@ -14,7 +14,6 @@ art.roc <- function(y,p,n=1e3) {
     O[i,1] <- 1-spec
     O[i,2] <- sens
   }
-
   O
 }
 
@@ -213,4 +212,35 @@ make.my.plots <- function() {
  
 pdf("auc.pdf")
   make.my.plots() 
+dev.off()
+
+####################################### MICKEY
+n <- nrow(x)
+m = 500
+lower = 0
+upper = 1
+cutoff = seq(lower,upper,length=m)
+pos.rate = double(m)
+neg.rate = double(m)
+error = double(m)
+
+p <- predict(my.mod.logit$mod,type="response")
+for (i in 1:m){
+    t.pos = sum(y == 1 & p > cutoff[i])
+    t.neg = sum(y == 0 & p < cutoff[i])
+    total.neg = (n-0)-sum(y)
+    total.pos = sum(y)
+
+    pos.rate[i] = 1-t.pos/total.pos
+    neg.rate[i] = 1-t.neg/total.neg
+    error[i] = 1-(t.pos+t.neg)/(n-0)
+    }
+
+pdf("error.pdf")
+plot(cutoff, pos.rate, type='s', col="darkblue", ylab="Error Rate",
+    xlab="Threshold", main="Predictive Error Rates")
+points(cutoff, neg.rate, type='s', col="red")
+points(cutoff, error, type='s', col="green", lwd=2)
+legend(0.6, 1, legend=c("False Positive", "False Negative", "Overall Error"),
+    col=c("darkblue", "red", "green"), lwd=c(1,1,2), lty=1, cex=1.1)
 dev.off()
