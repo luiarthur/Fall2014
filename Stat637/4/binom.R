@@ -156,5 +156,6 @@ par(mfrow=c(1,1))
 
 # Notes from Arthur:
 #   - Should we go with the Logit model because AUC is just slightly (<.01) smaller
-#     than clog-log and probit models, but is easier to interpret?
+#     than clog-log and probit models, but is easier to interpret, and has the 
+#     fewest number of covariates?
 
