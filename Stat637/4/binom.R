@@ -1,3 +1,24 @@
+art.roc <- function(y,p,n=1e3) {
+  p0 <- seq(0,1,len=n)
+  O <- matrix(0,n,2)
+  colnames(O) <- c("1-Specificity","Sensitivity")
+
+  for (i in 1:n) {
+    p.hat <- ifelse(p>p0[i],1,0)
+
+    true.ind <- which(y==1)
+    false.ind <- which(y==0)
+    sens <- mean(y[true.ind]==p.hat[true.ind])
+    spec <- mean(y[false.ind]==p.hat[false.ind])
+
+    O[i,1] <- 1-spec
+    O[i,2] <- sens
+  }
+
+  O
+}
+
+library(pROC)
 library(foreign)
 dat_slc <- read.csv("data/slcmormon.txt")
 dat_sf <- data.frame(read.spss("data/sfsample.SAV"))
@@ -130,9 +151,8 @@ fit.model <- function(my.link="logit") {
   mod.all <- glm(y~., data=x, family=binomial(link=my.link))
   mod.forward <- step(mod.int, scope=list(lower=mod.int,upper=mod.all), 
                       direction='both',data=x) 
-  summary(mod)
+  #summary(mod)
 
-  library(pROC)
   resp <- predict(mod.forward,type="response")
   my.roc <- roc(y,resp)
   #plot(my.roc)
@@ -140,10 +160,13 @@ fit.model <- function(my.link="logit") {
   
   out <- list("model"=mod.forward,"roc"=my.roc,"auc"=round(my.auc,5))
 }
- 
+
+
 mod.logit <- fit.model("logit") 
 mod.probit <- fit.model("probit") 
 mod.cloglog <- fit.model("cloglog") 
+
+summary(mod.logit$mod)
 
 par(mfrow=c(3,1))
   plot(mod.logit$roc,main=paste("Logit Model,AUC =",mod.logit$auc),col="blue")
@@ -158,4 +181,36 @@ par(mfrow=c(1,1))
 #   - Should we go with the Logit model because AUC is just slightly (<.01) smaller
 #     than clog-log and probit models, but is easier to interpret, and has the 
 #     fewest number of covariates?
+##############################################################################
 
+final.mod <- function(my.link="logit") {
+  temp <- glm(y~CITY+PRVPRAYR+CITY*PRVPRAYR+FRIEND+SACRMTG+LDS,data=x,
+              family=binomial(link=my.link))
+  resp <- predict(temp,type="response")
+  my.roc <- roc(y,resp)
+  #plot(my.roc)
+  my.auc <- auc(my.roc)+0
+  out <- list("model"=temp,"roc"=my.roc,"auc"=round(my.auc,5))
+}
+
+my.mod.logit <- final.mod()
+my.mod.probit <- final.mod("probit")
+my.mod.cloglog <- final.mod("cloglog")
+
+summary(my.mod.logit$mod)
+summary(my.mod.probit$mod)
+summary(my.mod.cloglog$mod)
+
+library(xtable)
+xtable(my.mod.logit$mod)
+
+make.my.plots <- function() {
+  p.log <- art.roc(y,predict(my.mod.logit$mod,type="response"))
+  plot(p.log,main=paste("Logit Model, AUC =",my.mod.logit$auc),col="blue",
+       type="l",lwd=3)
+  abline(0,1)     
+}
+ 
+pdf("auc.pdf")
+  make.my.plots() 
+dev.off()
