@@ -1,3 +1,36 @@
+sum.matrices <- function(Ms,return.matrices=F) { 
+# Ms is a list of matrices of different lengths
+# return.matrices is a boolean. If FALSE, function returns the sum of the matrices.
+# If TRUE, function returns a list of the matrices also.
+
+  l <- length(Ms)
+  max.c <- max(unlist(lapply(Ms,ncol)))
+  max.r <- max(unlist(lapply(Ms,nrow)))
+  
+  for (i in 1:l) {
+    M <- Ms[[i]]
+    
+    ncol0 <- max.c - ncol(M)
+    nrow0 <- max.r - nrow(M)
+
+    if (ncol0>0) {
+      col0 <- matrix(0,nrow(M),ncol0)
+      M <- Ms[[i]] <- cbind(Ms[[i]],col0)
+    }
+
+    if (nrow0>0) {
+      row0 <- matrix(0,nrow0,ncol(M))
+      M <- Ms[[i]] <- rbind(Ms[[i]],row0)
+    }
+  }
+
+  out <- Reduce("+",Ms)
+
+  if (return.matrices) out <- list("sum"=out,"matrices"=Ms)
+
+  out
+}
+
 art.roc <- function(y,p,n=1e3) {
   p0 <- seq(0,1,len=n)
   O <- matrix(0,n,2)
@@ -24,10 +57,10 @@ dat_sf <- data.frame(read.spss("data/sfsample.SAV"))
 
 ### data cleaning
 # initialize
-x = data.frame(matrix(0, nrow(dat_slc) + nrow(dat_sf), 14))
+x = data.frame(matrix(0, nrow(dat_slc) + nrow(dat_sf), 12))
 colnames(x) = c("CITY", "LDS", "PRNTACTV", "SACRMTG", "AGE",
     "INCOME", "EDUC", "PRVPRAYR", "READSCRP", "MARITAL",
-    "SEX", "PSTH", "FRIEND", "MISSION")
+    "SEX", "FRIEND")
 # 256, 28, 251, 252, 271, 36, 33, 270, 269, 3, 4, 6
 
 # city indicator (0 for SF, 1 for SLC)
@@ -97,16 +130,16 @@ x$MARITAL = c(dat_sf[,270], dat_slc[,270])
 x$SEX = 2 - c(dat_sf[,269], dat_slc[,269])
 
 # priesthood office (3)
-x$PSTH = c(dat_sf[,3], dat_slc[,3])
-x$PSTH[x$SEX == 0] = 0  # set priesthood to 0 if female
-                        # may need to deal with this
-                        # just ignore priesthood office?
+# x$PSTH = c(dat_sf[,3], dat_slc[,3])
+# x$PSTH[x$SEX == 0] = 0  # set priesthood to 0 if female
+#                         # may need to deal with this
+#                         # just ignore priesthood office?
 
 # lds friends (4)
-x$FRIEND = c(dat_sf[,4], dat_slc[,4])
+x$FRIEND = c(c(dat_sf[,4])-1, dat_slc[,4])
 
 # lds friends (6)
-x$MISSION = c(dat_sf[,6], dat_slc[,6]) - 1
+# x$MISSION = c(dat_sf[,6], dat_slc[,6]) - 1
 
 # response
 temp_sf = ifelse(dat_sf[,7] == "Born in the LDS Church, but no longer affiliated" |
@@ -136,6 +169,7 @@ x = x[-miss.all,]
 x[,names(x)] = lapply(x[,names(x)], factor)
 x$AGE = c(x$AGE)
 x$INCOME = c(x$INCOME)
+x$FRIEND = c(x$FRIEND)
 
 
 ### model fitting
@@ -182,6 +216,8 @@ par(mfrow=c(1,1))
 #     fewest number of covariates?
 ##############################################################################
 
+
+
 final.mod <- function(my.link="logit") {
   temp <- glm(y~CITY+PRVPRAYR+CITY*PRVPRAYR+FRIEND+SACRMTG+LDS,data=x,
               family=binomial(link=my.link))
@@ -189,6 +225,7 @@ final.mod <- function(my.link="logit") {
   my.roc <- roc(y,resp)
   #plot(my.roc)
   my.auc <- auc(my.roc)+0
+
   out <- list("model"=temp,"roc"=my.roc,"auc"=round(my.auc,5))
 }
 
@@ -214,8 +251,81 @@ pdf("auc.pdf")
   make.my.plots() 
 dev.off()
 
-####################################### MICKEY
+pdf("auc3.pdf",height=3.5)
+  par(mfrow=c(1,3))
+
+  p.log <- art.roc(y,predict(my.mod.logit$mod,type="response"))
+  plot(p.log,main=paste("Logit Model, AUC =",my.mod.logit$auc),col="blue",
+       type="l",lwd=3)
+  abline(0,1)
+
+  p.pro <- art.roc(y,predict(my.mod.probit$mod,type="response"))
+  plot(p.pro,main=paste("Probit Model, AUC =",my.mod.probit$auc),col="blue",
+       type="l",lwd=3)
+  abline(0,1)
+
+  p.clog <- art.roc(y,predict(my.mod.cloglog$mod,type="response"))
+  plot(p.clog,main=paste("Cloglog Model, AUC =",my.mod.cloglog$auc),col="blue",
+       type="l",lwd=3)
+  abline(0,1)
+
+  par(mfrow=c(1,1))
+dev.off()
+
+
+cv <- function(train.ind,dat=x) { # train.ind = index for training set
+  train <- dat[train.ind,]
+  test <- dat[-train.ind,]
+  y.train <- y[train.ind]
+  y.test <- y[-train.ind]
+  
+  mod <- glm(y.train~CITY+PRVPRAYR+CITY*PRVPRAYR+FRIEND+SACRMTG+LDS,data=train,
+              family=binomial(link="logit"))
+  
+  pred <- predict(mod,newdata=test,type="response")
+
+  my.roc <- roc(y.test,pred)
+  my.auc <- auc(my.roc)+0
+  artROC <- art.roc(y.test,pred)
+
+
+  out <- list("model"=mod,"roc"=my.roc,"auc"=round(my.auc,5),"artROC"=artROC,
+              "pred"=pred,"y.test"=y.test)
+  out
+}
+
 n <- nrow(x)
+####################################
+
+samp <- sample(1:n)
+l <- 10
+k <- floor(n/l)
+cv.mods <- as.list(1:l)
+for (i in 1:l) {
+  samp.i <- samp[((i-1)*k+1):(min(n,i*k))]
+  print(samp.i)
+  cv.mods[[i]] <- cv(samp.i)
+}
+
+errorRates <- NULL
+library(doMC)
+library(foreach)
+registerDoMC(16)
+do.it <- function(i,p=.5) {
+  errorRates[i] <- mean(cv.mods[[i]]$y.test == ifelse(cv.mods[[i]]$pred>p,1,0))
+}
+
+errorRates <- foreach(i=1:l,.combine=rbind,.errorhandling="pass") %dopar% do.it(i,.5)
+mean.error <- mean(errorRates)
+mean.aucs <- mean(unlist(lapply(cv.mods,function(x) x$auc)))
+sd.aucs <- sd(unlist(lapply(cv.mods,function(x) x$auc)))
+
+range(errorRates)
+range(aucs)
+
+plot(cv.mods[[3]]$artROC,main=paste("Logit Model (cv), AUC =",cv.mods[[3]]$auc),
+     col="blue", type="l",lwd=3); abline(0,1)
+####################################### MICKEY
 m = 500
 lower = 0
 upper = 1
@@ -244,3 +354,31 @@ points(cutoff, error, type='s', col="green", lwd=2)
 legend(0.6, 1, legend=c("False Positive", "False Negative", "Overall Error"),
     col=c("darkblue", "red", "green"), lwd=c(1,1,2), lty=1, cex=1.1)
 dev.off()
+
+
+#####################################################3
+cutoff = .5
+p <- predict(my.mod.logit$mod,type="response")
+t.pos = sum(y == 1 & p > cutoff)
+t.neg = sum(y == 0 & p < cutoff)
+total.neg = (n-0)-sum(y)
+total.pos = sum(y)
+
+pos.rate[i] = 1-t.pos/total.pos
+neg.rate[i] = 1-t.neg/total.neg
+error[i] = 1-(t.pos+t.neg)/(n-0)
+
+t.pos
+t.neg
+
+confusion <- matrix(0,2,2)
+colnames(confusion) <- c("Prediction=0","Prediction=1")
+rownames(confusion) <- c("y=0","y=1")
+
+confusion[1,1] <- t.neg
+confusion[1,2] <- total.neg-t.neg
+confusion[2,1] <- total.pos-t.pos
+confusion[2,2] <- t.pos
+
+confusion
+xtable(confusion)
