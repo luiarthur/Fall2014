@@ -122,11 +122,16 @@ plot.contour <- function(M,...) {
 
 plot.posts <- function(M,names=rep(NULL,ncol(M)),cex.legend=.7,keep.par=F) {
   k <- ncol(M)
+  corrs <- cor(M)
   set <- par(no.readonly=T)
   par(mfrow=c(k,k))
     for (i in 1:k) {
       if (i>1) {
-        for (j in 1:(i-1)) plot(1, type="n", axes=F, xlab="", ylab="") # empty plot
+        for (j in 1:(i-1)) { 
+          plot(1, type="n", axes=F, xlab="", ylab="") # empty plot
+          legend("center",legend=corrs[i,j],
+                 title=paste0("Corr (",names[i],",",names[j],")"))
+        }  
       }
       
       plot.post(M[,i],cex.l=cex.legend,main=names[i])
