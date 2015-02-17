@@ -53,10 +53,13 @@ m.probit <- function(y,X,n=nrow(X),k=ncol(X),prior.b=cbind(rep(0,k),rep(5,k)),
 out <- m.probit(y,X,cand.s=c(1,.02,1),trim.burn=T,B=1e5)
 out$acc
 
-source("plotPost.R")
-plot.post(out$post[,1],main="beta_0",trace=T)
-plot.post(out$post[,2],main="beta_1",trace=T)
-plot.post(out$post[,3],main="beta_2",trace=T)
+par(mfrow=c(3,1))
+  plot.post(out$post[,1],main="beta_0",trace=T)
+  par(mfg=c(2,1,3,1))
+  plot.post(out$post[,2],main="beta_1",trace=T)
+  par(mfg=c(3,1,3,1))
+  plot.post(out$post[,3],main="beta_2",trace=T)
+par(mfrow=c(1,1))
 
 
 hpd.95 <- t(apply(out$post,2,get.hpd))

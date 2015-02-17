@@ -57,6 +57,15 @@ plot.post <- function(x,main=NULL,hpd=T,color="cornflowerblue",trace=T) {
   rng.x <- range(den$x)
   x.diff <- rng.x[2] - rng.x[1]
 
+  color.den(den,rng.x[1],rng.x[2],col.den=color,col.area=color,add=T)
+  if (hpd) {
+    hpd <- get.hpd(x)
+    color.den(den,hpd[1],hpd[2],col.den=col.mult(color),
+              col.area=col.mult(color),add=T)
+  }
+  lines(c(mn.x,mn.x),c(0,bound(mn.x,den,ret=F)),lwd=2,col="red")
+  #abline(v=mn.x,col="red",lwd=2)
+
   if (trace) {
     opts <- par(no.readonly=T)
       left <- rng.x[1] + x.diff*2/3
@@ -69,16 +78,6 @@ plot.post <- function(x,main=NULL,hpd=T,color="cornflowerblue",trace=T) {
       axis(2,cex.axis=.5)
     par(opts)
   }
-
-  color.den(den,rng.x[1],rng.x[2],col.den=color,col.area=color,add=T)
-  if (hpd) {
-    hpd <- get.hpd(x)
-    color.den(den,hpd[1],hpd[2],col.den=col.mult(color),
-              col.area=col.mult(color),add=T)
-  }
-
-  lines(c(mn.x,mn.x),c(0,bound(mn.x,den,ret=F)),lwd=2,col="red")
-  #abline(v=mn.x,col="red",lwd=2)
 }
 
 
