@@ -2,18 +2,12 @@ library(truncnorm) # for rtruncnorm
 source("plotPost.R")
 source("countDown.R")
 
-library(MASS) # filled.contour, kde2d
-plot.contour <- function(M,...) {
-  J <- kde2d(M[,1],M[,2])
-  contour(J,...)
-}
-
 dat <- read.table("sore.txt",header=T)
 
 y <- dat$Y
 X <- cbind(1,dat$D,dat$T)
 
-mvrnorm <- function(M,S,n=nrow(S))  M + t(chol(S)) %*% rnorm(n)
+mvrnorm <- function(M,S,n=nrow(S)) M + t(chol(S)) %*% rnorm(n)
 
 updateZ <- function(x,y,b){
   z <- numeric(length(y))
@@ -24,7 +18,7 @@ updateZ <- function(x,y,b){
 
 
 gibb <- function(y,X,n=nrow(X),k=ncol(X),B=1e4,burn=round(B*.1),
-                 trim.burn=F,V=diag(2,k)) {
+                 trim.burn=F,V=diag(1,k)) {
   
   S <- solve(t(X)%*%X + solve(V))
   Xt <- t(X)
@@ -37,7 +31,7 @@ gibb <- function(y,X,n=nrow(X),k=ncol(X),B=1e4,burn=round(B*.1),
   for (i in 2:B){
     #Updates:
     old.time <- Sys.time()
-    z <- updateZ(X,y,beta[i,])
+    z <- updateZ(X,y,beta[i-1,])
     beta[i,] <- mvrnorm(S %*% Xt%*%z, S) 
     count.down(old.time,i,B)
   }
@@ -47,34 +41,10 @@ gibb <- function(y,X,n=nrow(X),k=ncol(X),B=1e4,burn=round(B*.1),
 
 out <- gibb(y,X,B=1e3)
 
-#par(mfrow=c(3,1))
-#  plot.post(out[,1],main="beta_0",trace=T)
-#  par(mfg=c(2,1,3,1))
-#  plot.post(out[,2],main="beta_1",trace=T)
-#  par(mfg=c(3,1,3,1))
-#  plot.post(out[,3],main="beta_2",trace=T)
-#par(mfrow=c(1,1))
+plot.posts(out,names=c("b0","b1","b2"))
 
-plot.posts <- function(M,cex.legend=.7) {
-  k <- ncol(M)
-  set <- par(no.readonly=T)
-  par(mfrow=c(k,k))
-    for (i in 1:k) {
-      if (i>1) {
-        for (j in 1:(i-1)) plot(1, type="n", axes=F, xlab="", ylab="") # empty plot
-      }
-
-      plot.post(out[,i],cex.l=cex.legend)
-
-      if (i<k) {
-        for (j in (i+1):k) {
-          plot(out[,c(i,j)],type="l",col="gray85")
-          plot.contour(out[,c(i,j)],add=T)
-        }
-      }  
-    }
-  par(set)
-}
-
-plot.posts(out)
+hpd.95 <- t(apply(out,2,get.hpd))
+rownames(hpd.95) <- paste0("beta",0:2)
+colnames(hpd.95) <- c("Lower 95% HPD","Upper 95% HPD")
+hpd.95
 
