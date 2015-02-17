@@ -134,7 +134,7 @@ plot.posts <- function(M,names=rep(NULL,ncol(M)),cex.legend=.7,keep.par=F) {
       if (i<k) {
         for (j in (i+1):k) {
           plot(M[,c(j,i)],type="l",col="gray85",xlab=names[j],ylab=names[i],
-               main=paste("Trace & Contour \n",names[j],"vs",names[i]))
+               main=paste("Trace & Contour \n",names[i],"vs",names[j]))
           plot.contour(M[,c(j,i)],add=T)
         }
       }  
