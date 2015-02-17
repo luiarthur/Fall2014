@@ -2,6 +2,12 @@ library(truncnorm) # for rtruncnorm
 source("plotPost.R")
 source("countDown.R")
 
+library(MASS) # filled.contour, kde2d
+plot.contour <- function(M,...) {
+  J <- kde2d(M[,1],M[,2])
+  contour(J,...)
+}
+
 dat <- read.table("sore.txt",header=T)
 
 y <- dat$Y
@@ -39,12 +45,36 @@ gibb <- function(y,X,n=nrow(X),k=ncol(X),B=1e4,burn=round(B*.1),
   beta
 }
 
-out <- gibb(y,X,B=1e5)
+out <- gibb(y,X,B=1e3)
 
-par(mfrow=c(3,1))
-  plot.post(out[,1],main="beta_0",trace=T)
-  par(mfg=c(2,1,3,1))
-  plot.post(out[,2],main="beta_1",trace=T)
-  par(mfg=c(3,1,3,1))
-  plot.post(out[,3],main="beta_2",trace=T)
-par(mfrow=c(1,1))
+#par(mfrow=c(3,1))
+#  plot.post(out[,1],main="beta_0",trace=T)
+#  par(mfg=c(2,1,3,1))
+#  plot.post(out[,2],main="beta_1",trace=T)
+#  par(mfg=c(3,1,3,1))
+#  plot.post(out[,3],main="beta_2",trace=T)
+#par(mfrow=c(1,1))
+
+plot.posts <- function(M,cex.legend=.7) {
+  k <- ncol(M)
+  set <- par(no.readonly=T)
+  par(mfrow=c(k,k))
+    for (i in 1:k) {
+      if (i>1) {
+        for (j in 1:(i-1)) plot(1, type="n", axes=F, xlab="", ylab="") # empty plot
+      }
+
+      plot.post(out[,i],cex.l=cex.legend)
+
+      if (i<k) {
+        for (j in (i+1):k) {
+          plot(out[,c(i,j)],type="l",col="gray85")
+          plot.contour(out[,c(i,j)],add=T)
+        }
+      }  
+    }
+  par(set)
+}
+
+plot.posts(out)
+
