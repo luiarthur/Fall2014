@@ -45,7 +45,7 @@ gibb <- function(y,X,n=nrow(X),k=ncol(X),B=1e4,burn=round(B*.1),
   list("beta"=beta,"dev"=dev)
 }
 
-outs <- gibb(y,X,B=1e3)
+outs <- gibb(y,X,B=1e4)
 out <- outs$beta
 
 #opts <- par(no.readonly=T)
