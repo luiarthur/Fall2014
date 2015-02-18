@@ -129,8 +129,9 @@ plot.posts <- function(M,names=rep(NULL,ncol(M)),cex.legend=.7,keep.par=F) {
       if (i>1) {
         for (j in 1:(i-1)) { 
           plot(1, type="n", axes=F, xlab="", ylab="") # empty plot
-          legend("center",legend=corrs[i,j],
-                 title=paste0("Corr (",names[i],",",names[j],")"))
+          text(corrs[i,j],cex=5)
+          #legend("center",legend=corrs[i,j],
+          #       title=paste0("Corr (",names[i],",",names[j],")"))
         }  
       }
       
