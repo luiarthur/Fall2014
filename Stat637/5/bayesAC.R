@@ -45,7 +45,7 @@ gibb <- function(y,X,n=nrow(X),k=ncol(X),B=1e4,burn=round(B*.1),
   list("beta"=beta,"dev"=dev)
 }
 
-outs <- gibb(y,X,B=1e3)
+outs <- gibb(y,X,B=1e5)
 out <- outs$beta
 
 plot.posts(out,names=c("b0","b1","b2"))
@@ -55,4 +55,12 @@ plot.posts(out,names=c("b0","b1","b2"))
 #colnames(hpd.95) <- c("Lower 95% HPD","Upper 95% HPD")
 #hpd.95
 
-plot(density(out$dev))
+dev <- outs$dev[which(!(is.na(outs$dev)))]
+plot.post(dev)
+
+x0 <- c(1,44,1)
+z <- out%*%x0 
+p <- pnorm(z)
+
+plot.post(p,"p")
+

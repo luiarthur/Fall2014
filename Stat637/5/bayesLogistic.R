@@ -61,6 +61,7 @@ m.probit <- function(y,X,n=nrow(X),k=ncol(X),prior.b=cbind(rep(0,k),rep(1,k)),
 out <- m.probit(y,X,cand.s=c(1,.02,1),trim.burn=T,B=1e4)
 out$acc
 
+par(new=T)
 plot.posts(out$post,names=c("b0","b1","b2"))
 
 #hpd.95 <- t(apply(out$post,2,get.hpd))
@@ -72,4 +73,10 @@ plot.posts(out$post,names=c("b0","b1","b2"))
 # Need to interpret values!!!
 
 plot.new()
-plot(density(out$dev,na.rm=T))
+dev <- out$dev[which(!(is.na(out$dev)))]
+plot.post(dev)
+
+x0 <- c(1,44,1)
+p <- pnorm(out$post%*%x0)
+plot.post(p,"p")
+
