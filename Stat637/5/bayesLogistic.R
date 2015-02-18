@@ -61,8 +61,8 @@ m.probit <- function(y,X,n=nrow(X),k=ncol(X),prior.b=cbind(rep(0,k),rep(1,k)),
 out <- m.probit(y,X,cand.s=c(1,.02,1),trim.burn=T,B=1e4)
 out$acc
 
-par(new=T)
-plot.posts(out$post,names=c("b0","b1","b2"))
+#opts <- par(no.readonly=T)
+#plot.posts(out$post,names=c("b0","b1","b2"));par(opts)
 
 #hpd.95 <- t(apply(out$post,2,get.hpd))
 #rownames(hpd.95) <- paste0("beta",0:2)
@@ -72,11 +72,19 @@ plot.posts(out$post,names=c("b0","b1","b2"))
 # Need to compute deviance!!!
 # Need to interpret values!!!
 
-plot.new()
 dev <- out$dev[which(!(is.na(out$dev)))]
-plot.post(dev)
+#plot.post(dev);par(opts)
 
 x0 <- c(1,44,1)
 p <- pnorm(out$post%*%x0)
-plot.post(p,"p")
+#plot.post(p,"p");par(opts)
 
+pdf("pics/postMs.pdf")
+  plot.posts(out$post,names=c("b0","b1","b2"),cex.l=.6,cex.a=.8)
+dev.off()
+pdf("pics/postMDev.pdf")
+  plot.post(dev)
+dev.off()
+pdf("pics/postMP.pdf")
+  plot.post(p,"p")
+dev.off()

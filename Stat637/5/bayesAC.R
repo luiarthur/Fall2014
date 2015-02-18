@@ -45,10 +45,11 @@ gibb <- function(y,X,n=nrow(X),k=ncol(X),B=1e4,burn=round(B*.1),
   list("beta"=beta,"dev"=dev)
 }
 
-outs <- gibb(y,X,B=1e5)
+outs <- gibb(y,X,B=1e3)
 out <- outs$beta
 
-plot.posts(out,names=c("b0","b1","b2"))
+#opts <- par(no.readonly=T)
+#plot.posts(out,names=c("b0","b1","b2"),cex.a=1,tck.d=2); par(opts)
 
 #hpd.95 <- t(apply(out,2,get.hpd))
 #rownames(hpd.95) <- paste0("beta",0:2)
@@ -56,11 +57,22 @@ plot.posts(out,names=c("b0","b1","b2"))
 #hpd.95
 
 dev <- outs$dev[which(!(is.na(outs$dev)))]
-plot.post(dev)
+#plot.post(dev); par(opts)
 
 x0 <- c(1,44,1)
 z <- out%*%x0 
 p <- pnorm(z)
 
-plot.post(p,"p")
+#plot.post(p,"p");par(opts)
+
+source("plotPost.R")
+pdf("pics/postGibbs.pdf")
+  plot.posts(out,names=c("b0","b1","b2"),cex.a=.8,tck.d=2,cex.l=.6)
+dev.off()
+pdf("pics/postGibbsDev.pdf")
+  plot.post(dev)
+dev.off()
+pdf("pics/postGibbsP.pdf")
+  plot.post(p,"p")
+dev.off()
 

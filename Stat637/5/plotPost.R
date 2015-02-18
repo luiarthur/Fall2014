@@ -1,4 +1,42 @@
-source("colorUnderCurve.R")
+my.color <- function(dat,from,to,col.den="black",col.area="red",...) {
+  if (is(dat)[1] == "function") {
+    color.fn(dat,from,to)
+  } else if (is(dat)[1] == "density") {
+    color.den(dat,from,to,col.den,col.area,...)
+  } else if (is(dat)[1] == "matrix") {
+    color.emp(dat,from,to)
+  }
+}
+
+
+color.den <- function(den,from,to,col.den="black",col.area="red",add=F,...) {
+  # Colors area under a density within an interval
+  # den has to be a density object
+  if (add) {
+    #lines(den,col=col.den,...)
+  } else {
+    plot(den,col=col.den,...)
+  }
+  polygon(c(from, den$x[den$x>=from & den$x<=to], to),
+          c(0, den$y[den$x>=from & den$x<=to], 0),
+          col=col.area,border=col.den)
+}
+
+color.fn <- function(f,from,to) {
+  x <- seq(from,to,by=(to-from)/10000)
+  polygon(c(from,x,to),
+          c(0,f(x),0),col="red")
+}
+
+
+color.emp <- function(M,from,to) {
+  x <- M[,1]
+  y <- M[,2]
+  polygon(c(from,x[x>=from & x<= to],to),
+          c(0,y[x>=from & x<=to],0),col="red")
+}
+
+
 bound <- function(x, dens, return.x=TRUE){
   # Mickey Warner: 
   # https://github.com/mickwar/r-sandbox/blob/master/mcmc/bayes_functions.R
@@ -42,7 +80,7 @@ int2rgb = function(x){
 }
 
 plot.post <- function(x,main=NULL,hpd=T,color="cornflowerblue",cex.l=1,trace=T,
-                      stay=F) {
+                      stay=F,tck.dig=4,...) {
   mn.x <- round(mean(x),5)
   v.x <- round(sd(x),3)
   den <- density(x)
@@ -51,21 +89,38 @@ plot.post <- function(x,main=NULL,hpd=T,color="cornflowerblue",cex.l=1,trace=T,
   diff <- rng[2]-rng[1]
   main <- ifelse(is.null(main),"Posterior Distribution",
                          paste("Posterior Distribution \n for",main))
-  plot(density(x),col=color,ylim=c(rng[1],rng[2]+diff*.3),lwd=3,
-       main=main)
-  legend("topleft",legend=c(paste("Mean =",mn.x),
-                            paste("Std. Dev. = ",v.x)),bty="n",cex=cex.l)
+  if (hpd) {
+  } else {
+  }
+
   rng.x <- range(den$x)
   x.diff <- rng.x[2] - rng.x[1]
 
-  color.den(den,rng.x[1],rng.x[2],col.den=color,col.area=color,add=T)
   if (hpd) {
     hpd <- get.hpd(x)
+
+    plot(density(x),col=color,ylim=c(rng[1],rng[2]+diff*.3),lwd=3,
+         main=main,xaxt="n")
+
+    color.den(den,rng.x[1],rng.x[2],col.den=color,col.area=color,add=T)
     color.den(den,hpd[1],hpd[2],col.den=col.mult(color),
-              col.area=col.mult(color),add=T)
+              col.area=col.mult(color),add=T) 
+    lines(c(mn.x,mn.x),c(0,bound(mn.x,den,ret=F)),lwd=2,col="red")
+
+    axis(1,at=c(hpd,mn.x),labels=round(c(hpd,mn.x),tck.dig),las=0,...)
+    legend("topleft",legend=c(paste("Mean =",mn.x),
+                              paste("Std. Dev. =",v.x),
+                              paste("Low HPD =",round(hpd[1],4)),
+                              paste("Upp HPD =",round(hpd[2],4))),
+                              bty="n",cex=cex.l)
+  } else {
+    plot(density(x),col=color,ylim=c(rng[1],rng[2]+diff*.3),lwd=3,main=main)
+    color.den(den,rng.x[1],rng.x[2],col.den=color,col.area=color,add=T)
+    lines(c(mn.x,mn.x),c(0,bound(mn.x,den,ret=F)),lwd=2,col="red")
+    legend("topleft",legend=c(paste("Mean =",mn.x),
+                              paste("Std. Dev. =",v.x)),
+                              bty="n",cex=cex.l)
   }
-  lines(c(mn.x,mn.x),c(0,bound(mn.x,den,ret=F)),lwd=2,col="red")
-  #abline(v=mn.x,col="red",lwd=2)
 
   mfg <- par()$mfg
 
@@ -120,7 +175,8 @@ plot.contour <- function(M,...) {
   contour(J,...)
 }
 
-plot.posts <- function(M,names=rep(NULL,ncol(M)),cex.legend=.7,keep.par=F) {
+plot.posts <- function(M,names=rep(NULL,ncol(M)),digits=4,cex.legend=.7,
+                       keep.par=F,tck.dig=4,cex.a=1/ncol(M)) {
   k <- ncol(M)
   corrs <- cor(M)
   set <- par(no.readonly=T)
@@ -128,14 +184,17 @@ plot.posts <- function(M,names=rep(NULL,ncol(M)),cex.legend=.7,keep.par=F) {
     for (i in 1:k) {
       if (i>1) {
         for (j in 1:(i-1)) { 
-          plot(1, type="n", axes=F, xlab="", ylab="") # empty plot
-          text(corrs[i,j],cex=5)
+          plot(1, type="n", axes=F, xlab="", ylab="",
+               main=paste0("Corr (",names[i],",",names[j],")")) # empty plot
+          r <- round(corrs[i,j],digits)
+          cex.cor <- max(.8/strwidth(format(r)) * abs(r),1)
+          text(1,labels=r,cex=cex.cor)
           #legend("center",legend=corrs[i,j],
           #       title=paste0("Corr (",names[i],",",names[j],")"))
         }  
       }
       
-      plot.post(M[,i],cex.l=cex.legend,main=names[i])
+      plot.post(M[,i],cex.l=cex.legend,main=names[i],tck.dig=tck.dig,cex.axis=cex.a)
 
       if (i<k) {
         for (j in (i+1):k) {
