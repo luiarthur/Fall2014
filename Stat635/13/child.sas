@@ -22,14 +22,14 @@ run;
 
 ods graphics on;
   proc MIXED data=child method=ml;
-    class sex;
-    model len = sex age age*sex / s
-                outpred=p1 outpredm=p2 vciry influence;
+    class kid sex;
+    model len = sex age age*sex / s 
+                influence(effect=kid);
     random intercept / subject = kid;
   run;
 
-  proc sgplot data=p2;
-    scatter y = scaledresid x=pred/group=kid;
-    loess y=scaledresid x=pred/nomarkers;
-  run;
+  *proc sgplot data=p2;
+  *  scatter y = scaledresid x=pred/group=kid;
+  *  loess y=scaledresid x=pred/nomarkers;
+  *run;
 ods graphics off;
