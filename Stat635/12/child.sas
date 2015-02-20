@@ -1,19 +1,5 @@
-/*
-Steps, using child growth dataset:
+*Name: Arthur Lui;
 
-1. Propose 6 covariance structures for the fixed effects gender, age, and age*gender
-   - Done.
-
-2. Of those 6, select 1 by using/evaluating/analyzing 2 information criteria 
-   of your choice.
-   - Done. Choose #1: Lowest AIC (440.6)
-
-3. Using your chosen model, test whether the interaction effect of age*gender 
-   should be left in the model using all of the following: 
-     - 2 information criteria of your choice, (AIC,BIC => interaction)
-     - Likelihood Ratio Test, and (6.3 => keep)
-     - Wald Test (p-val=.013 => keep)
-*/
 
 data child;
   infile 'child.dat';
@@ -82,3 +68,27 @@ proc MIXED data=child method=ml;
   random Intercept / subject = kid type=ar(1);
 run;
 *AIC = 442.6;
+*/
+*End of Code************************************************************;
+
+/*
+Steps, using child growth dataset:
+
+1. Propose 6 covariance structures for the fixed effects gender, age, and age*gender
+   - Done.
+
+2. Of those 6, select 1 by using/evaluating/analyzing 2 information criteria 
+   of your choice.
+   - Done. Choose Model 1.
+
+
+3. Using your chosen model, test whether the interaction effect of age*gender 
+   should be left in the model using all of the following: 
+     - Wald Test (p-val=.013 => keep)
+
+     Model with Interaction   Model w/o Interaction               Keep Interaction?
+ AIC                  440.6 <                 444.9                       (=> Keep)
+ BIC                  448.4 <                 451.3                       (=> Keep)
+-2ll                 -428.6 +                 434.9  (=6.3<.012 = Chi^2(1) => Keep)
+Wald                                                           (p-val=.013 => Keep)
+*/
