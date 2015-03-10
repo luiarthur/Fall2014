@@ -90,11 +90,28 @@
   pos.words.count <- apply(as.matrix(train.review),1,function(x) rgx(pos.words,x)$counts)
 
   X <- cbind(X,neg.words.count,pos.words.count)
-
+  X <- cbind(X[,1]/X[,2],X)
+  colnames(X) <- c("helpful.prop","helpful","help.count","day","month","year","neg.count","pos.count")
 # Fit model:
-library(VGAM)
-mod <-vglm(y~X[,1]+X[,2]+X[,1]/X[,2]+X[,3]+X[,4]+X[,5]+X[,6]+X[,7],family=cumulative)
-head(X)
-y
-mod
-# 27,68 help yes and help total
+  library(VGAM)
+  #mod <-vglm(y~X[,1]+X[,2]+X[,1]/X[,2]+X[,3]+X[,4]+X[,5]+X[,6]+X[,7],family=cumulative)
+  pairs(cbind(y,X))
+  x <- as.data.frame(X)
+  head(X)
+
+  #mod <- vglm(y~helpful.prop+helpful+help.count+month+year+bs(neg.count)+bs(pos.count),family=cumulative(parallel=T),data=x)
+  mod <- vglm(y~helpful.prop+helpful+help.count+month+year+neg.count+pos.count,family=cumulative(parallel=T),data=x)
+  summary(mod)
+
+  create.X <- function(m) {
+    #m <- test[,-1]
+    neg.wd.count <- apply(as.matrix(m$review),1,function(x) rgx(neg.words,x)$counts)
+    pos.wd.count <- apply(as.matrix(m$review),1,function(x) rgx(pos.words,x)$counts)
+
+    m <- cbind(m[,1]/m[,2],m[,1],m[,2],as.factor(m[,4]),m[,5],neg.wd.count,pos.wd.count)
+    colnames(m) <- c("helpful.prop","helpful","help.count","month","year","neg.count","pos.count")
+    
+    as.data.frame(m)
+  }
+
+  predict(mod,create.X(test[,-1]))
