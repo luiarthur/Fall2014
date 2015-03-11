@@ -91,8 +91,12 @@
   #mod <- vglm(y~helpful.prop+helpful+help.count+month+year+bs(neg.count)+bs(pos.count),family=cumulative(parallel=T),data=x)
   #mod <- vglm(y~helpful.prop+helpful+help.count+month+year+bs(neg.count),family=cumulative(parallel=T),data=x)
   #mod <- vglm(y~helpful.prop+helpful+help.count+year+bs(neg.count),family=cumulative(parallel=T),data=x)
-  mod <- vglm(y~helpful.prop+year+bs(neg.count),family=cumulative(parallel=T),data=x)
+  mod <- vglm(y~bs(helpful.prop)+year+bs(neg.count),family=cumulative(parallel=T),data=x)
   summary(mod)
+  
+  pairs(cbind(jitter(y),x$helpful.prop,x$year,jitter(x$neg.count)),
+        labels=c("y","help prop","year","neg count"),
+        main="Paired Scatter Plots",col="blue")
 
 # Test Model:
   create.X <- function(m) {
@@ -100,7 +104,7 @@
     neg.wd.count <- apply(as.matrix(m$review),1,function(x) rgx(neg.words,x)$counts)
     pos.wd.count <- apply(as.matrix(m$review),1,function(x) rgx(pos.words,x)$counts)
 
-    m <- data.frame(m[,1]/m[,2],m[,5],neg.wd.count)
+    m <- data.frame(m$help.yes/m$help.total,m$year,neg.wd.count)
     colnames(m) <- c("helpful.prop","year","neg.count")
 
     #m <- data.frame(m[,1]/m[,2],m[,1],m[,2],as.factor(m[,4]),m[,5],neg.wd.count,pos.wd.count)
@@ -123,5 +127,5 @@
   
   table(yi,y.hat)
   cbind(yi,y.hat)
-  
+
   (mse <- mean((yi-y.hat)^2))

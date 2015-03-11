@@ -1,4 +1,6 @@
-#!/bin/bash
-pdflatex competition.tex
-rm -f *.log *.aux
-firefox competition.pdf &
+#!/usr/bin/env Rscript
+
+Sweave("competition.rnw")
+system("pdflatex *.tex")
+system("rm -f *-*.pdf *.log *.aux *.tex")
+system("firefox *.pdf &")
