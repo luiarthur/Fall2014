@@ -19,6 +19,8 @@
 
 \begin{document}
 % my title:
+
+
 \begin{center}
   \section*{\textbf{Stat637 Homework 7}
     \footnote{https://github.com/luiarthur/Fall2014/blob/master/Stat637/competition}
@@ -27,11 +29,18 @@
   \subsection*{\noindent\today}
 \end{center}
 
+<<design,echo=F>>=
+  source("../roc.R",chdir=T)
+@
+
 \section{model}
+\[
+  y_i = \beta_0 + \beta_1~spline(helpProportion_i) + \beta_2~year_i + \beta_3~spline(negativeWords)
+\]
 \section{Interpretation of Parameters}
 \section{Predictino Error}
 \section{Plots}
+
 \section{Value of Model}
-\section{Conclusion}
 
 \end{document}
