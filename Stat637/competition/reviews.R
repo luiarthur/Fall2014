@@ -89,7 +89,9 @@
   head(X)
 
   #mod <- vglm(y~helpful.prop+helpful+help.count+month+year+bs(neg.count)+bs(pos.count),family=cumulative(parallel=T),data=x)
-  mod <- vglm(y~helpful.prop+helpful+help.count+month+year+bs(neg.count),family=cumulative(parallel=T),data=x)
+  #mod <- vglm(y~helpful.prop+helpful+help.count+month+year+bs(neg.count),family=cumulative(parallel=T),data=x)
+  #mod <- vglm(y~helpful.prop+helpful+help.count+year+bs(neg.count),family=cumulative(parallel=T),data=x)
+  mod <- vglm(y~helpful.prop+year+bs(neg.count),family=cumulative(parallel=T),data=x)
   summary(mod)
 
 # Test Model:
@@ -98,12 +100,18 @@
     neg.wd.count <- apply(as.matrix(m$review),1,function(x) rgx(neg.words,x)$counts)
     pos.wd.count <- apply(as.matrix(m$review),1,function(x) rgx(pos.words,x)$counts)
 
+    m <- data.frame(m[,1]/m[,2],m[,5],neg.wd.count)
+    colnames(m) <- c("helpful.prop","year","neg.count")
+
     #m <- data.frame(m[,1]/m[,2],m[,1],m[,2],as.factor(m[,4]),m[,5],neg.wd.count,pos.wd.count)
     #colnames(m) <- c("helpful.prop","helpful","help.count","month","year","neg.count","pos.count")
 
-    m <- data.frame(m[,1]/m[,2],m[,1],m[,2],as.factor(m[,4]),m[,5],neg.wd.count)
-    colnames(m) <- c("helpful.prop","helpful","help.count","month","year","neg.count")
+    #m <- data.frame(m[,1]/m[,2],m[,1],m[,2],as.factor(m[,4]),m[,5],neg.wd.count)
+    #colnames(m) <- c("helpful.prop","helpful","help.count","month","year","neg.count")
     
+    #m <- data.frame(m[,1]/m[,2],m[,1],m[,2],m[,5],neg.wd.count)
+    #colnames(m) <- c("helpful.prop","helpful","help.count","year","neg.count")
+
     m
   }
   

@@ -1,0 +1,4 @@
+#!/bin/bash
+pdflatex competition.tex
+rm -f *.log *.aux
+firefox competition.pdf &
