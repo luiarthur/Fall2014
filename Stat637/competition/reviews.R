@@ -7,8 +7,6 @@
 #2. You must fit a model using the odds/probabilities -- nominal or
 #   ordinal -- we discussed in class (but you can use different links, just be sure
 #   you know what the model is you're fitting) 
-#3. You cannot collapse the response variable (i.e., you must use all 5 stars, 
-#   you can't combine stars 1 and 2, etc.)
 #4. Note that the data size is actually quite small for fitting four
 #   different models, so be lenient with level of significance.  
 #5. Write a 1-2 page report including your model, interpretation of parameters, 
@@ -17,21 +15,13 @@
 #6. In class, each person will present their model so that we can vote on the
 #   winners for the various categories. I'd like this to be brief, so no slides
 #   are needed unless necessary (I'll let you decide if that's the case).
-#7. There will be four categories for prizes: Smallest test error predictions (in
-#   terms of mean squared error); Model that tells the best story (quantifies
-#   relationships in a valuable/interesting way); Most interpretable (but useful)
-#   model; Most creative model (e.g., uses statistical words in the model, etc.).
+#7. There will be four categories for prizes: 
+#     - Smallest test error predictions (in terms of mean squared error)
+#     - Model that tells the best story (quantifies relationships in a valuable/interesting way)
+#     - Most interpretable (but useful) model
+#     - Most creative model (e.g., uses statistical words in the model, etc.).
 #   The class will vote on the last three categories.  
 
-#1. stars.scores: 1:5 (score given by the reviewer)
-#2. help.yes: # of people that rated the review as helpful
-#3. help.total: # of people that rated review
-#4. day
-#5. month
-#6. year
-#7. title.review (default is # of stars)
-#8. review
-#9. name
 
 
 # Functions:
@@ -94,24 +84,36 @@
   colnames(X) <- c("helpful.prop","helpful","help.count","day","month","year","neg.count","pos.count")
 # Fit model:
   library(VGAM)
-  #mod <-vglm(y~X[,1]+X[,2]+X[,1]/X[,2]+X[,3]+X[,4]+X[,5]+X[,6]+X[,7],family=cumulative)
   pairs(cbind(y,X))
   x <- as.data.frame(X)
   head(X)
 
   #mod <- vglm(y~helpful.prop+helpful+help.count+month+year+bs(neg.count)+bs(pos.count),family=cumulative(parallel=T),data=x)
-  mod <- vglm(y~helpful.prop+helpful+help.count+month+year+neg.count+pos.count,family=cumulative(parallel=T),data=x)
+  mod <- vglm(y~helpful.prop+helpful+help.count+month+year+bs(neg.count),family=cumulative(parallel=T),data=x)
   summary(mod)
 
+# Test Model:
   create.X <- function(m) {
     #m <- test[,-1]
     neg.wd.count <- apply(as.matrix(m$review),1,function(x) rgx(neg.words,x)$counts)
     pos.wd.count <- apply(as.matrix(m$review),1,function(x) rgx(pos.words,x)$counts)
 
-    m <- cbind(m[,1]/m[,2],m[,1],m[,2],as.factor(m[,4]),m[,5],neg.wd.count,pos.wd.count)
-    colnames(m) <- c("helpful.prop","helpful","help.count","month","year","neg.count","pos.count")
-    
-    as.data.frame(m)
-  }
+    #m <- data.frame(m[,1]/m[,2],m[,1],m[,2],as.factor(m[,4]),m[,5],neg.wd.count,pos.wd.count)
+    #colnames(m) <- c("helpful.prop","helpful","help.count","month","year","neg.count","pos.count")
 
-  predict(mod,create.X(test[,-1]))
+    m <- data.frame(m[,1]/m[,2],m[,1],m[,2],as.factor(m[,4]),m[,5],neg.wd.count)
+    colnames(m) <- c("helpful.prop","helpful","help.count","month","year","neg.count")
+    
+    m
+  }
+  
+  
+
+  yi <- test[-16,1] # 16 was missing
+  pred <- predict(mod,create.X(test[,-1]),type="response")
+  y.hat <- apply(pred,1,function(x) which.max(x))
+  
+  table(yi,y.hat)
+  cbind(yi,y.hat)
+  
+  (mse <- mean((yi-y.hat)^2))
