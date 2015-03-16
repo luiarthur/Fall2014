@@ -33,30 +33,31 @@ observations. One could fit one linear model
 \[
   y = \beta_0 + \beta_1 x + \epsilon
 \]
-through all three clusters 
-together (the black line); but it would be more appropriate to fit three
-seperate models to each cluster (the colored lines). Using linear mixed 
-models (LMM), we could fit the model 
+through all three clusters together (the black line); but it would be more
+appropriate to fit three seperate models to each cluster (the colored lines).
+Using linear mixed models (LMM), we could fit the model 
 \[
   y_i = \beta_0 + \beta_1 x_i + Z_i \gamma + \epsilon_i
 \]
-to account for the effect of each cluster. The problem with an LMM is 
-that if the clusters are latent, and not observed, we cannot specify out
-design matrix. \\
+to account for the effect of each cluster. However, if the clusters are latent, 
+and not observed, we cannot specify the design matrix $\bm Z$ when using LMM's.\\
 
 \noindent
-Using an Indian Buffet Prior, a distribution for sparse and infinite 
-binary matrices, I propose a model and sampling algorithm to estimate Z.
-Time permitting, I will fit the model.
-
+Using an Indian Buffet Process Prior, a distribution for sparse and infinite 
+binary matrices, I will propose a model and sampling algorithm to estimate Z.
+Time permitting, I will complete a simulation study to assess the performance
+of the algorithm. I will extend these ideas to generalized linear models, 
+specifically when the link function is the logistic function, and the response
+variable is binary.\\
 \begin{center}
 <<fig=T,echo=F>>=
-  x1 <- rnorm(1:100)
-  e1 <- rnorm(100)
-  x2 <- rnorm(1:100)
-  e2 <- rnorm(100)
-  x3 <- rnorm(1:100)
-  e3 <- rnorm(100)
+  n <- 50
+  x1 <- rnorm(1:n)
+  e1 <- rnorm(n)
+  x2 <- rnorm(1:n)
+  e2 <- rnorm(n)
+  x3 <- rnorm(1:n)
+  e3 <- rnorm(n)
 
   b1 <- 1.5
   b0 <- c(3,7,11)
