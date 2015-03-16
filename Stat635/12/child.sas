@@ -21,7 +21,7 @@ run;
 proc MIXED data=child method=ml;
   class sex;
   model len = sex age / s;
-  random intercept / subject = kid;
+  random intercept / subject = kid G SOLUTION V;
 run;
 *AIC = 444.9 ;
 *BIC = 451.3 ;
