@@ -187,8 +187,8 @@ V <- EZ %*% G %*% t(EZ) + R
 beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
 gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
 
-plot(X[,2],y)
-points(X[,2],X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
+plot(X,y)
+points(X,X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
 
 cbind(b,beta.hat)
 gam

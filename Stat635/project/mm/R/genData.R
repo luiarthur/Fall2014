@@ -8,7 +8,8 @@ n <- 3*15
 #b <- c(2,4)
 #gam <- c(3,7,30)
 
-b <- c(2,4)
+#b <- c(2,4)
+b <- 4
 gam <- c(3,15,30)
 
 #gam.vec <- cbind(gam[1]+rnorm(1000),gam[2]+rnorm(1000),gam[3]+rnorm(1000))
@@ -23,7 +24,8 @@ gam <- c(3,15,30)
 G <- diag(73,3)
 #apply(mvrnorm(1000,c(0,0,0),G),2,mean)
 
-X <- cbind(1,matrix(runif(n,0,5),n))
+#X <- cbind(1,matrix(runif(n,0,5),n))
+X <- matrix(runif(n,0,5),n)
 
 Z <- matrix(0,n,3)
 Z[1:(n/3),1] <- 1
@@ -43,9 +45,9 @@ gam.hat <- G %*% t(Z) %*% solve(V) %*% (y-X%*%b.hat)
 y.hat <- X%*%b.hat + Z%*%gam.hat 
 plot(y-y.hat)
 
-plot(X[,2],y,pch=20)
-points(X[,2],y.hat,col="blue",cex=2)
-abline(lm(y~X[,2]),col="red")
+plot(X,y,pch=20)
+points(X,y.hat,col="blue",cex=2)
+abline(lm(y~X),col="red")
 
 cbind(b,b.hat)
 cbind(gam,gam.hat)
