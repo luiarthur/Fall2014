@@ -178,7 +178,7 @@ B <- 10000
 elapsed.time <- system.time(out <- gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
 
 EZ <- est.Z(out$Zs)
-EZ <- Z
+#EZ <- Z
 a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
 
 G <- diag(mean(out$sig.g2),ncol(EZ))
