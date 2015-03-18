@@ -1,8 +1,8 @@
 library(lme4)
 library(MASS)
 set.seed(5)
-n <- 3*15
 
+n <- 3*30
 # THIS SET WORKS with sig.r2=.1!!!
 #X <- cbind(1,matrix(runif(n,0,5),n))
 #b <- c(2,4)
