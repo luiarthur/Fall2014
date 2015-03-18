@@ -9,8 +9,8 @@ det <- function(x,log=F) {
   out
 }
 
-gibbs.post <- function(y,X,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
-                       a.a=1,a.b=1,sg.a=1,sg.b=1,sr.a=1,sr.b=1,plotProgress=F) {
+gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress=T,
+                       a.a=1,a.b=1,a.r=1,b.r=5,plotProgress=F) {
   B <- ceiling(B/50)*50 
 
   D <- ncol(X)
@@ -96,16 +96,12 @@ gibbs.post <- function(y,X,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
   Zs <- as.list(1:B)
   Zs[[1]] <- matrix(1,N,1)
   alpha <- rep(a,B)
-  sig.b2 <- rep(1,B)
-  sig.g2 <- rep(1,B)
   sig.r2 <- rep(1,B)
 
   for (b in 2:B) { # B = num of iterations in Gibbs
     old.time <- Sys.time()
     z <- Zs[[b-1]]
     alpha[b] <- alpha[b-1]
-    sig.b2[b] <- sigb2 <- sig.b2[b-1]
-    sig.g2[b] <- sigg2 <- sig.g2[b-1]
     sig.r2[b] <- sigr2 <- sig.r2[b-1]
 
     for (i in 1:N) { # iterate through all rows of Z
@@ -148,15 +144,21 @@ gibbs.post <- function(y,X,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
     #a.b <- (1/a.b+Hn)^(-1)
     alpha[b] <- rgamma(1,a.a+ncol(z),scale=1/(1/a.b+Hn))
     Zs[[b]] <- z
-    sig.b2[b] <- 100 # should draw from posterior instead of set to 1 every time!!!
-    sig.g2[b] <- 100 # should draw from posterior instead of set to 1 every time!!!
-    sig.r2[b] <- 1 # should draw from posterior instead of set to 1 every time!!!
+    #sig.r2[b] <- 1 # should draw from posterior instead of set to 1 every time!!!
+
+    G <- diag(sigg2,ncol(z))
+    R <- diag(sigr2,length(y))
+    V <- z %*% G %*% t(z) + R
+    beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
+    gam.hat <- G%*%t(z)%*%solve(V)%*%(y-X%*%beta.hat)
+    y.hat <- X%*%beta.hat + z%*%gam.hat
+    sig.r2[b] <- 1/rgamma(1,a.r+N/2,rate=b.r+.5*sum((y-y.hat)^2))
     
     sink("out/Z.post.results",append=b>2)
       cat("ITERATION:",b,"\n")
-      #print(b.hat[b,])
       print(z)
       #print(gam[[b]])
+      #print(b.hat[b,])
     sink()
     #if (b %% 50 == 0) {
     #  gp <- b%/%50
@@ -174,8 +176,12 @@ gibbs.post <- function(y,X,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
       plot(n.col,xlab="Iteration",ylab="K+",
            main=paste0("Columns of Z ","(",b,")"),col="pink",lwd=3,type="b",pch=20)
       abline(h=mean(n.col),col="blue",lwd=3)     
-      minor <- function() { plot(alpha[1:b],type="l",col="gray30",main="Trace for alpha") } 
+      minor <- function() {plot(alpha[1:b],type="l",col="gray30",cex.main=.6,
+                                main=paste("alpha:",round(mean(alpha[1:b]),4))) } 
+      minor2 <- function() {plot(sig.r2[1:b],type="l",col="gray30",cex.main=.6,
+                                 main=paste("sig.r2:",round(mean(sig.r2[1:b]),4)))}
       plot.in.plot(minor,"topright")
+      plot.in.plot(minor2,"bottomright")
 
     }
 
