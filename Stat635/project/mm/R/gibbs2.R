@@ -217,9 +217,13 @@ V <- EZ %*% G %*% t(EZ) + R
 beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
 gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
 
-plot(X[,2],y)
-points(X[,2],X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
-#points(X[c(39,46),2],y[c(39,46)],col="red",pch=20)
+clust.num <- apply(EZ,1,which.max) 
+plot(X[,2],y,col=clust.num,pch=20)
+K <- ncol(EZ)
+for (kk in 1:K) {
+  ind <- which(clust.num==kk)
+  abline(beta.hat[1]+EZ[ind,]%*%gam.hat, beta.hat[2],col=kk,lwd=2)
+}
 
 cbind(b,beta.hat)
 gam
