@@ -32,7 +32,7 @@ Z[1:(n/3),1] <- 1
 Z[(n/3+1):(2*n/3),2] <- 1
 Z[(2*n/3+1):n,3] <- 1
 
-e <- rnorm(n,0,.5)
+e <- rnorm(n,0,1)
 
 y <- X%*%b + Z%*%gam + e
 
@@ -45,9 +45,14 @@ gam.hat <- G %*% t(Z) %*% solve(V) %*% (y-X%*%b.hat)
 y.hat <- X%*%b.hat + Z%*%gam.hat 
 plot(y-y.hat)
 
-plot(X[,2],y,pch=20)
-points(X[,2],y.hat,col="blue",cex=2)
-abline(lm(y~X[,2]),col="red")
+#abline(lm(y~X[,2]),col="red")
+clust.num <- apply(Z,1,which.max) 
+plot(X[,2],y,col=clust.num,pch=20)
+K <- ncol(Z)
+for (kk in 1:K) {
+  ind <- which(clust.num==kk)
+  abline(b.hat[1]+Z[ind,]%*%gam.hat, b.hat[2],col=kk,lwd=2)
+}
 
 cbind(b,b.hat)
 cbind(gam,gam.hat)
