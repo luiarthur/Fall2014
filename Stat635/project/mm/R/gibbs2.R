@@ -1,13 +1,4 @@
 source("rfunctions.R")
-det <- function(x,log=F) {
-  out <- 0
-  if (!log) {
-    out <- det(x)
-  } else {
-    out <- unlist(determinant(x,log=T))[1]
-  }
-  out
-}
 
 gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress=T,
                        a.a=1,a.b=1,a.r=1,b.r=5,plotProgress=F) {
@@ -189,28 +180,49 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
   } # end of gibbs
 
   #out <- Zs[(burn+1):B]
-  out <- list("Zs"=Zs,"alpha"=alpha,"sig.g2"=sig.g2,"sig.r2"=sig.r2)
+  out <- list("Zs"=Zs,"alpha"=alpha,"sig.r2"=sig.r2)
   out
 }
 
-source("genData.R")
+# SIMULATIONS STUDY: UNCOMMENT TO SIMULATE!!!
+#source("genData.R")
+#
+#B <- 50
+#elapsed.time <- system.time(out <- gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
+#
+#EZ <- est.Z(out$Zs)
+#EZ <- clust.Z(EZ)
+##EZ <- Z
+#a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
+#
+#G <- diag(100,ncol(EZ))
+#R <- diag(mean(out$sig.r2),length(y))
+#V <- EZ %*% G %*% t(EZ) + R
+#beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
+#gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
+#
+#plot(X[,2],y)
+#points(X[,2],X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
+##points(X[c(39,46),2],y[c(39,46)],col="red",pch=20)
+#
+#cbind(b,beta.hat)
+#gam
+#gam.hat
 
-B <- 10000
-elapsed.time <- system.time(out <- gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
+##############################
+#gam2 <- c(gam.hat,sum(gam.hat))
+#EZ2 <- rbind(cbind(EZ[1:60,],0),cbind(0,0,rep(1,30)))
+#G <- diag(100,ncol(EZ2))
+#R <- diag(mean(out$sig.r2),length(y))
+#V <- EZ2 %*% G %*% t(EZ2) + R
+#beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
+#gam.hat <- G%*%t(EZ2)%*%solve(V)%*%(y-X%*%beta.hat)
+#
+#plot(X,y)
+#points(X,X%*%beta.hat+EZ2%*%gam.hat,col="blue",cex=2)
+#
+#cbind(b,beta.hat)
+#gam
+#gam.hat
 
-EZ <- est.Z(out$Zs)
-#EZ <- Z
-a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
 
-G <- diag(mean(out$sig.g2),ncol(EZ))
-R <- diag(mean(out$sig.r2),length(y))
-V <- EZ %*% G %*% t(EZ) + R
-beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
-gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
-
-plot(X,y)
-points(X,X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
-
-cbind(b,beta.hat)
-gam
-gam.hat

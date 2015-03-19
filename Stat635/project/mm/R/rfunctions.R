@@ -1,5 +1,5 @@
 a.image <- function(Q,color=rev(heat.colors(100)),#paste0("gray",100:0),
-                    numbers=F,num.cex=1,
+                    numbers=F,num.cex=1,label.axis=F,
                     numcolor="black",axis.num=T,...) {
 
   image(t(apply(Q,2,rev)),yaxt="n",xaxt="n",col=color,...)
@@ -8,6 +8,8 @@ a.image <- function(Q,color=rev(heat.colors(100)),#paste0("gray",100:0),
   er <- apply(Q,1,sum)
   seq1 <- seq(0,1,len=length(ec))
   seq2 <- seq(1,0,len=length(er))
+  seq4 <- seq(0,1,len=nrow(Q))
+  if (label.axis) axis(4,at=seq4,lab=1:n,las=2,...)
 
   if (axis.num) {
     axis(1,at=seq1,lab=ec)
@@ -266,7 +268,7 @@ est.Z <- function(Zs,p=.5) {
   EZ <- sum.matrices(Zs) / B
   EZ <- ifelse(EZ>p,1,0)
   col0.ind <- which(apply(EZ,2,function(x) sum(x)==0))
-  EZ <- EZ[,-col0.ind]
+  EZ <- as.matrix(EZ[,-col0.ind])
   EZ
 }
 
@@ -277,3 +279,29 @@ Rapply <- function(L,f) { # L is a list, f is a function to apply to L[[x]]
   out <- apply(matrix(1:n),1,function(i) f(L[[i]]))
   t(out)
 }
+
+clust.Z <- function(z) {
+  z <- as.matrix(z)
+  v.z <- apply(z,1,function(x) toString(x))
+  uniq.vz <- unique(v.z)
+  clust.num <- apply(matrix(v.z),1,function(x) which(uniq.vz %in% x))
+  k <- length(uniq.vz)
+  n <- nrow(z)
+  z.out <- matrix(0,n,k)
+  for (i in 1:n) {
+    z.out[i,clust.num[i]] <- 1
+  }
+  z.out
+}
+
+
+det <- function(x,log=F) {
+  out <- 0
+  if (!log) {
+    out <- det(x)
+  } else {
+    out <- unlist(determinant(x,log=T))[1]
+  }
+  out
+}
+

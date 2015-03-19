@@ -172,24 +172,25 @@ gibbs.post <- function(y,X,siga=1,sigx=.5,a=1,B=1000,burn=B*.1,showProgress=T,
   out
 }
 
-source("genData.R")
-
-B <- 10000
-elapsed.time <- system.time(out <- gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
-
-EZ <- est.Z(out$Zs)
-#EZ <- Z
-a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
-
-G <- diag(mean(out$sig.g2),ncol(EZ))
-R <- diag(mean(out$sig.r2),length(y))
-V <- EZ %*% G %*% t(EZ) + R
-beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
-gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
-
-plot(X,y)
-points(X,X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
-
-cbind(b,beta.hat)
-gam
-gam.hat
+# SIMULATION: UNCOMMENT TO SIMULATE!
+#source("genData.R")
+#
+#B <- 10000
+#elapsed.time <- system.time(out <- gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
+#
+#EZ <- est.Z(out$Zs)
+##EZ <- Z
+#a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
+#
+#G <- diag(mean(out$sig.g2),ncol(EZ))
+#R <- diag(mean(out$sig.r2),length(y))
+#V <- EZ %*% G %*% t(EZ) + R
+#beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
+#gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
+#
+#plot(X,y)
+#points(X,X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
+#
+#cbind(b,beta.hat)
+#gam
+#gam.hat
