@@ -180,6 +180,7 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
 }
 
 # SIMULATIONS STUDY: UNCOMMENT TO SIMULATE!!!
+# Works when sig.r2=1
 source("genData.R")
 B <- 2000
 elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=T))
@@ -188,6 +189,7 @@ EZ <- est.Z(out$Zs)
 EZ <- clust.Z(EZ)
 #EZ <- Z
 a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
+#axis(4,at=seq(1,0,length=4),label=c(1,30,60,90))
 
 G <- diag(100,ncol(EZ))
 R <- diag(mean(out$sig.r2),length(y))
