@@ -137,19 +137,7 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
     alpha[b] <- rgamma(1,a.a+ncol(z),scale=1/(1/a.b+Hn))
     Zs[[b]] <- z
 
-    # Sample sig.r2. VERSION 1:
-    #sig.r2[b] <- 1 # should draw from posterior instead of set to 1 every time!!!
-
-    # Sample sig.r2. VERSION 2:
-    #G <- diag(sigg2,ncol(z))
-    #R <- diag(sigr2,length(y))
-    #V <- z %*% G %*% t(z) + R
-    #beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
-    #gam.hat <- G%*%t(z)%*%solve(V)%*%(y-X%*%beta.hat)
-    #y.hat <- X%*%beta.hat + z%*%gam.hat
-    #sig.r2[b] <- 1/rgamma(1,a.r+N/2,rate=b.r+.5*sum((y-y.hat)^2))
-    
-    # Sample sig.r2. VERSION 3:
+    # MH: Sample sig.r2. VERSION 3:
     cand <- rnorm(1,sigr2,cs.r2)
     if (cand>0) {
       lr2.cand <- -(a.r-1)*log(cand)-b.r/cand+p.x.z(z,sigb2,sigg2,cand,log=T)
@@ -161,21 +149,11 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
       }
     }
 
+    # Print Results as I go
     sink("out/Z.post.results",append=b>2)
       cat("ITERATION:",b,"\n")
       print(z)
-      #print(gam[[b]])
-      #print(b.hat[b,])
     sink()
-    #if (b %% 50 == 0) {
-    #  gp <- b%/%50
-    #  sink("out/Z.post.results",append=T)
-    #    Zs[ ((gp-1)*50+1) : (gp*50) ]
-    #  sink()  
-    #} else if (b==1) {
-    #  sink("out/Z.post.results")
-    #  sink()  
-    #}
 
     if (plotProgress && b%%10==0) {
       # Plot Trace Plots:
