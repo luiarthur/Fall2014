@@ -16,7 +16,7 @@ for (i in 1:N) {
 }
 colnames(Z) <- uniq.k
 
-B <- 100
+B <- 500
 elapsed.time <- system.time(out<-gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
 
 EZ <- est.Z(out$Zs)

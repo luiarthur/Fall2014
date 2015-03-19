@@ -1,7 +1,7 @@
 source("rfunctions.R")
 
 gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress=T,
-                       a.a=1,a.b=1,a.r=1,b.r=5,plotProgress=F) {
+                       a.a=1,a.b=1,a.r=1,b.r=5,cs.r2=1,plotProgress=F) {
   B <- ceiling(B/50)*50 
 
   D <- ncol(X)
@@ -10,7 +10,7 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
   Hn <- sum(1/(1:N))
 
   p.x.z <- function(Z,sig.b2,sig.g2,sig.r2,log=T) { # p.x.z = Likelihood
-
+    # [y|X,Z,sigb2,sigg2,sigr2]
     #if (ncol(Z) > 10) Z <- Z[,1:10]
 
     K <- ncol(Z)
@@ -88,6 +88,7 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
   Zs[[1]] <- matrix(1,N,1)
   alpha <- rep(a,B)
   sig.r2 <- rep(1,B)
+  count.acc.r2 <- 0
 
   for (b in 2:B) { # B = num of iterations in Gibbs
     old.time <- Sys.time()
@@ -135,16 +136,31 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
     #a.b <- (1/a.b+Hn)^(-1)
     alpha[b] <- rgamma(1,a.a+ncol(z),scale=1/(1/a.b+Hn))
     Zs[[b]] <- z
+
+    # Sample sig.r2. VERSION 1:
     #sig.r2[b] <- 1 # should draw from posterior instead of set to 1 every time!!!
 
-    G <- diag(sigg2,ncol(z))
-    R <- diag(sigr2,length(y))
-    V <- z %*% G %*% t(z) + R
-    beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
-    gam.hat <- G%*%t(z)%*%solve(V)%*%(y-X%*%beta.hat)
-    y.hat <- X%*%beta.hat + z%*%gam.hat
-    sig.r2[b] <- 1/rgamma(1,a.r+N/2,rate=b.r+.5*sum((y-y.hat)^2))
+    # Sample sig.r2. VERSION 2:
+    #G <- diag(sigg2,ncol(z))
+    #R <- diag(sigr2,length(y))
+    #V <- z %*% G %*% t(z) + R
+    #beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
+    #gam.hat <- G%*%t(z)%*%solve(V)%*%(y-X%*%beta.hat)
+    #y.hat <- X%*%beta.hat + z%*%gam.hat
+    #sig.r2[b] <- 1/rgamma(1,a.r+N/2,rate=b.r+.5*sum((y-y.hat)^2))
     
+    # Sample sig.r2. VERSION 3:
+    cand <- rnorm(1,sigr2,cs.r2)
+    if (cand>0) {
+      lr2.cand <- -(a.r-1)*log(cand)-b.r/cand+p.x.z(z,sigb2,sigg2,cand,log=T)
+      lr2.old <- -(a.r-1)*log(sigr2)-b.r/sigr2+p.x.z(z,sigb2,sigg2,sigr2,log=T)
+      lr2 <- lr2.cand-lr2.old
+      if (lr2 > log(runif(1))) {
+        sig.r2[b] <- cand
+        count.acc.r2 <- count.acc.r2 + 1
+      }
+    }
+
     sink("out/Z.post.results",append=b>2)
       cat("ITERATION:",b,"\n")
       print(z)
@@ -179,35 +195,35 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
     if (showProgress) count.down(old.time,b,B)
   } # end of gibbs
 
+  cat("\n Acceptance for sig.r2: ",count.acc.r2/B,"\n")
   #out <- Zs[(burn+1):B]
   out <- list("Zs"=Zs,"alpha"=alpha,"sig.r2"=sig.r2)
   out
 }
 
 # SIMULATIONS STUDY: UNCOMMENT TO SIMULATE!!!
-#source("genData.R")
-#
-#B <- 50
-#elapsed.time <- system.time(out <- gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
-#
-#EZ <- est.Z(out$Zs)
-#EZ <- clust.Z(EZ)
-##EZ <- Z
-#a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
-#
-#G <- diag(100,ncol(EZ))
-#R <- diag(mean(out$sig.r2),length(y))
-#V <- EZ %*% G %*% t(EZ) + R
-#beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
-#gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
-#
-#plot(X[,2],y)
-#points(X[,2],X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
-##points(X[c(39,46),2],y[c(39,46)],col="red",pch=20)
-#
-#cbind(b,beta.hat)
-#gam
-#gam.hat
+source("genData.R")
+B <- 500
+elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=T))
+
+EZ <- est.Z(out$Zs)
+EZ <- clust.Z(EZ)
+#EZ <- Z
+a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
+
+G <- diag(100,ncol(EZ))
+R <- diag(mean(out$sig.r2),length(y))
+V <- EZ %*% G %*% t(EZ) + R
+beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
+gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
+
+plot(X[,2],y)
+points(X[,2],X%*%beta.hat+EZ%*%gam.hat,col="blue",cex=2)
+#points(X[c(39,46),2],y[c(39,46)],col="red",pch=20)
+
+cbind(b,beta.hat)
+gam
+gam.hat
 
 ##############################
 #gam2 <- c(gam.hat,sum(gam.hat))
