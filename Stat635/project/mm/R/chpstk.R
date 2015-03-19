@@ -5,7 +5,7 @@ dat <- read.table("chopstick.txt")
 y <- dat[,1]
 X <- cbind(1,dat[,2])
 
-B <- 50
+B <- 500
 elapsed.time <- system.time(out<-gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
 
 EZ <- est.Z(out$Zs)
@@ -24,12 +24,8 @@ plot(X[,2],y,col=clust.num)
 K <- ncol(EZ)
 for (kk in 1:K) {
   ind <- which(clust.num==kk)
-  abline(beta.hat[1]+EZ[ind,]%*%gam.hat, X[ind,2]*beta.hat[2],col=kk)
+  abline(beta.hat[1]+EZ[ind,]%*%gam.hat, beta.hat[2],col=kk)
 }
 
 beta.hat
 gam.hat
-
-
-
-

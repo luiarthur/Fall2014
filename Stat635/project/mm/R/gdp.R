@@ -16,7 +16,7 @@ for (i in 1:N) {
 }
 colnames(Z) <- uniq.k
 
-B <- 50
+B <- 100
 elapsed.time <- system.time(out<-gibbs.post(y,X,B=B,showProgress=T,plotProgress=T))
 
 EZ <- est.Z(out$Zs)
@@ -31,16 +31,12 @@ gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
 
 clust.num <- apply(EZ,1,which.max) 
 plot(X[,2],y)
-plot(X[,2],y,col=clust.num)
-K <- ncol(EZ)
-for (kk in 1:K) {
+plot(X[,2],y,col=clust.num,lwd=3,cex=.5)
+KK <- ncol(EZ)
+for (kk in 1:KK) {
   ind <- which(clust.num==kk)
-  abline(beta.hat[1]+EZ[ind,]%*%gam.hat, X[ind,2]*beta.hat[2],col=kk)
+  abline(beta.hat[1]+EZ[ind,]%*%gam.hat, beta.hat[2],col=kk)
 }
 
 beta.hat
 gam.hat
-
-
-
-
