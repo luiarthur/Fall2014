@@ -1,0 +1,42 @@
+> GH.GI$deviance #HIGHEST
+[1] 11.66574
+> GH.HI$deviance
+[1] 4.126712
+> GI.HI$deviance
+[1] 2.383139
+> GH.GI.HI$deviance
+[1] 0.3007213
+
+
+
+
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                 3.8521     0.1415  27.219  < 2e-16 ***
+genderM                    -0.5976     0.2242  -2.666  0.00768 ** 
+infosupport                 1.3514     0.1575   8.578  < 2e-16 ***
+healthsupport              -1.3750     0.2750  -5.001 5.71e-07 ***
+genderM:infosupport         0.4636     0.2406   1.927  0.05401 .  
+genderM:healthsupport      -0.2516     0.1749  -1.438  0.15035    
+infosupport:healthsupport   0.8997     0.2852   3.155  0.00160 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 445.82335  on 7  degrees of freedom
+Residual deviance:   0.30072  on 1  degrees of freedom
+AIC: 59.683
+
+Number of Fisher Scoring iterations: 4
+
+> gh <- -.2516 + c(-1,1)*1.96*.1749
+> exp(gh)
+[1] 0.5518914 1.0954925
+> 
+> gi <- .4636 + c(-1,1)*1.96*.2406
+> exp(gi)
+[1] 0.9920557 2.5476618
+> 
+
