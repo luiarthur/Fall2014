@@ -1,5 +1,7 @@
 source("../rfunctions.R")
 
+# This doens't work!
+
 gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress=T,
                        a.a=1,a.b=1,a.r=1,b.r=5,cs.r2=1,plotProgress=F) {
   B <- ceiling(B/50)*50 
@@ -13,14 +15,15 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
     # [y|X,Z,sigb2,sigg2,sigr2]
     #if (ncol(Z) > 10) Z <- Z[,1:10]
 
-    K <- ncol(Zz)
+    Zx <- t(apply(matrix(1:N),1,function(i) X[i,2]*Zz[i,]))
+    if (nrow(Zx)==1) Zx <- t(Zx)
+    Z <- cbind(Zz,Zx)
+
+    K <- ncol(Z)
     Id <- diag(1,D)
     Ik <- diag(1,K)
     In <- diag(1,N)
 
-    Zx <- t(apply(matrix(1:N),1,function(i) X[i,2]*Zz[x,]))
-    
-    Z <- cbind(Zz,Zx)
 
     M1 <- solve(t(Z)%*%Z + sig.r2/sig.g2 * Ik)
     U <- In- Z%*%M1%*%t(Z)
@@ -154,16 +157,18 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
     }
 
     # Print Results as I go
-    sink("out/Z.post.results",append=b>2)
-      cat("ITERATION:",b,"\n")
-      print(z)
-    sink()
+    #sink("out/Z.post.results",append=b>2)
+    #  cat("ITERATION:",b,"\n")
+    #  print(z)
+    #sink()
 
-    if (plotProgress && b%%10==0) {
+    #if (plotProgress && b%%10==0) {
+    if (plotProgress) {
       # Plot Trace Plots:
       n.col <- unlist(lapply(Zs[1:b],ncol))
       plot(n.col,xlab="Iteration",ylab="K+",
-           main=paste0("Columns of Z ","(",b,")"),col="pink",lwd=3,type="b",pch=20)
+           main=paste0("Columns of Z ","(",b,")"),col="pink",lwd=3,type="l",pch=20)
+           #main=paste0("Columns of Z ","(",b,")"),col="pink",lwd=3,type="b",pch=20)
       abline(h=mean(n.col),col="blue",lwd=3)     
       minor <- function() {plot(alpha[1:b],type="l",col="gray30",cex.main=.6,
                                 main=paste("alpha:",round(mean(alpha[1:b]),4))) } 
