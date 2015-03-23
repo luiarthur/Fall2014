@@ -28,9 +28,9 @@ X <- cbind(1,matrix(rnorm(n,5,.5),n))
 #X <- matrix(runif(n,0,5),n)
 
 Z <- matrix(0,n,3)
-Z[1:(n/3),1] <- 1
-Z[(n/3+1):(2*n/3),2] <- 1
-Z[(2*n/3+1):n,3] <- 1
+for (k in 1:length(gam)) {
+  Z[((k-1)*(n/3)+1):(k*(n/3)),k] <- 1
+}
 
 e <- rnorm(n,0,1)
 
