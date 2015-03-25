@@ -182,7 +182,7 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
 # SIMULATIONS STUDY: UNCOMMENT TO SIMULATE!!!
 # Works when sig.r2=1
 source("genData.R")
-B <- 2000
+B <- 500
 elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=T))
 
 EZ <- est.Z(out$Zs)
