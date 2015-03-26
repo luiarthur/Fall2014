@@ -56,7 +56,7 @@ for (kk in 1:K) {
   ind <- which(clust.num==kk)
   abline(b.hat[1]+Z[ind,]%*%gam.hat, b.hat[2],col=kk+1,lwd=2)
 }
-abline(lm(y~X[,2]),lwd=2)
+abline(b.hat[1],b.hat[2],lwd=2)
 
 cbind(b,b.hat)
 cbind(gam,gam.hat)

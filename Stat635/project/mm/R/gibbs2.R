@@ -198,12 +198,13 @@ beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
 gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
 
 clust.num <- apply(EZ,1,which.max) 
-plot(X[,2],y,col=clust.num,pch=20)
+plot(X[,2],y,col=clust.num+1,pch=20)
 K <- ncol(EZ)
 for (kk in 1:K) {
   ind <- which(clust.num==kk)
   abline(beta.hat[1]+EZ[ind,]%*%gam.hat, beta.hat[2],col=kk+1,lwd=2)
 }
+abline(lm(y~X[,2]))
 
 cbind(b,beta.hat)
 gam
@@ -224,5 +225,3 @@ gam.hat
 #cbind(b,beta.hat)
 #gam
 #gam.hat
-
-
