@@ -45,14 +45,18 @@ gam.hat <- G %*% t(Z) %*% solve(V) %*% (y-X%*%b.hat)
 y.hat <- X%*%b.hat + Z%*%gam.hat 
 plot(y-y.hat)
 
+plot(X[,2],y,pch=20,main="y=Xb+e",xlab="x")
+abline(lm(y~X[,2]),lwd=2)
+
 #abline(lm(y~X[,2]),col="red")
 clust.num <- apply(Z,1,which.max) 
-plot(X[,2],y,col=clust.num,pch=20)
+plot(X[,2],y,col=clust.num+1,pch=20,main="y=Xb+Zg+e",xlab="x")
 K <- ncol(Z)
 for (kk in 1:K) {
   ind <- which(clust.num==kk)
-  abline(b.hat[1]+Z[ind,]%*%gam.hat, b.hat[2],col=kk,lwd=2)
+  abline(b.hat[1]+Z[ind,]%*%gam.hat, b.hat[2],col=kk+1,lwd=2)
 }
+abline(lm(y~X[,2]),lwd=2)
 
 cbind(b,b.hat)
 cbind(gam,gam.hat)

@@ -182,7 +182,7 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
 # SIMULATIONS STUDY: UNCOMMENT TO SIMULATE!!!
 # Works when sig.r2=1
 source("genData.R")
-B <- 500
+B <- 100
 elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=T))
 
 EZ <- est.Z(out$Zs)
@@ -202,7 +202,7 @@ plot(X[,2],y,col=clust.num,pch=20)
 K <- ncol(EZ)
 for (kk in 1:K) {
   ind <- which(clust.num==kk)
-  abline(beta.hat[1]+EZ[ind,]%*%gam.hat, beta.hat[2],col=kk,lwd=2)
+  abline(beta.hat[1]+EZ[ind,]%*%gam.hat, beta.hat[2],col=kk+1,lwd=2)
 }
 
 cbind(b,beta.hat)
