@@ -1,0 +1,3 @@
+#!/bin/bash
+sas mud.sas
+vi mud.lst
