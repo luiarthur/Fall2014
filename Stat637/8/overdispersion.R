@@ -1,0 +1,4 @@
+library(aod)
+head(dja)
+
+
