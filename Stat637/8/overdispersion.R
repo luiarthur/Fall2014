@@ -8,6 +8,7 @@ test.stat <- qchisq(.95,N-p) / (N-p)
 
 #1 
 mod1 <- glm(y/n ~ group, family=quasibinomial(link="logit"), weights=n, data=dja)
+summary(glm(y/n ~ group, family=binomial(link="logit"), weights=n, data=dja))
 summary(mod1)
 
 #2
