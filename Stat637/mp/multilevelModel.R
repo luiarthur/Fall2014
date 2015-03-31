@@ -1,3 +1,8 @@
+# Paper:
+#http://www.stat.columbia.edu/~gelman/research/published/multi2.pdf
+# Data taken from:
+#http://www.unc.edu/courses/2007spring/enst/562/001/docs/assignments/assign10.htm
+
 det <- function(x,log=F) {
   out <- 0
   if (!log) {
