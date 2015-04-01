@@ -111,14 +111,16 @@ plot.post <- function(x,main=NULL,hpd=T,color="cornflowerblue",cex.l=1,trace=T,
     legend("topleft",legend=c(paste("Mean =",mn.x),
                               paste("Std. Dev. =",v.x),
                               paste("Low HPD =",round(hpd[1],4)),
-                              paste("Upp HPD =",round(hpd[2],4))),
+                              paste("Upp HPD =",round(hpd[2],4)),
+                              paste("Iterations =",length(x))),
                               bty="n",cex=cex.l)
   } else {
     plot(density(x),col=color,ylim=c(rng[1],rng[2]+diff*.3),lwd=3,main=main)
     color.den(den,rng.x[1],rng.x[2],col.den=color,col.area=color,add=T)
     lines(c(mn.x,mn.x),c(0,bound(mn.x,den,ret=F)),lwd=2,col="red")
     legend("topleft",legend=c(paste("Mean =",mn.x),
-                              paste("Std. Dev. =",v.x)),
+                              paste("Std. Dev. =",v.x),
+                              paste("Iterations =",length(x))),
                               bty="n",cex=cex.l)
   }
 
