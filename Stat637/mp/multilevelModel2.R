@@ -152,12 +152,22 @@ mh <- function(B=1e3,csa=rep(.1,J),csb=.1,csg0=.1,csg1=.1,cssy=.1,cssa=.01,
   out
 }
 
-out <- mh(B=1e5)
-plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"))
-plot.posts(out$b,names="b")
-plot.posts(cbind(out$g0,out$g1),names=c("g0","g1"))
-plot.posts(out$sy2,names="sy2")
-plot.posts(out$sa2,names="sa2") # With uniform prior, trace plot is terrible; and acceptance rate is high (.8)
+out <- mh(B=B)
+pdf("latex/images/apost.pdf")
+  plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"),color="pink")
+dev.off()
+pdf("latex/images/bpost.pdf")
+  plot.posts(out$b,names="b")
+dev.off()
+pdf("latex/images/gpost.pdf")
+  plot.posts(cbind(out$g0,out$g1),names=c("g0","g1"))
+dev.off() 
+pdf("latex/images/sy2post.pdf")
+  plot.posts(out$sy2,names="sy2")
+dev.off()
+pdf("latex/images/sa2post.pdf")
+  plot.posts(out$sa2,names="sa2") # With uniform prior, trace plot is terrible; and acceptance rate is high (.8)
+dev.off()
 
 out$acc.a
 out$acc.b

@@ -80,7 +80,7 @@ int2rgb = function(x){
 }
 
 plot.post <- function(x,main=NULL,hpd=T,color="cornflowerblue",cex.l=1,trace=T,
-                      stay=F,tck.dig=4,...) {
+                      stay=F,tck.dig=4,its=length(x),...) {
   mn.x <- round(mean(x),5)
   v.x <- round(sd(x),3)
   den <- density(x)
@@ -112,7 +112,7 @@ plot.post <- function(x,main=NULL,hpd=T,color="cornflowerblue",cex.l=1,trace=T,
                               paste("Std. Dev. =",v.x),
                               paste("Low HPD =",round(hpd[1],4)),
                               paste("Upp HPD =",round(hpd[2],4)),
-                              paste("Iterations =",length(x))),
+                              paste("Iterations =",its)),
                               bty="n",cex=cex.l)
   } else {
     plot(density(x),col=color,ylim=c(rng[1],rng[2]+diff*.3),lwd=3,main=main)
@@ -178,7 +178,7 @@ plot.contour <- function(M,...) {
 }
 
 plot.posts <- function(M,names=rep(NULL,ncol(as.matrix(M))),digits=4,cex.legend=.7,
-                       keep.par=F,tck.dig=4,cex.a=1/ncol(M)) {
+                       keep.par=F,tck.dig=4,cex.a=1/ncol(M),its=nrow(M),...) {
   M <- as.matrix(M)
   k <- ncol(M)
   corrs <- cor(M)
@@ -197,7 +197,7 @@ plot.posts <- function(M,names=rep(NULL,ncol(as.matrix(M))),digits=4,cex.legend=
         }  
       }
       
-      plot.post(M[,i],cex.l=cex.legend,main=names[i],tck.dig=tck.dig,cex.axis=cex.a)
+      plot.post(M[,i],cex.l=cex.legend,main=names[i],tck.dig=tck.dig,cex.axis=cex.a,its=its,...)
 
       if (i<k) {
         for (j in (i+1):k) {
