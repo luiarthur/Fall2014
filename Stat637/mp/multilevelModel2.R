@@ -154,7 +154,7 @@ mh <- function(B=1e3,csa=rep(.1,J),csb=.1,csg0=.1,csg1=.1,cssy=.1,cssa=.01,
 
 out <- mh(B=B)
 pdf("latex/images/apost.pdf")
-  plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"),color="pink")
+  plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"),color="pink",cex.legend=.5)
 dev.off()
 pdf("latex/images/bpost.pdf")
   plot.posts(out$b,names="b")
@@ -180,5 +180,12 @@ a.h <- apply(out$a,2,mean)
 g0.h <- mean(out$g0)
 g1.h <- mean(out$g1)
 
-plot(u,a.h)
-abline(g0.h,g1.h)
+pdf("latex/images/au.pdf")
+  plot(u,a.h,main="aj vs. log(Uranium)",pch=20,col="grey30",
+       ylab="Regression Intercept (aj)",xlab="County-level Log Uranium Meaure")
+  abline(g0.h,g1.h,lwd=2,col="purple")
+  legend("topleft",bty="n",
+         legend=c(paste("Intercept:",round(g0.h,4)),
+                  paste("Slope:",round(g1.h,4))))
+dev.off()
+
