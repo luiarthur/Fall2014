@@ -21,7 +21,7 @@ x <- ifelse(dat$basement=="Y",1,0)
 counties <- unique(dat$county)
 
 G <- matrix(0,N,J)
-u <- unique(dat$Uppm)
+u <- log(unique(dat$Uppm))
 Y <- as.list(1:J)
 X <- as.list(1:J)
 for (j in 1:J) {
@@ -30,13 +30,21 @@ for (j in 1:J) {
 }
 
 
-mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=3,csg1=3,cssy=2,cssa=2,
+mh <- function(B=1e3,csa=rep(.1,J),csb=.1,csg0=.1,csg1=.1,cssy=.1,cssa=.01,
                sigb2=100,ubg0=100,ubg1=100,ubsy2=100,ubsa2=100) {
   # Likelihoods:
   # yij ~ N(aj+b*xij, sy2)  ......(1)
     ll1 <- function(j,aj,b,sy2) sum(dnorm(Y[[j]],aj+b*X[[j]],sqrt(sy2),log=T))
   #  aj ~ N(g0+g1*uj, sa2) ......(2)
     ll2 <- function(aj,g0,g1,uj,sa2) dnorm(aj,g0+g1*uj,sqrt(sa2),log=T)
+  # y ~ prod_{j=1:J}{i=1:N}{N(aj+b*xij, sy2)}  ......(3)
+    ll3 <- function(a,b,sy2) {
+      out <- 0
+      for (j in 1:J) out <- out + sum(dnorm(Y[[j]],a[j]+b*X[[j]],sqrt(sy2),log=T))
+      out
+    }
+  #  a ~ prod_{j=1:J}{N(g0+g1*uj, sa2)} ......(4)
+    ll4 <- function(a,g0,g1,sa2) sum(dnorm(a,g0+g1*u,sqrt(sa2),log=T))
 
   #Priors:
   # aj ~ N(g0+g1*uj,sa2)
@@ -85,58 +93,56 @@ mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=3,csg1=3,cssy=2,cssa=2,
         a[z,j] <- cand
         acc.a[j] <- acc.a[j]+1
       }
+    } # End of J Loops
 
-      # Update b:
-      cand <- rnorm(1,b[z],csb)
-      #j <- sample(1:J,1)
-      lr <- ll1(j,a[z,j],cand,sy2[z]) + lb(cand) - 
-           (ll1(j,a[z,j],b[z],sy2[z]) + lb(b[z]))
+    # Update b:
+    cand <- rnorm(1,b[z],csb)
+    lr <- ll3(a[z,],cand,sy2[z]) + lb(cand) - 
+       (ll3(a[z,],b[z],sy2[z]) + lb(b[z]))
+    if (lr > log(runif(1))) {
+      b[z] <- cand
+      acc.b <- acc.b+1
+    }
+
+    # Update sy2:
+    cand <- rnorm(1,sy2[z],cssy)
+    if (cand>0){
+      lr <- ll3(a[z,],b[z],cand) + lsy2(cand) - 
+           (ll3(a[z,],b[z],sy2[z]) + lsy2(sy2[z]))
       if (lr > log(runif(1))) {
-        b[z] <- cand
-        acc.b <- acc.b+1
+        sy2[z] <- cand
+        acc.sy2 <- acc.sy2+1
       }
+    }
 
-      # Update sy2:
-      cand <- rnorm(1,sy2[z],cssy)
-      if (cand>0){
-        #j <- sample(1:J,1)
-        lr <- ll1(j,a[z,j],b[z],cand) + lsy2(cand) - 
-             (ll1(j,a[z,j],b[z],sy2[z]) + lsy2(sy2[z]))
-        if (lr > log(runif(1))) {
-          sy2[z] <- cand
-          acc.sy2 <- acc.sy2+1
-        }
-      }
-
-      # Update sa2:
-      cand <- rnorm(1,sa2[z],cssa)
-      if (cand>0){
-        lr <- ll2(a[z,j],g0[z],g1[z],u[j],cand) + lsa2(cand) - 
-             (ll2(a[z,j],g0[z],g1[z],u[j],sa2[z]) + lsa2(sa2[z]))
-        if (lr > log(runif(1))) {
-          sa2[z] <- cand
-          acc.sa2 <- acc.sa2+1
-        }
-      }
-
-      # Update g0:
-      cand <- rnorm(1,g0[z],csg0)
-      lr <- ll2(a[z,j],cand,g1[z],u[j],sa2[z]) + lg0(cand) - 
-           (ll2(a[z,j],g0[z],g1[z],u[j],sa2[z]) + lg0(g0[z]))
+    # Update sa2:
+    cand <- rnorm(1,sa2[z],cssa)
+    if (cand>0){
+      lr <- ll4(a[z,],g0[z],g1[z],cand) + lsa2(cand) - 
+           (ll4(a[z,],g0[z],g1[z],sa2[z]) + lsa2(sa2[z]))
       if (lr > log(runif(1))) {
-        g0[z] <- cand
-        acc.g0 <- acc.g0+1
+        sa2[z] <- cand
+        acc.sa2 <- acc.sa2+1
       }
+    }
 
-      # Update g1:
-      cand <- rnorm(1,g1[z],csg1)
-      lr <- ll2(a[z,j],g0[z],cand,u[j],sa2[z]) + lg1(cand) - 
-           (ll2(a[z,j],g0[z],g1[z],u[j],sa2[z]) + lg1(g1[z]))
-      if (lr > log(runif(1))) {
-        g1[z] <- cand
-        acc.g1 <- acc.g1+1
-      }
-    }# End of J Loops
+    # Update g0:
+    cand <- rnorm(1,g0[z],csg0)
+    lr <- ll4(a[z,],cand,g1[z],sa2[z]) + lg0(cand) - 
+         (ll4(a[z,],g0[z],g1[z],sa2[z]) + lg0(g0[z]))
+    if (lr > log(runif(1))) {
+      g0[z] <- cand
+      acc.g0 <- acc.g0+1
+    }
+
+    # Update g1:
+    cand <- rnorm(1,g1[z],csg1)
+    lr <- ll4(a[z,],g0[z],cand,sa2[z]) + lg1(cand) - 
+         (ll4(a[z,],g0[z],g1[z],sa2[z]) + lg1(g1[z]))
+    if (lr > log(runif(1))) {
+      g1[z] <- cand
+      acc.g1 <- acc.g1+1
+    }
     count.down(ot,z,B)
   }# End of B Loops
   
@@ -146,7 +152,7 @@ mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=3,csg1=3,cssy=2,cssa=2,
   out
 }
 
-out <- mh(B=1e5)
+out <- mh(B=1e4)
 plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"))
 plot.posts(out$b)
 plot.posts(out$g0)
@@ -160,3 +166,10 @@ out$acc.g0
 out$acc.g1
 out$acc.sy2
 out$acc.sa2
+
+a.h <- apply(out$a,2,mean)
+g0.h <- mean(out$g0)
+g1.h <- mean(out$g1)
+
+plot(u,a.h)
+abline(g0.h,g1.h)
