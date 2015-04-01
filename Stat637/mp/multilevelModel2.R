@@ -30,7 +30,7 @@ for (j in 1:J) {
 }
 
 
-mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=13,csg1=14,cssy=12,cssa=64,
+mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=3,csg1=3,cssy=2,cssa=2,
                sigb2=100,ubg0=100,ubg1=100,ubsy2=100,ubsa2=100) {
   # Likelihoods:
   # yij ~ N(aj+b*xij, sy2)  ......(1)
@@ -43,14 +43,14 @@ mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=13,csg1=14,cssy=12,cssa=64,
     laj <- ll2
   # b ~ N(0,100)
     lb <- function(b) dnorm(b,0,sqrt(sigb2),log=T)
-  # g0 ~ U(0,100)
-    lg0 <- function(g0) 0
-  # g1 ~ U(0,100)
-    lg1 <- function(g1) 0
+  # g0 ~ U(-100,100)
+    lg0 <- function(g0) dnorm(g0,0,10,log=T) #0
+  # g1 ~ U(-100,100)
+    lg1 <- function(g1) dnorm(g1,0,10,log=T) #0
   # sy2 ~ U(0,100)
-    lsy2 <- function(sy2) 0
+    lsy2 <- function(sy2) dnorm(sy2,2,log=T)#0
   # sa2 ~ U(0,100)
-    lsa2 <- function(sa2) 0
+    lsa2 <- function(sa2) dnorm(sa2,2,log=T)#0
 
   a <- matrix(0,B,J)
   b <- rep(0,B)
@@ -146,13 +146,13 @@ mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=13,csg1=14,cssy=12,cssa=64,
   out
 }
 
-out <- mh(B=1e4)
+out <- mh(B=1e5)
 plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"))
 plot.posts(out$b)
 plot.posts(out$g0)
 plot.posts(out$g1)
 plot.posts(out$sy2)
-plot.posts(out$sa2) # Problem?
+plot.posts(out$sa2) # With uniform prior, trace plot is terrible; and acceptance rate is high (.8)
 
 out$acc.a
 out$acc.b
