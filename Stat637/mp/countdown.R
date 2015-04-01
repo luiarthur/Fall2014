@@ -5,7 +5,7 @@ count.down <- function(old.time,i,B,figs=0) {
   time.remain <- time.diff * (B-i)
   if (time.remain < 60) {
     secs <- round(time.remain)
-    time.remain <- paste0(secs,"s     ")
+    time.remain <- paste0(secs,"s        ")
   } else if (time.remain<3600) {
     mins <- round(time.remain%/%60)
     secs <- round(time.remain%%60)
