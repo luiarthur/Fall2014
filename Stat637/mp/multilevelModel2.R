@@ -30,7 +30,7 @@ for (j in 1:J) {
 }
 
 
-mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=3,csg1=3,cssy=3,cssa=3,
+mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=13,csg1=14,cssy=12,cssa=13,
                sigb2=100,ubg0=100,ubg1=100,ubsy2=100,ubsa2=100) {
   # Likelihoods:
   # yij ~ N(aj+b*xij, sy2)  ......(1)
@@ -147,5 +147,16 @@ mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=3,csg1=3,cssy=3,cssa=3,
 }
 
 out <- mh(B=1e4)
-plot.posts(out$g0,names="g0")
+plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"))
+plot.posts(out$b)
+plot.posts(out$g0)
+plot.posts(out$g1)
+plot.posts(out$sy2)
+plot.posts(out$sa2) # Problem?
 
+out$acc.a
+out$acc.b
+out$acc.g0
+out$acc.g1
+out$acc.sy2
+out$acc.sa2

@@ -175,7 +175,7 @@ plot.contour <- function(M,...) {
   contour(J,...)
 }
 
-plot.posts <- function(M,names=deparse(substitute(M)),digits=4,cex.legend=.7,
+plot.posts <- function(M,names=rep(NULL,ncol(as.matrix(M))),digits=4,cex.legend=.7,
                        keep.par=F,tck.dig=4,cex.a=1/ncol(M)) {
   M <- as.matrix(M)
   k <- ncol(M)

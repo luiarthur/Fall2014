@@ -1,4 +1,4 @@
-count.down <- function(old.time,i,B,figs=2) {
+count.down <- function(old.time,i,B,figs=0) {
   prog <- round(100*i/B,figs)
   new.time <- Sys.time()
   time.diff <- as.numeric(new.time-old.time)
