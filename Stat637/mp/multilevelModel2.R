@@ -30,7 +30,7 @@ for (j in 1:J) {
 }
 
 
-mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=13,csg1=14,cssy=12,cssa=13,
+mh <- function(B=1e3,csa=rep(3,J),csb=3,csg0=13,csg1=14,cssy=12,cssa=64,
                sigb2=100,ubg0=100,ubg1=100,ubsy2=100,ubsa2=100) {
   # Likelihoods:
   # yij ~ N(aj+b*xij, sy2)  ......(1)
