@@ -3,5 +3,4 @@ pdflatex *.tex
 rm -f *.log *.aux
 sftp sonata.byu.edu <<EOF
 put multHMod.pdf
-quit
 EOF
