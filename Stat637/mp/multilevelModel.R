@@ -66,6 +66,7 @@ mh <- function(B=1e4,candSigA=diag(100,k)) {
 
     # Update A:
     cand <- mvrnorm(k,A[i,],candSigA)
+    r <- ll() + lp 
   }
 
 }
