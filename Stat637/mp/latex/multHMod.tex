@@ -13,7 +13,7 @@
 \def\wl{\par \vspace{\baselineskip}\noindent}
 \def\beginmyfig{\begin{figure}[htbp]\begin{center}}
 \def\endmyfig{\end{center}\end{figure}}
-\def\myfig#1{\beginmyfig\includegraphics{#1}\endmyfig}
+\def\myfig#1#2{\beginmyfig\includegraphics{#1}\caption{#2}\endmyfig}
 %\def\prodl{\prod\limits_{i=1}^n}
 \def\suml{\sum\limits_{i=1}^n}
 \def\ds{\displaystyle}
@@ -92,15 +92,14 @@ to covariates of interest. We could express this model as
       \gamma_1 u_j,\sigma_a^2),\text{ for }j=1,...,J\\
 \end{align*}
 
+\section{Fitting The Normal Model}
+\myfig{images/apost.pdf}{}
+\myfig{images/bpost.pdf}{}
+\myfig{images/gpost.pdf}{}
+\myfig{images/sy2post.pdf}{}
+\myfig{images/sa2post.pdf}{}
+\myfig{images/au.pdf}{}
 
-\section{Fitting The Model}
-\myfig{images/apost.pdf}
-\myfig{images/bpost.pdf}
-\myfig{images/gpost.pdf}
-\myfig{images/sy2post.pdf}
-\myfig{images/sa2post.pdf}
-\myfig{images/au.pdf}
-
-\section{Extending Results of the Paper}
+\section{Fitting The Bernoulli Model}
 
 \end{document}
