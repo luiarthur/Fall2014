@@ -13,7 +13,6 @@
 \def\wl{\par \vspace{\baselineskip}\noindent}
 \def\beginmyfig{\begin{figure}[htbp]\begin{center}}
 \def\endmyfig{\end{center}\end{figure}}
-\def\myfig#1#2{\beginmyfig\includegraphics{#1}\caption{#2}\endmyfig}
 %\def\prodl{\prod\limits_{i=1}^n}
 \def\suml{\sum\limits_{i=1}^n}
 \def\ds{\displaystyle}
@@ -36,15 +35,16 @@ regression, and shows when it is essential, useful, or only helpful.\\
 
 \noindent
 Of interest to the EPA is the distribution of radon levels across homes in the
-US. Radon is a carcinogenic gas that causes several thousand lung cancer deaths
-each year. It is known that radon comes from underground and enters more easily
-into homes that are built into the ground, or that have basements.
-Consequently, the presence of basements in homes an important predictor for
-radon levels. In addition, uranuim, a solid that exists in soil, is a parent
-element that eventually decays to form radon gas. So, soil uranium measurements
-are also an important predictor of radon levels. The dataset from the EPA 
-contains information on more than 80,000 houses throughout the country. But
-Gelman analyzes only data in Minnesota, and groups observations (to form a
+US. Radon (measured in picoCuries per Liter or pCi/L) is a carcinogenic gas
+that causes several thousand lung cancer deaths each year. It is known that
+radon comes from underground and enters more easily into homes that are built
+into the ground, or that have basements.  Consequently, the presence of
+basements in homes an important predictor for radon levels. In addition,
+uranuim (measured in parts per million or ppm), a solid that exists in soil, is
+a parent element that eventually decays to form radon gas. So, soil uranium
+measurements are also an important predictor of radon levels. The dataset from
+the EPA contains information on more than 80,000 houses throughout the country.
+But Gelman analyzes only data in Minnesota, and groups observations (to form a
 hierarchy) by county, within the state of Minnesota.\\
 
 \noindent
@@ -80,10 +80,12 @@ different counties in Minnesota.\\
 \section{Multilevel Hierarchical Generalized Linear Models}
 The ideas of multilevel modeling can be extended to generalized linear models
 (GLM's) where the likelihood is not necessarily normal. Specifically, if we
-were to set a new indicator variable $z_{ij} = \text{I}(y_{ij}>1.8)$, and interpret
-it to be house $i$'s log radon danger level (1 if dangerous, and 0 if safe), then
-we could model $z_{ij}$ with a bernoulli likelihood, and link the log odds
-to covariates of interest. We could express this model as
+were to set a new indicator variable $z_{ij} = \text{I}(y_{ij}>\text{log}(4))$,
+and interpret it to be house $i$'s log radon danger level (1 if dangerous, and
+0 if safe), then we could model $z_{ij}$ with a bernoulli likelihood, and link
+the log odds to covariates of interest. (The EPA recommends homes to take
+corrective measures to reduce radon levels when they are measured to be 4 and
+above.) We could express this model as
 \begin{align*}
   z_{ij}|p_{ij} \sim & \text{Bernoulli}(p_{ij}),\text{ for }i=1,...,n_j,~j=1,...J.\\
   &\text{log}\left(\frac{p_{ij}}{1-p_{ij}}\right) = \alpha_j+\beta x_{ij}\\
@@ -104,14 +106,61 @@ The posterior means for the $\alpha_j$'s range from 2.35 to 1.31. It appears fro
 plots that the chain has converged the correct distribution. Figure 1 shows the posterior
 densities and trace plots for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$, which are representative
 of the posteriors of the other $\alpha_j$'s.
-\myfig{images/apost.pdf}{Posterior Distributions for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$}
 
-\myfig{images/bpost.pdf}{}
-\myfig{images/gpost.pdf}{}
-\myfig{images/sy2post.pdf}{}
-\myfig{images/sa2post.pdf}{}
-\myfig{images/au.pdf}{}
+\beginmyfig \includegraphics[scale=.5]{images/apost.pdf} 
+            \caption{Posterior Distributions for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$} \endmyfig 
+
+\noindent
+The chain also appears to have reached the correct distributions for the posterior of the other parameters
+and hyper parameters. Here we will not discuss the plots in detail, but simply display them in Figure 2.
+\beginmyfig \includegraphics[scale=.3]{images/hyperPost.pdf} 
+            \caption{Posteriors and traceplots for parameters and hyper parameters}\endmyfig 
+
+\noindent
+The EPA is interested in the relationship between county level radon
+measurements and county level uranium measurements. Figure 3 summarizes this
+relationship. On the y-axis is the predicted log radon levels computed using
+the estimated parameters. On the x-axis is the counties arranged in order of
+predicted log radon levels. The red line is the predicted log radon level
+for houses with basements, the blue line is the predicted log radon level
+for houses without basements. The grey line is the measured log uranium level.
+We see in general that as uranium levels increase, the radon levels increase. 
+Moreover, we see that radon levels for houses with basements are higher than
+those without. It is interesting to note, however, that it is not always the
+case that counties with higher uranium levels have higher radon levels that
+that of counties with lower uranium levels. This provides useful information
+for the EPA as they can investigate why certain counties would have higher 
+radon levels despite lower uranium levels. 
+
+\beginmyfig \includegraphics[scale=.5]{images/ym.pdf}  
+            \caption{The red and blue lines are the predicted log radon levels
+            (log pCi/L) for house with basements and houses without basements
+            for each county respectively. The grey line is the measured log
+            soil uranium levels (log ppm) for each county.}\endmyfig 
+
+%Of interest to the EPA was the relationship between county level radon measurements and 
+%county level uranium measurements. This relationship can be observed by plotting the
+%posterior means for each $\alpha_j$  against each corresponding $u_j$. The scatter plot
+%with the fitted regression line is shown in Figure 3.
+%\beginmyfig \includegraphics[scale=.5]{images/au.pdf}  
+%            \caption{Estimated County Coefficients ($\alpha_j$) versus county
+%            level log-uranium measures ($u_j$)}\endmyfig 
+
 
 \section{Fitting The Bernoulli Model}
+To extend these ideas to generalized linear models, I will
+\beginmyfig \includegraphics[scale=.5]{images/lapost.pdf} 
+            \caption{Posterior Distributions for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$} \endmyfig 
+
+\beginmyfig \includegraphics[scale=.3]{images/lhyperPost.pdf} 
+            \caption{Posteriors and traceplots for parameters and hyper parameters}\endmyfig 
+
+\beginmyfig \includegraphics[scale=.5]{images/pm.pdf}  
+            \caption{The figure above is the estimated probability of a house
+            with a basement (red) and that of a house without a basement
+            (blue), having radon levels above 4 for each county. The figure
+            below is the measured log radon levels (log ppm) for each
+            county.}\endmyfig 
+
 
 \end{document}
