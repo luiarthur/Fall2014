@@ -42,12 +42,36 @@ into homes that are built into the ground, or that have basements.
 Consequently, the presence of basements in homes an important predictor for
 radon levels. In addition, uranuim, a solid that exists in soil, is a parent
 element that eventually decays to form radon gas. So, soil uranium measurements
-are also an important predictor of radon levels. The dataset from the EPA is
+are also an important predictor of radon levels. The dataset from the EPA 
 contains information on more than 80,000 houses throughout the country. But
 Gelman analyzes only data in Minnesota, and groups observations (to form a
-hierarchy) by county, within Minnesota.\\
+hierarchy) by county, within the state of Minnesota.\\
 
 \noindent
+The hierarchical model that Gelman fits is
+\begin{align*}
+  y_{ij}      &\sim \text{N}(\alpha_j + \beta x_{ij},\sigma_y^2),
+               \text{ for }i=1,...,n_j,~j=1,...J.\\
+  \alpha_{ij} &\sim \text{N}(\gamma_0 + \gamma_1 u_j,\sigma_a^2),
+               \text{ for }j=1,...,J,\\
+\end{align*}
+where $y_{ij}$ is the \textit{log} radon measurement in house $i$ within county
+$j$, $x_{ij}$ is an indicator (0 for ``No", 1 for ``Yes") for whether house $i$
+in county $j$ has a basement, $u_j$ is the \textit{log} soil uranium
+measurement in county $j$. Consequently, the interpretation of $\alpha_j$ would
+be the expected \textit{log} radon measurement in a houses without basements in
+county $j$ (within Minnesota). Instead of interpreting $\beta$, it may be more
+informing to interpret $\alpha_j+\beta$, which is the the expected \textit{log}
+radon measurement in a houses with basements in county $j$. $\gamma_0$ is the
+expected \textit{log} radon measurement in houses without basements in
+Minnesota when county uranium level is 1. $\gamma_1$ is the expected increase
+in \textit{log} radon measurement in houses in county $j$ when county $j$'s
+uranium measurement increase by $e\approx 2.718$. $\sigma_y^2$ is the variation
+that exists between houses within county $j$. Finally, $\sigma_a^2$ is the
+variation that exists between baseline \textit{log} radon measurements between
+different counties.\\
+
+
 
 \section{How the Paper Relates to Generalized Linear Models}
 
