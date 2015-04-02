@@ -34,8 +34,8 @@ for (j in 1:J) {
 
 
 # Logistic Veresion
-mh <- function(B=1e3,csa=rep(.1,J),csb=.1,csg0=.1,csg1=.1,cssa=.01,
-               sigb2=100,) {
+mh <- function(B=1e3,csa=rep(1,J),csb=.3,csg0=.1,csg1=.3,cssa=.05,
+               sigb2=100) {
   # Likelihoods:
   # zij ~ Bern(pij)  ......(1)
     ll1 <- function(j,zj,aj,b) {
@@ -148,7 +148,7 @@ mh <- function(B=1e3,csa=rep(.1,J),csb=.1,csg0=.1,csg1=.1,cssa=.01,
   out
 }
 
-out <- mh(B=1e4)
+out <- mh(B=1e5)
 pdf("latex/images/lapost.pdf")
   plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"),color="pink",cex.legend=.5)
 dev.off()
@@ -179,16 +179,19 @@ cty <- sapply(counties,as.character)
 p.m <- cbind(as.factor(cty),p.h1,p.h0)
 p.m <- p.m[order(p.m[,2],p.m[,3]),]
 
-plot(p.m[,2],type="l",col="red",lwd=3,ylab="Probability of Danger",xaxt="n",xlab="")
-lines(p.m[,3],type="l",col="blue",lwd=3)
-axis(1,at=1:J,lab=cty[p.m[,1]],las=2,cex.axis=.5)
-legend("topleft",legend=c("Basement","No Basement"),col=c("red","blue"),bty="n",lwd=3)
 
-#pdf("latex/images/lau.pdf")
+pdf("latex/images/pm.pdf")
+  plot(p.m[,2],type="l",col="red",lwd=3,ylab="Probability of Danger",xaxt="n",xlab="",ylim=range(c(p.h1,p.h0)))
+  lines(p.m[,3],type="l",col="blue",lwd=3)
+  axis(1,at=1:J,lab=cty[p.m[,1]],las=2,cex.axis=.5)
+  legend("topleft",legend=c("Basement","No Basement"),col=c("red","blue"),bty="n",lwd=3)
+dev.off()
+
+pdf("latex/images/lau.pdf")
   plot(u,a.h,main="aj vs. log(Uranium)",pch=20,col="grey30",
        ylab="Regression Intercept (aj)",xlab="County-level Log Uranium Meaure")
   abline(g0.h,g1.h,lwd=2,col="purple")
   legend("topleft",bty="n",
          legend=c(paste("Intercept:",round(g0.h,4)),
                   paste("Slope:",round(g1.h,4))))
-#dev.off()
+dev.off()

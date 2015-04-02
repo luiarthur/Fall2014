@@ -177,8 +177,22 @@ out$acc.sy2
 out$acc.sa2
 
 a.h <- apply(out$a,2,mean)
+b.h <- mean(out$b)
 g0.h <- mean(out$g0)
 g1.h <- mean(out$g1)
+y1 <- apply(as.matrix(a.h),1,function(a) a+b.h)
+y0 <- apply(as.matrix(a.h),1,function(a) a)
+
+cty <- sapply(counties,as.character)
+y.m <- cbind(as.factor(cty),y1,y0)
+y.m <- y.m[order(y.m[,2],y.m[,3]),]
+
+pdf("latex/images/ym.pdf")
+  plot(y.m[,2],type="l",col="red",lwd=3,ylab="log radon",xaxt="n",xlab="",ylim=range(c(y1,y0)))
+  lines(y.m[,3],type="l",col="blue",lwd=3)
+  axis(1,at=1:J,lab=cty[y.m[,1]],las=2,cex.axis=.5)
+  legend("topleft",legend=c("Basement","No Basement"),col=c("red","blue"),bty="n",lwd=3)
+dev.off()
 
 pdf("latex/images/au.pdf")
   plot(u,a.h,main="aj vs. log(Uranium)",pch=20,col="grey30",

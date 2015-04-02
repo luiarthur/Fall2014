@@ -48,12 +48,18 @@ Gelman analyzes only data in Minnesota, and groups observations (to form a
 hierarchy) by county, within the state of Minnesota.\\
 
 \noindent
-The hierarchical model that Gelman fits is
+The structure for the hierarchical model that Gelman fits is similar to the
+following:
 \begin{align*}
   y_{ij}|\alpha_j,\beta,\sigma_y^2,x_{ij} &\sim \text{N}(\alpha_j + \beta
       x_{ij},\sigma_y^2),\text{ for }i=1,...,n_j,~j=1,...J.\\
   \alpha_{j}|\gamma_0,\gamma_1,\sigma_a^2,u_j &\sim \text{N}(\gamma_0 +
       \gamma_1 u_j,\sigma_a^2),\text{ for }j=1,...,J,\\
+  \beta &\sim \text{N}(0,100) \\
+  \gamma_0 &\sim \text{N}(0,100)\\
+  \gamma_1 &\sim \text{N}(0,100)\\
+  \sigma_y^2 &\sim \text{N}(2,1)\\
+  \sigma_a^2 &\sim \text{N}(2,1)
 \end{align*}
 where $y_{ij}$ is the \textit{log} radon measurement in house $i$ within county
 $j$, $x_{ij}$ is an indicator (0 for ``No", 1 for ``Yes") for whether house $i$
@@ -89,11 +95,17 @@ to covariates of interest. We could express this model as
       \text{Bernoulli}\left(\frac{exp(\alpha_j+\beta x_{ij})}{1+exp(\alpha_j+\beta
       x_{ij})}\right),\text{ for }i=1,...,n_j,~j=1,...J.\\
   \alpha_{j}|\gamma_0,\gamma_1,\sigma_a^2,u_j \sim & \text{N}(\gamma_0 +
-      \gamma_1 u_j,\sigma_a^2),\text{ for }j=1,...,J\\
+      \gamma_1 u_j,\sigma_a^2),\text{ for }j=1,...,J,
 \end{align*}
+with the same prior specifications as before.
 
 \section{Fitting The Normal Model}
-\myfig{images/apost.pdf}{}
+The posterior means for the $\alpha_j$'s range from 2.35 to 1.31. It appears from the trace
+plots that the chain has converged the correct distribution. Figure 1 shows the posterior
+densities and trace plots for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$, which are representative
+of the posteriors of the other $\alpha_j$'s.
+\myfig{images/apost.pdf}{Posterior Distributions for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$}
+
 \myfig{images/bpost.pdf}{}
 \myfig{images/gpost.pdf}{}
 \myfig{images/sy2post.pdf}{}
