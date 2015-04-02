@@ -50,10 +50,10 @@ hierarchy) by county, within the state of Minnesota.\\
 \noindent
 The hierarchical model that Gelman fits is
 \begin{align*}
-  y_{ij}      &\sim \text{N}(\alpha_j + \beta x_{ij},\sigma_y^2),
-               \text{ for }i=1,...,n_j,~j=1,...J.\\
-  \alpha_{ij} &\sim \text{N}(\gamma_0 + \gamma_1 u_j,\sigma_a^2),
-               \text{ for }j=1,...,J,\\
+  y_{ij}|\alpha_j,\beta,\sigma_y^2,x_{ij} &\sim \text{N}(\alpha_j + \beta
+      x_{ij},\sigma_y^2),\text{ for }i=1,...,n_j,~j=1,...J.\\
+  \alpha_{j}|\gamma_0,\gamma_1,\sigma_a^2,u_j &\sim \text{N}(\gamma_0 +
+      \gamma_1 u_j,\sigma_a^2),\text{ for }j=1,...,J,\\
 \end{align*}
 where $y_{ij}$ is the \textit{log} radon measurement in house $i$ within county
 $j$, $x_{ij}$ is an indicator (0 for ``No", 1 for ``Yes") for whether house $i$
@@ -71,9 +71,27 @@ that exists between houses within county $j$. Finally, $\sigma_a^2$ is the
 variation that exists between baseline \textit{log} radon measurements between
 different counties in Minnesota.\\
 
+\section{Multilevel Hierarchical Generalized Linear Models}
+The ideas of multilevel modeling can be extended to generalized linear models
+(GLM's) where the likelihood is not necessarily normal. Specifically, if we
+were to set a new indicator variable $z_{ij} = \text{I}(y_{ij}>1.8)$, and interpret
+it to be house $i$'s log radon danger level (1 if dangerous, and 0 if safe), then
+we could model $z_{ij}$ with a bernoulli likelihood, and link the log odds
+to covariates of interest. We could express this model as
+\begin{align*}
+  z_{ij}|p_{ij} \sim & \text{Bernoulli}(p_{ij}),\text{ for }i=1,...,n_j,~j=1,...J.\\
+  &\text{log}\left(\frac{p_{ij}}{1-p_{ij}}\right) = \alpha_j+\beta x_{ij}\\
+  \alpha_{j}|\gamma_0,\gamma_1,\sigma_a^2,u_j \sim & \text{N}(\gamma_0 +
+      \gamma_1 u_j,\sigma_a^2),\text{ for }j=1,...,J\\
+  \\
+  \implies
+  z_{ij}|\alpha_j,\beta,x_{ij} \sim &
+      \text{Bernoulli}\left(\frac{exp(\alpha_j+\beta x_{ij})}{1+exp(\alpha_j+\beta
+      x_{ij})}\right),\text{ for }i=1,...,n_j,~j=1,...J.\\
+  \alpha_{j}|\gamma_0,\gamma_1,\sigma_a^2,u_j \sim & \text{N}(\gamma_0 +
+      \gamma_1 u_j,\sigma_a^2),\text{ for }j=1,...,J\\
+\end{align*}
 
-
-\section{How the Paper Relates to Generalized Linear Models}
 
 \section{Fitting The Model}
 \myfig{images/apost.pdf}
