@@ -172,11 +172,11 @@ mh <- function(B=1e3,csa=rep(.1,J),csb=.1,csg0=.1,csg1=.1,cssy=.1,cssa=.01,
 
 out <- mh(B=1e5)
 
-png("latex/images/apost.png")
+pdf("latex/images/apost.pdf")
   plot.posts(out$a[,c(1,50,85)],names=c("a1","a50","a85"),color="pink",cex.legend=.5)
 dev.off()
 
-png("latex/images/hyperPost.png",width=19,height=13)
+pdf("latex/images/hyperPost.pdf",width=19,height=13)
   plot.posts(cbind(out$b,out$g0,out$g1,out$sy2,out$sa2),
              names=c("b","g0","g1","sy2","sa2"))
 dev.off()
