@@ -224,8 +224,8 @@ pdf("latex/images/au.pdf")
                   paste("Slope:",round(g1.h,4))))
 dev.off()
 
-clay <-  dat[which(dat$county=="CLAY"),c("county","activity")]
-lyon <-  dat[which(dat$county=="LYON"),c("county","activity")]
+clay <-  dat[which(dat$county=="CLAY"),]
+lyon <-  dat[which(dat$county=="LYON"),]
 
 mean(clay$act)
 mean(lyon$act)
