@@ -208,7 +208,7 @@ pdf("latex/images/ym.pdf")
   axis(1,at=1:J,lab=cty[y.m[,1]],las=2,cex.axis=.5)
   #axis(1,at=1:J,lab=paste0(cty[y.m[,1]],": ",round(y.m[,4],3)),las=2,cex.axis=.5)
   legend("topleft",legend=c("Basement","No Basement","log uranium"),col=c("red","blue","grey30"),bty="n",lwd=3)
-  axis(2,at=log(4),las=2,lab=c"log(4)",cex.axis=.6)
+  axis(2,at=log(4),las=2,lab="log(4)",cex.axis=.6)
   #axis(2,at=c(log(2),log(4)),las=2,lab=c("log(2)","log(4)"),cex.axis=.6)
   abline(h=log(4),col="yellow",lwd=2)
   #abline(h=log(2),col="green",lwd=2)
@@ -224,3 +224,11 @@ pdf("latex/images/au.pdf")
                   paste("Slope:",round(g1.h,4))))
 dev.off()
 
+clay <-  dat[which(dat$county=="CLAY"),c("county","activity")]
+lyon <-  dat[which(dat$county=="LYON"),c("county","activity")]
+
+mean(clay$act)
+mean(lyon$act)
+
+mean(clay$act>4)
+mean(lyon$act>4)

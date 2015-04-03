@@ -110,11 +110,13 @@ densities and trace plots for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$, which a
 of the posteriors of the other $\alpha_j$'s.\\
 \beginmyfig \includegraphics[scale=.5]{images/apost.pdf} 
             \caption{Posterior Distributions for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$} \endmyfig 
+
 \noindent
 The chain also appears to have reached the correct distributions for the posterior of the other parameters
 and hyper parameters. Here we will not discuss the plots in detail, but simply display them in Figure 2.\\
 \beginmyfig \includegraphics[scale=.3]{images/hyperPost.pdf} 
             \caption{Posteriors and trace plots for parameters and hyper parameters}\endmyfig 
+
 \noindent
 The EPA is interested in the relationship between county level radon
 measurements and county level uranium measurements. Figure 3 summarizes this
@@ -129,7 +131,8 @@ those without. It is interesting to note, however, that it is not always the
 case that counties with higher uranium levels have higher radon levels that
 that of counties with lower uranium levels. This provides useful information
 for the EPA as they can investigate why certain counties would have higher 
-radon levels despite lower uranium levels.\\
+radon levels despite lower uranium levels. Also, note that the predicted 
+radon levels for houses without basements are below 4 for all counties.\\
 
 \beginmyfig \includegraphics[scale=.5]{images/ym.pdf}  
             \caption{The red and blue lines are the predicted log radon levels
@@ -148,11 +151,12 @@ radon levels despite lower uranium levels.\\
 
 
 \section{Fitting The Bernoulli Model}
-To extend these ideas to generalized linear models, model (2) was fit. 
-The posterior means for the $\alpha_j$'s range from -2.55 to .274. It appears from the trace
-plots that the chain has converged the correct distribution. Figure 4 shows the posterior
-densities and trace plots for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$, which are representative
-of the posteriors of the other $\alpha_j$'s.\\
+To extend these ideas to generalized linear models, model (2) was fit.  The
+posterior means for the $\alpha_j$'s range from -2.55 to .274. It appears from
+the trace plots that the chain has converged the correct distribution. Figure 4
+shows the posterior densities and trace plots for $\alpha_1,\alpha_{50}$, and
+$\alpha_{85}$, which are representative of the posteriors of the other
+$\alpha_j$'s.\\
 \beginmyfig \includegraphics[scale=.5]{images/lapost.pdf} 
             \caption{Posterior Distributions for $\alpha_1,\alpha_{50}$, and $\alpha_{85}$} \endmyfig 
 \noindent
@@ -176,9 +180,74 @@ levels are more likely to have radon levels above 4.\\
 \beginmyfig \includegraphics[scale=.5]{images/pm.pdf}  
             \caption{The figure above is the estimated probability of a house
             with a basement (red) and that of a house without a basement
-            (blue), having radon levels above 4 for each county. The figure
+            (blue) having radon levels above 4 for each county. The figure
             below is the measured log uranium levels (log ppm) for each
             county.}\endmyfig 
 
+\section*{Comparisons}
+The choice of likelihoods obviously provides different interpretations for
+parameters. It is interesting to note that the counties with higher predicted
+probability of having radon levels above 4 are not necessarily the counties
+with higher predicted radon levels. For instance, Clay county has the highest
+predicted radon levels, but it 14 from the county (Lyon) with the highest
+probability of having radon levels above 4. This is due to Lyon having more
+houses slightly above 4 piC/L radon measurements and Clay having only a few
+houses with much higher radon measurements, pulling the average radon
+measurements above 4 (See Table 1). The EPA could potentially use this
+information to tailor further analyses to different counties. I suspect that
+houses in Lyon may have higher radon levels due to other unmodeled factors that
+are influencing the slightly higher-than-4 radon levels across Lyon. It may be
+the case that home owners cannot do much to reduce radon levels in their homes.
+I would also suppose that the variation in radon levels in Clay could be due to
+location. Certain regions in Clay could may have higher radon levels. In which
+case, homeowners may not be able to reduce the radon levels in their homes, but
+may have to evacuate their homes.\\
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rlrrr}
+  \hline
+  Observation & County & Activity & Basement & U(ppm)\\ 
+  \hline
+  1 & LYON & 6.50 & Y & 1.48\\ 
+  2 & LYON & 6.90 & N & 1.48\\ 
+  3 & LYON & 5.10 & Y & 1.48\\ 
+  4 & LYON & 12.00& Y & 1.48\\ 
+  5 & LYON & 5.10 & Y & 1.48\\ 
+  6 & LYON & 8.90 & Y & 1.48\\ 
+  7 & LYON & 5.80 & Y & 1.48\\ 
+  8 & LYON & 4.60 & Y & 1.48\\ 
+   \hline
+\end{tabular}
+%\end{table}
+\quad
+%\begin{table}[ht]
+\centering
+\begin{tabular}{rlrrr}
+  \hline
+  Observation& County & Activity & Basement & U(ppm)\\ 
+  \hline
+   1 & CLAY & 12.90 & Y & 1.41\\ 
+   2 & CLAY & 2.60  & Y & 1.41\\ 
+   3 & CLAY & 26.60 & Y & 1.41\\ 
+   4 & CLAY & 13.00 & Y & 1.41\\ 
+   5 & CLAY & 8.80  & Y & 1.41\\ 
+   6 & CLAY & 19.50 & Y & 1.41\\ 
+   7 & CLAY & 2.50  & N & 1.41\\ 
+   8 & CLAY & 9.00  & Y & 1.41\\ 
+   9 & CLAY & 13.10 & Y & 1.41\\ 
+  10 & CLAY & 3.60  & Y & 1.41\\ 
+   \hline
+\end{tabular}
+\caption{Radon measurements (piC/L) for Lyon county and Clay county. The all
+         the houses sampled in Lyon, with and without basements, had radon
+         levels above 4, while 7 out of 9 houses with basements sampled in Clay 
+         had radon levels above 4. The one house without basement sampled in Clay
+         had radon levels below 4. Notice, however, that the mean radon levels
+         in Clay is 14.7 for houses with basements while the mean radon levels
+         for houses with basements in Lyon is only 6.86 even though Lyon had
+         a higher sampled proportion of houses with radon levels greater than
+         4.}
+\end{table}
 
 \end{document}
