@@ -193,7 +193,7 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
 # End of genData.R Plots
 
 # Simulation:
-B <- 2e4
+B <- 1e3
 elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=F))
 
 # Analysis:
