@@ -1,0 +1,58 @@
+\documentclass{beamer}                                                    
+\usepackage{amssymb}                                                      
+%\usepackage{Sweave}                                                       
+\usepackage{bm}                                                           
+\usepackage{mathtools}                                                    
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath} % multline
+\usepackage{caption} %captionof
+\usepackage[UKenglish]{isodate} % for: \today                             
+\cleanlookdateon                % for: \today                             
+                                                                          
+\def\wl{\par \vspace{\baselineskip}\noindent}                             
+\def\beginmyfig{\begin{figure}[ht]\begin{center}}                          
+\def\endmyfig{\end{center}\end{figure}}                                   
+
+\def\prodl#1#2#3{\prod\limits_{#1=#2}^{#3}}                               
+\def\suml#1#2#3{\sum\limits_{#1=#2}^{#3}}                                 
+\def\ds{\displaystyle}                                                    
+
+% Beamer Stuff:
+\usepackage{beamerthemeBoadilla} % Determines the Theme
+\usecolortheme{beaver}         % Determines the Color
+\beamertemplatenavigationsymbolsempty % To get rid of navigation bar
+
+% my title:                                                               
+\title[IBP In Mixed Models]{Using The Indian Buffet Process to Estimate the Design Matrix G in
+                            Random Intercept Mixed Models}
+%\logo{\includegraphics[width=1cm,height=1cm,keepspectration]{/data/arthurll/Pictures/logo.png}}
+\author[Arthur Lui]{Arthur Lui}
+\institute[Brigham Young University]{
+  Department of Statistics\\
+  Brigham Young University
+}
+%\setkeys{Gin}{width=0.5\textwidth}                                       
+\begin{document}                                                          
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\frame{\titlepage}
+\section{Introduction}
+  \frame{
+    \frametitle{Why use the IBP?}
+    \begin{itemize}
+      \item[] Factor Analysis 
+      \begin{itemize}
+          \item[]
+          \item[] \item Only $\bm y$ is observed 
+          \item[]
+          \item $\bm{Y = F\Lambda + \epsilon}$, where $\bm F$ and $\bm\Lambda$ 
+                         are matrices with continuous values
+          \item[]
+          \item Latent Feature Model
+          \begin{itemize}
+            \item $\bm{Y = Z\Lambda + \epsilon}$, where $\bm Z$ is a binary matrix
+            %\item $\bm{y = X\beta + Zf + \epsilon}$
+            \item $\bm Z$ can be modeled with an Indian buffet process prior
+          \end{itemize}
+      \end{itemize}
