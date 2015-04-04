@@ -193,8 +193,8 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
 # End of genData.R Plots
 
 # Simulation:
-B <- 1e1
-elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=T))
+B <- 2e4
+elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=F))
 
 # Analysis:
 system("mkdir -p latex/images")
@@ -221,6 +221,13 @@ pdf("latex/images/postMeanZ.pdf")
   a.image(sum.matrices(out$Zs)/B,axis.num=F)
 dev.off()
 
+pdf("latex/images/scatter.pdf")
+  plot(X[,2],y,pch=20,xlab="x")
+dev.off()  
+
+pdf("latex/images/clus.pdf")
+  plot.mm(y,X[,2],b,Z,g,pch=20,line=F)
+dev.off()  
 
 G <- diag(100,ncol(EZ))
 R <- diag(mean(out$sig.r2),length(y))

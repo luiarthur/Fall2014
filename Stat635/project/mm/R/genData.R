@@ -17,7 +17,7 @@ gendata <- function(n.vec=c(30,30,30),g=c(-7,1,6),b=c(5,4),
   list("y"=y,"X"=X,"b"=b,"Z"=Z,"g"=g,"sigr2"=sigr^2)
 }
 
-plot.mm <- function(y,x,b,z,g,addplot=F,...) {
+plot.mm <- function(y,x,b,z,g,addplot=F,line=T,...) {
   clust.num <- apply(z,1,which.max) 
 
   if (addplot) {
@@ -26,12 +26,14 @@ plot.mm <- function(y,x,b,z,g,addplot=F,...) {
     plot(x,y,col=clust.num+1,...)
   }
 
-  K <- ncol(z)
-  for (kk in 1:K) {
-    ind <- which(clust.num==kk)
-    abline(b[1]+z[ind,]%*%g, b[2],col=kk+1,lwd=2)
+  if (line) {
+    K <- ncol(z)
+    for (kk in 1:K) {
+      ind <- which(clust.num==kk)
+      abline(b[1]+z[ind,]%*%g, b[2],col=kk+1,lwd=2)
+    }
+    abline(lm(y~x),lwd=2,col="grey80")
   }
-  abline(lm(y~x),lwd=2,col="grey80")
 }
 
 
