@@ -1,9 +1,7 @@
 source("rfunctions.R")
-source("genData.R")
 
-system("mkdir -p out")
-
-gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress=T,a.a=1,a.b=1,a.r=1,b.r=5,cs.r2=2,plotProgress=F) {
+gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress=T,
+                       a.a=1,a.b=1,a.r=1,b.r=5,cs.r2=1,plotProgress=F) {
   B <- ceiling(B/50)*50 
 
   D <- ncol(X)
@@ -183,44 +181,34 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
 
 # SIMULATIONS STUDY: UNCOMMENT TO SIMULATE!!!
 # Works when sig.r2=1
-  dat <- gendata()
-  y <- dat$y
-  X <- dat$X
-  b <- dat$b
-  Z <- dat$Z
-  g <- dat$g
-  sigr2 <- dat$sigr2
-# End of genData.R Plots
+#source("genData.R")
 
-# Simulation:
-B <- 1e1
+data(iris)
+X <- as.matrix(cbind(1,iris[,1:4]))
+sp <- iris[,5]
+pairs(iris,col=sp,cex=.8)
+
+K <- length(unique(sp))
+N <- length(sp)
+uniq.k <- unique(sp)
+Z <- matrix(0,N,K)
+for (i in 1:N) {
+  Z[i,which(uniq.k == sp[i])] <- 1
+}
+colnames(Z) <- uniq.k
+
+b <- 1:5
+gam <- c(-3,1,2)
+y <- X%*%b + Z%*%gam + rnorm(1:N,0,sd=1)
+
+B <- 100
 elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=T))
 
-# Analysis:
-system("mkdir -p latex/images")
-
-EZ.pre <- est.Z(out$Zs)
-EZ <- clust.Z(EZ.pre)
-pdf("latex/images/EZpre.pdf")
-  a.image(EZ.pre,axis.num=F)
-dev.off()
-  
-pdf("latex/images/EZ.pdf")
-  a.image(EZ,axis.num=F)
-dev.off()
-
-pdf("latex/images/posta.pdf")
-  plot.post(out$a)
-dev.off()
-
-pdf("latex/images/postsigr2.pdf")
-  plot.post(out$sig.r2)
-dev.off()
-
-pdf("latex/images/postMeanZ.pdf")
-  a.image(sum.matrices(out$Zs)/B,axis.num=F)
-dev.off()
-
+EZ <- est.Z(out$Zs)
+EZ <- clust.Z(EZ)
+#EZ <- Z
+a.image(EZ,axis.num=F,main="Posterior Estimate of Z")
+#axis(4,at=seq(1,0,length=4),label=c(1,30,60,90))
 
 G <- diag(100,ncol(EZ))
 R <- diag(mean(out$sig.r2),length(y))
@@ -228,6 +216,32 @@ V <- EZ %*% G %*% t(EZ) + R
 beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
 gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
 
-pdf("latex/images/resultmm.pdf")
-  plot.mm(y,X[,2],beta.hat,EZ,gam.hat,pch=20)
-dev.off()
+clust.num <- apply(EZ,1,which.max) 
+plot(X[,2],y,col=clust.num,pch=20)
+K <- ncol(EZ)
+for (kk in 1:K) {
+  ind <- which(clust.num==kk)
+  abline(beta.hat[1]+EZ[ind,]%*%gam.hat, beta.hat[2],col=kk,lwd=2)
+}
+
+cbind(b,beta.hat)
+gam
+gam.hat
+
+##############################
+#gam2 <- c(gam.hat,sum(gam.hat))
+#EZ2 <- rbind(cbind(EZ[1:60,],0),cbind(0,0,rep(1,30)))
+#G <- diag(100,ncol(EZ2))
+#R <- diag(mean(out$sig.r2),length(y))
+#V <- EZ2 %*% G %*% t(EZ2) + R
+#beta.hat <- solve(t(X) %*%solve(V) %*%X)%*%t(X) %*%solve(V) %*%y
+#gam.hat <- G%*%t(EZ2)%*%solve(V)%*%(y-X%*%beta.hat)
+#
+#plot(X,y)
+#points(X,X%*%beta.hat+EZ2%*%gam.hat,col="blue",cex=2)
+#
+#cbind(b,beta.hat)
+#gam
+#gam.hat
+
+
