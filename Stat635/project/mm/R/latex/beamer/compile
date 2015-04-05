@@ -1,4 +1,5 @@
 #!/bin/bash
+
 pdflatex *.tex
 pdflatex *.tex
 rm -f *-*.pdf *.log *.aux *.out *.snm *.toc *.nav

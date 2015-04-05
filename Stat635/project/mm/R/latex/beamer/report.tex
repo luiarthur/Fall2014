@@ -1,12 +1,7 @@
-\documentclass{beamer}                                                    
-\usepackage{amssymb}                                                      
+\documentclass{beamer}
 %\usepackage{Sweave}                                                       
-\usepackage{bm}                                                           
-\usepackage{mathtools}                                                    
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage{amsmath} % multline
-\usepackage{caption} %captionof
+\usepackage{amssymb,bm,mathtools,amsmath}                                                      
+\usepackage{graphicx,caption,float}
 \usepackage[UKenglish]{isodate} % for: \today                             
 \cleanlookdateon                % for: \today                             
                                                                           
@@ -17,10 +12,15 @@
 \def\prodl#1#2#3{\prod\limits_{#1=#2}^{#3}}                               
 \def\suml#1#2#3{\sum\limits_{#1=#2}^{#3}}                                 
 \def\ds{\displaystyle}                                                    
+\def\tbf#1{\textbf{#1}}
+\def\inv{^{\raisebox{.2ex}{$\scriptscriptstyle-1$}}}
+\def\pm{^{\raisebox{.2ex}{$\scriptscriptstyle\prime$}}}
 
 % Beamer Stuff:
 \usepackage{beamerthemeBoadilla} % Determines the Theme
 \usecolortheme{beaver}           % Determines the Color
+%\usefonttheme{serif}
+
 \beamertemplatenavigationsymbolsempty % To get rid of navigation bar
 
 % my title:                                                               
@@ -37,18 +37,158 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \frame{\titlepage}
-\section{Motivation}
-  \frame{
-    \frametitle{Observations}
-    \beginmyfig
-    \includegraphics[scale=.4]{../images/scatter.pdf}
-    \endmyfig
-  }    
+
+\frame{
+  \frametitle{Observations}
+  \beginmyfig
+  \includegraphics[scale=.4]{../images/scatter.pdf}
+  \endmyfig
+}    
+
+\frame{
+  \frametitle{Random Intercept Linear Mixed Models}
+  \beginmyfig
+  \includegraphics[scale=.4]{../images/clus.pdf}
+  \endmyfig
+} 
+
+%\frame{
+%  \frametitle{Mixed Model}
+%  \[\bm{ y = X\beta + Z \gamma + \epsilon }\]
+%  \beginmyfig
+%    \vspace{-10mm}
+%    \includegraphics[scale=.4]{../images/clus.pdf}
+%  \endmyfig
+%}
+
+\frame{
+  \frametitle{Random Intercept Linear Mixed Models}
+  \begin{columns}
+    \begin{column}{.4\textwidth}
+      \beginmyfig
+        \includegraphics[scale=.3]{../images/clus.pdf}
+      \endmyfig
+    \end{column}
+    \begin{column}{.6\textwidth}
+      \begin{itemize}
+        \setlength\itemsep{1em}
+        \item $\bm{y = X\beta + Z \gamma + \epsilon}$
+        \begin{itemize}
+          \setlength\itemsep{1em}
+          \pause
+          %\item[]
+          \item $\bm{V=Z\hat GZ\pm+\hat R}$
+          \item $\bm{\hat\beta=(X\pm V\inv X)\inv X\pm V\inv y}$
+          \item $\bm{\hat\gamma=\hat G Z\pm V\inv (y-X\hat\beta)}$
+        \end{itemize}
+        \item []
+      \end{itemize}
+    \end{column}
+  \end{columns}
+}
+
+\frame{
+  \frametitle{Random Intercept Linear Mixed Models}
+  \begin{columns}
+    \begin{column}{.4\textwidth}
+      \beginmyfig
+        \includegraphics[scale=.3]{../images/resultmm.pdf}
+      \endmyfig
+    \end{column}
+    \begin{column}{.6\textwidth}
+      \begin{itemize}
+        \setlength\itemsep{1em}
+        \item $\bm{y = X\beta + Z \gamma + \epsilon}$
+        \begin{itemize}
+          \setlength\itemsep{1em}
+          %\item[]
+          \item $\bm{V=Z\hat GZ\pm+\hat R}$
+          \item $\bm{\hat\beta=(X\pm V\inv X)\inv X\pm V\inv y}$
+          \item $\bm{\hat\gamma=\hat G Z\pm V\inv (y-X\hat\beta)}$
+        \end{itemize}
+        \pause
+        \item But what if we don't know $\bm Z$?
+      \end{itemize}
+    \end{column}
+  \end{columns}
+}
+
+\frame{
+  \frametitle{Indian Buffet Process (IBP)}
+  
+}
+
+\frame{
+  \frametitle{Future Work}
+  \begin{itemize}
+    \item Proposal mechanism for IBP
+    \item Non-normal likelihood
+    \item Applications
+    \item Random slope?
+  \end{itemize}
+}
+
+\frame{
+  \frametitle{Questions?}
+  \begin{center}
+    \Huge Thank You!
+  \end{center}
+}
 
   \frame{
-    \frametitle{Clusters}
+    \frametitle{Indian Buffet Process (IBP)}
+    Customer $i$ taking a dish $k$ is analogous to observation $i$ possessing
+    feautre $k$. For $\bm Z \sim \text{IBP}_N(\alpha)$:\\
+    \wl
+    \begin{enumerate}
+      \setlength\itemsep{1em}
+      \pause
+      \item The first customer takes Poisson($\alpha$) number of dishes
+      \pause
+      \item For customers $i=2 \text{ to } N$,
+      \begin{itemize}
+        \pause
+        \item For each previously sampled dish, customer $i$ takes dish $k$
+              with probability $m_{-i,k} / i$
+              \pause
+        \item after sampling the last sampled dish, customer $i$ samples 
+              Poisson($\alpha/i$) new dishes
+      \end{itemize}
+    \end{enumerate}
+  }
+
+  \frame{
+    \frametitle{Realizations from the IBP}
     \beginmyfig
-    \includegraphics[scale=.4]{../images/clus.pdf}
+      %\includegraphics[scale=.4]{ibp2.pdf}
     \endmyfig
-  } 
+  }
+
+  \frame{
+    \frametitle{PMF for the IBP}
+      \[
+      \begin{array}{rcl}
+        \underset{N \times \infty}{\bm Z} &\sim& \text{IBP}(\alpha),
+           \text{ where $z_{ik} \in \{0,1\}$} \\
+        \implies \text{P}(\bm Z) & = & \frac{\alpha^{K}}{\prodl{i}{1}{N} 
+                                       x_i!} 
+                                       exp\{-\alpha H_N\}\prodl{k}{1}{K}
+                                       \frac{(N-m_k)!(m_k-1)!}{N!}\\
+                                 \pause
+                                 & = & \frac{\alpha^{K}exp\{-\alpha H_N\}}
+                                            {\prodl{i}{1}{N}(x_i!~i^{x_i})} 
+                                       \prodl{i}{2}{N}\prodl{k}{1}{y_{i}}
+                                       \left(\frac{m_{-i,k}}{i}\right)^{z_{i,k}}
+                                       \left(1-\frac{m_{-i,k}}{i}\right)^{1-z_{i,k}}
+      \end{array}
+      \]
+      \pause
+      where $H_N$ is the harmonic number $\suml{i}{1}{N}i^{-1}$, $K$ is the
+      number of non-zero columns in $\bm Z$, $m_k$ is the $k^{th}$ column sum
+      of $\bm Z$, $y_i$ is the total number of dishes sampled before the
+      $i^{th}$ customer, $m_{-i,k}$ is the number of customers that sampled
+      dish k before customer $i$,and $x_i$ is the number of ``new dishes"
+      sampled by customer $i$.\\
+  }
+
 \end{document}
