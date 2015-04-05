@@ -115,7 +115,60 @@
 
 \frame{
   \frametitle{Indian Buffet Process (IBP)}
-  
+  $\underset{N\times\infty}{\bm Z} \sim \text{IBP}_N(\alpha)$,
+  where $z_{ik} \in \left\{0,1\right\}$
+  \pause
+  \wl
+  NEED A FIGURE HERE!!!
+  \beginmyfig
+    %\includegraphics[scale=.4]{../images/ibp.pdf}
+  \endmyfig
+}
+
+\frame{
+  \frametitle{Model}
+  \begin{align*}
+    \text{Likelihood:}\\
+    \bm{y|X,\beta,Z,\gamma},\sigma_r^2 &\sim 
+      N(\bm{X\beta+Z\gamma},\sigma_r^2 \bm I_N)\\
+    \text{Priors:}\\
+    \bm\beta &\sim N(0,s_\beta^2\bm I_2)\\
+    \bm Z|\alpha &\sim \text{IBP($\alpha$)}\\
+    \alpha &\sim \text{Gamma}(a_\alpha,b_\alpha)\\
+    \bm\gamma &\sim N(0,s_\gamma^2\bm I_{K?})\\
+    \sigma_r^2 &\sim \text{Gamma}(a_\sigma,b_\sigma)\\
+    \\
+    \text{Marginalized Likelihood:}\\
+    \bm{[y|Z,X},\sigma_r^2] &= \int_{\beta,\gamma} \bm{[y|Z,X,\beta,\gamma][\beta][\gamma]} 
+                               d\bm\beta d\bm\gamma\\
+  \end{align*}
+}
+
+\frame{
+  \frametitle{Results}
+  \beginmyfig
+    \includegraphics[scale=.4]{../images/agpost.pdf}
+  \endmyfig  
+}
+
+\frame{
+  \frametitle{Results}
+  \beginmyfig
+    \includegraphics[scale=.4]{../images/EZpre.pdf}
+  \endmyfig  
+}
+
+\frame{
+  \frametitle{Results}
+  \beginmyfig
+    \includegraphics[scale=.4]{../images/EZ.pdf}
+  \endmyfig  
+}
+
+\frame{
+  \frametitle{Results}
+  \input{../images/mb.tex}
+  \input{../images/mg.tex}
 }
 
 \frame{

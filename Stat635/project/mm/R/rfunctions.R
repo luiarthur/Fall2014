@@ -348,3 +348,43 @@ det <- function(x,log=F) {
   out
 }
 
+plot.contour <- function(M,...) {
+  library(MASS) # filled.contour, kde2d
+  J <- kde2d(M[,1],M[,2])
+  contour(J,...)
+}
+
+plot.posts <- function(M,names=rep(NULL,ncol(as.matrix(M))),digits=4,cex.legend=.7,
+                       keep.par=F,tck.dig=4,cex.a=1/ncol(M),its=nrow(M),...) {
+  M <- as.matrix(M)
+  k <- ncol(M)
+  corrs <- cor(M)
+  set <- par(no.readonly=T)
+  par(mfrow=c(k,k))
+    for (i in 1:k) {
+      if (i>1) {
+        for (j in 1:(i-1)) { 
+          plot(1, type="n", axes=F, xlab="", ylab="",
+               main=paste0("Corr (",names[i],",",names[j],")")) # empty plot
+          r <- round(corrs[i,j],digits)
+          cex.cor <- max(.8/strwidth(format(r)) * abs(r),1)
+          text(1,labels=r,cex=cex.cor)
+          #legend("center",legend=corrs[i,j],
+          #       title=paste0("Corr (",names[i],",",names[j],")"))
+        }  
+      }
+      
+      plot.post(M[,i],cex.l=cex.legend,main=names[i],tck.dig=tck.dig,cex.axis=cex.a,its=its,...)
+
+      if (i<k) {
+        for (j in (i+1):k) {
+          plot(M[,c(j,i)],type="l",col="gray85",xlab=names[j],ylab=names[i],
+               main=paste("Trace & Contour \n",names[i],"vs",names[j]))
+          plot.contour(M[,c(j,i)],add=T)
+        }
+      }  
+    }
+  if (!(keep.par)) par(set)
+}
+
+

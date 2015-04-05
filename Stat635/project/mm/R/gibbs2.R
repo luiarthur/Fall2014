@@ -1,5 +1,6 @@
 source("rfunctions.R")
 source("genData.R")
+library(xtable)
 
 system("mkdir -p out")
 
@@ -229,6 +230,10 @@ pdf("latex/images/clus.pdf")
   plot.mm(y,X[,2],b,Z,g,pch=20,line=F)
 dev.off()  
 
+pdf("latex/images/agpost.pdf")
+  plot.posts(cbind(out$a,out$sig.r2),names=c("a","sig.r2"))
+dev.off()
+
 G <- diag(100,ncol(EZ))
 R <- diag(mean(out$sig.r2),length(y))
 V <- EZ %*% G %*% t(EZ) + R
@@ -238,3 +243,10 @@ gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
 pdf("latex/images/resultmm.pdf")
   plot.mm(y,X[,2],beta.hat,EZ,gam.hat,pch=20)
 dev.off()
+
+sink("latex/images/mb.tex")
+  Mb <- cbind(b,beta.hat)
+  rownames(Mb) <- c("Intercept","Slope")
+  colnames(Mb) <- c("True","Estimated")
+  Mb <- xtable(Mb,digits=c(0,0,3))
+sink()
