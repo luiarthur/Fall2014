@@ -202,10 +202,12 @@ system("mkdir -p latex/images")
 
 EZ.pre <- est.Z(out$Zs)
 EZ <- clust.Z(EZ.pre)
+
 pdf("latex/images/EZpre.pdf")
   a.image(EZ.pre,axis.num=F,col=paste0("grey",100:30))
 dev.off()
-  
+
+ 
 pdf("latex/images/EZ.pdf")
   a.image(EZ,axis.num=F,color=paste0("grey",100:30))
 dev.off()
@@ -298,3 +300,8 @@ pdf("combineMM.pdf",height=11)
     plot.mm(y,X[,2],b=bk.hat,z=KZ,gk.hat,pch=20,main="K-Means")
   par(mfrow=c(1,1))
 dev.off()
+
+pdf("latex/images/KZ.pdf")
+  a.image(KZ,axis.num=F,col=paste0("grey",100:30))
+dev.off()
+ 
