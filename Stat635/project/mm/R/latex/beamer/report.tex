@@ -55,13 +55,7 @@
 } 
 
 
-\frame{
-  \frametitle{Random Intercept Linear Mixed Models}
-  \beginmyfig
-    \caption{Groups obtained by kmeans}
-    \includegraphics[scale=.4]{../images/kmean.pdf}
-  \endmyfig
-} 
+
 %\frame{
 %  \frametitle{Mixed Model}
 %  \[\bm{ y = X\beta + Z \gamma + \epsilon }\]
@@ -102,7 +96,7 @@
   \begin{columns}
     \begin{column}{.4\textwidth}
       \beginmyfig
-        \includegraphics[scale=.3]{../images/resultmm.pdf}
+        \includegraphics[scale=.3]{../images/truemm.pdf}
       \endmyfig
     \end{column}
     \begin{column}{.6\textwidth}
@@ -122,6 +116,21 @@
     \end{column}
   \end{columns}
 }
+
+\frame{
+  \frametitle{Random Intercept Linear Mixed Models}
+  \beginmyfig
+    \caption{True Groups}
+    \includegraphics[scale=.4]{../images/clus.pdf}
+  \endmyfig
+} 
+\frame{
+  \frametitle{Random Intercept Linear Mixed Models}
+  \beginmyfig
+    \caption{Groups obtained by kmeans}
+    \includegraphics[scale=.4]{../images/kmean.pdf}
+  \endmyfig
+} 
 
 \frame{
   \frametitle{Indian Buffet Process (IBP)}
@@ -164,6 +173,8 @@
   \frametitle{Results}
   \beginmyfig
     \includegraphics[scale=.4]{../images/EZpre.pdf}
+    \vspace{-5mm}
+    \caption{Estimated Z Matrix}
   \endmyfig  
 }
 
@@ -171,13 +182,58 @@
   \frametitle{Results}
   \beginmyfig
     \includegraphics[scale=.4]{../images/EZ.pdf}
+    \vspace{-5mm}
+    \caption{Reparameterized Estimated Z Matrix}
   \endmyfig  
 }
 
 \frame{
   \frametitle{Results}
-  \input{../images/mb.tex}
-  \input{../images/mg.tex}
+  \begin{columns}
+    \begin{column}{.6\textwidth}
+      \beginmyfig
+        \caption{True}
+        \vspace{-5mm}
+        \includegraphics[scale=.4]{../images/truemm.pdf}
+      \endmyfig
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \input{../images/mb.tex}
+      \input{../images/mg.tex}     
+    \end{column}
+  \end{columns}
+}
+\frame{
+  \frametitle{Results}
+  \begin{columns}
+    \begin{column}{.6\textwidth}
+      \beginmyfig
+        \caption{IBP}
+        \vspace{-5mm}
+        \includegraphics[scale=.4]{../images/ibpmm.pdf}
+      \endmyfig
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \input{../images/mb.tex}
+      \input{../images/mg.tex}     
+    \end{column}
+  \end{columns}
+}
+\frame{
+  \frametitle{Results}
+  \begin{columns}
+    \begin{column}{.6\textwidth}
+      \beginmyfig
+        \caption{K-Means}
+        \vspace{-5mm}
+        \includegraphics[scale=.4]{../images/KMmm.pdf}
+      \endmyfig
+    \end{column}
+    \begin{column}{.4\textwidth}
+      \input{../images/mb.tex}
+      \input{../images/mg.tex}     
+    \end{column}
+  \end{columns}
 }
 
 \frame{

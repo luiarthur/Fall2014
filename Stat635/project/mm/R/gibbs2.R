@@ -203,11 +203,11 @@ system("mkdir -p latex/images")
 EZ.pre <- est.Z(out$Zs)
 EZ <- clust.Z(EZ.pre)
 pdf("latex/images/EZpre.pdf")
-  a.image(EZ.pre,axis.num=F)
+  a.image(EZ.pre,axis.num=F,col=paste0("grey",100:30))
 dev.off()
   
 pdf("latex/images/EZ.pdf")
-  a.image(EZ,axis.num=F)
+  a.image(EZ,axis.num=F,color=paste0("grey",100:30))
 dev.off()
 
 pdf("latex/images/posta.pdf")
@@ -219,7 +219,7 @@ pdf("latex/images/postsigr2.pdf")
 dev.off()
 
 pdf("latex/images/postMeanZ.pdf")
-  a.image(sum.matrices(out$Zs)/B,axis.num=F)
+  a.image(sum.matrices(out$Zs)/B,axis.num=F,color=paste0("grey",100:30))
 dev.off()
 
 pdf("latex/images/scatter.pdf")
@@ -244,24 +244,57 @@ pdf("latex/images/resultmm.pdf")
   plot.mm(y,X[,2],beta.hat,EZ,gam.hat,pch=20)
 dev.off()
 
-sink("latex/images/mb.tex")
-  Mb <- cbind(b,beta.hat)
-  rownames(Mb) <- c("$\\beta_0$","$\\beta_1$")
-  colnames(Mb) <- c("True","Estimated")
-  Mb <- xtable(Mb,digits=c(0,0,3))
-  print(Mb,sanitize.text.function=function(x) x)
-sink()
-
-sink("latex/images/mg.tex")
-  Mg <- cbind(g,gam.hat)
-  rownames(Mg) <- c("$\\gamma_0$","$\\gamma_1$","$\\gamma_2$")
-  colnames(Mg) <- c("True","Estimated")
-  Mg <- xtable(Mg,digits=c(0,0,3))
-  print(Mg,sanitize.text.function=function(x) x)
-sink()
+pdf("latex/images/truemm.pdf")
+  plot.mm(y,X[,2],b,EZ,g,pch=20)
+dev.off()
 
 kmean.clus <- kmeans(cbind(y,X[,2]),3)$cluster+4
 kmean.clus <- ifelse(kmean.clus==6,4,ifelse(kmean.clus==5,2,3))
 pdf("latex/images/kmean.pdf")
-  plot(X[,2],y,,xlab="x",col=kmean.clus,pch=20)
+  plot(X[,2],y,xlab="x",col=kmean.clus,pch=20)
+dev.off()
+
+KZ <- matrix(0,n,3)
+for (i in 1:n) {
+  KZ[i,kmean.clus[i]-1] <- 1
+}
+KZ
+
+
+Gk <- diag(100,ncol(KZ))
+Rk <- diag(mean(out$sig.r2),length(y))
+Vk <- KZ %*% Gk %*% t(KZ) + R
+bk.hat <- solve(t(X) %*%solve(Vk) %*%X)%*%t(X) %*%solve(Vk) %*%y
+gk.hat <- Gk%*%t(KZ)%*%solve(Vk)%*%(y-X%*%bk.hat)
+
+pdf("latex/images/ibpmm.pdf")
+  plot.mm(y,X[,2],b=beta.hat,z=EZ,gam.hat,pch=20)
+dev.off()
+
+pdf("latex/images/KMmm.pdf")
+  plot.mm(y,X[,2],b=bk.hat,z=KZ,gk.hat,pch=20)
+dev.off()
+
+sink("latex/images/mb.tex")
+  Mb <- cbind(b,beta.hat,bk.hat)
+  rownames(Mb) <- c("$\\beta_0$","$\\beta_1$")
+  colnames(Mb) <- c("True","IBP","KM")
+  Mb <- xtable(Mb,digits=c(0,0,3,3))
+  print(Mb,sanitize.text.function=function(x) x)
+sink()
+
+sink("latex/images/mg.tex")
+  Mg <- cbind(g,gam.hat,gk.hat)
+  rownames(Mg) <- c("$\\gamma_0$","$\\gamma_1$","$\\gamma_2$")
+  colnames(Mg) <- c("True","IBP","KM")
+  Mg <- xtable(Mg,digits=c(0,0,3,3))
+  print(Mg,sanitize.text.function=function(x) x)
+sink()
+
+pdf("combineMM.pdf",height=11)
+  par(mfrow=c(3,1))
+    plot.mm(y,X[,2],b=b,z=Z,g,pch=20,main="TRUE")
+    plot.mm(y,X[,2],b=beta.hat,z=EZ,gam.hat,pch=20,main="IBP")
+    plot.mm(y,X[,2],b=bk.hat,z=KZ,gk.hat,pch=20,main="K-Means")
+  par(mfrow=c(1,1))
 dev.off()
