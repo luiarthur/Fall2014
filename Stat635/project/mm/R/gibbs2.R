@@ -1,5 +1,6 @@
 source("rfunctions.R")
 source("genData.R")
+library(xtable)
 
 system("mkdir -p out")
 
@@ -193,7 +194,7 @@ gibbs.post <- function(y,X,sigg2=100,sigb2=100,a=1,B=1000,burn=B*.1,showProgress
 # End of genData.R Plots
 
 # Simulation:
-B <- 2e4
+B <- 1e3
 elapsed.time <- system.time(out <- gibbs.post(y,X,cs.r2=.2,B=B,showProgress=T,plotProgress=F))
 
 # Analysis:
@@ -229,6 +230,10 @@ pdf("latex/images/clus.pdf")
   plot.mm(y,X[,2],b,Z,g,pch=20,line=F)
 dev.off()  
 
+pdf("latex/images/agpost.pdf")
+  plot.posts(cbind(out$a,out$sig.r2),names=c("a","sig.r2"))
+dev.off()
+
 G <- diag(100,ncol(EZ))
 R <- diag(mean(out$sig.r2),length(y))
 V <- EZ %*% G %*% t(EZ) + R
@@ -238,3 +243,19 @@ gam.hat <- G%*%t(EZ)%*%solve(V)%*%(y-X%*%beta.hat)
 pdf("latex/images/resultmm.pdf")
   plot.mm(y,X[,2],beta.hat,EZ,gam.hat,pch=20)
 dev.off()
+
+sink("latex/images/mb.tex")
+  Mb <- cbind(b,beta.hat)
+  rownames(Mb) <- c("$\\beta_0$","$\\beta_1$")
+  colnames(Mb) <- c("True","Estimated")
+  Mb <- xtable(Mb,digits=c(0,0,3))
+  print(Mb,sanitize.text.function=function(x) x)
+sink()
+
+sink("latex/images/mg.tex")
+  Mg <- cbind(g,gam.hat)
+  rownames(Mg) <- c("$\\gamma_0$","$\\gamma_1$","$\\gamma_2$")
+  colnames(Mg) <- c("True","Estimated")
+  Mg <- xtable(Mg,digits=c(0,0,3))
+  print(Mg,sanitize.text.function=function(x) x)
+sink()
