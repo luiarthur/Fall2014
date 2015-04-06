@@ -259,3 +259,9 @@ sink("latex/images/mg.tex")
   Mg <- xtable(Mg,digits=c(0,0,3))
   print(Mg,sanitize.text.function=function(x) x)
 sink()
+
+kmean.clus <- kmeans(cbind(y,X[,2]),3)$cluster+4
+kmean.clus <- ifelse(kmean.clus==6,4,ifelse(kmean.clus==5,2,3))
+pdf("latex/images/kmean.pdf")
+  plot(X[,2],y,,xlab="x",col=kmean.clus,pch=20)
+dev.off()

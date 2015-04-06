@@ -4,7 +4,7 @@ pdflatex *.tex
 pdflatex *.tex
 rm -f *-*.pdf *.log *.aux *.out *.snm *.toc *.nav
 
-#sftp sonata.byu.edu <<EOF
-#  cd PDF
-#  put *.pdf
-#EOF
+sftp sonata.byu.edu <<EOF
+  cd PDF
+  put *.pdf
+EOF
