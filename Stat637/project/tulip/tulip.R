@@ -18,11 +18,15 @@ uchill <- unique(chill)
 pop <- dat$Population
 upop <- unique(pop)
 k <- length(unique(pop))
-X <- cbind(1,chill)
-Z <- matrix(0,N,k*ncol(X))
+X <- cbind(1,bs(chill))
+p <- ncol(X)
+Z <- matrix(0,N,k*p)
 for (i in 1:N) {
-  Z[i,pop[i]] <- 1
-  Z[i,pop[i]+k] <- X[i,2]
+  #Z[i,pop[i]] <- 1
+  #Z[i,pop[i]+k] <- X[i,2]
+  for (j in 1:p) {
+    Z[i,pop[i]+k*(j-1)] <- X[i,j]
+  }
 }
 
 pdf("images/rawData.pdf",width=19,height=13)
@@ -67,7 +71,6 @@ gibbs <- function(y,X,Z,n=nrow(X),p=ncol(X),k=ncol(Z),B=1e4,burn=round(B*.1),
   b <- matrix(0,B,p)
   g <- matrix(0,B,k)
   colnames(b) <- paste0("b",0:(p-1))
-  colnames(g) <- c(paste0("g0.",1:(k/2)),paste0("g1.",1:(k/2)))
   #######################
 
   for (i in 2:B){
@@ -86,7 +89,7 @@ gibbs <- function(y,X,Z,n=nrow(X),p=ncol(X),k=ncol(Z),B=1e4,burn=round(B*.1),
 }
 
 out <- gibbs(y,X,Z,B=1e4)
-plot.posts(out$b,names=c("beta0","beta1"))
+plot.posts(out$b,names=c("b0","b1","b2","b3"))
 b <- apply(out$b,2,mean)
 g <- apply(out$g,2,mean)
 
@@ -101,14 +104,19 @@ compare.chill.effect <- function(G) {
   k <- ncol(G)
   out <- matrix(0,k,k)
   J <- matrix(1:k)
+  pairs <- c()
   for (j in 1:k) {
     #out[i,] <- apply(J,1,function(j) compare.one.pair(i,j))
     for (i in 1:j) {
       out[i,j] <- compare.one.pair(i,j)
+      if (out[i,j]==1 && i!=j) pairs <- c(pairs, paste0("(",i,",",j,")"))
     }
   }
 
-  out
+  list("matrix"=out,"pairs"=pairs)
 }
 
-compare.chill.effect(cbind(out$g[,12:22],out$b[,2]))
+comp <- compare.chill.effect(cbind(out$g[,12:22],out$b[,2]))
+comp$m
+comp$p
+
