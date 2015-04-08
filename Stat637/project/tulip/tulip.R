@@ -18,29 +18,39 @@ uchill <- unique(chill)
 pop <- dat$Population
 upop <- unique(pop)
 k <- length(unique(pop))
-X <- cbind(1,bs(chill))
+X <- cbind(1,bs(chill)) # bs(chill) => Cubic Splines
+colnames(X) <- c("x0","x1","x2","x3")
 p <- ncol(X)
-Z <- matrix(0,N,k*p)
-for (i in 1:N) {
-  #Z[i,pop[i]] <- 1
-  #Z[i,pop[i]+k] <- X[i,2]
-  for (j in 1:p) {
-    Z[i,pop[i]+k*(j-1)] <- X[i,j]
+
+create.Z <- function(X,k) {
+  p <- ncol(X)
+  N <- nrow(X)
+  Z <- matrix(0,N,k*p)
+  for (i in 1:N) {
+    for (j in 1:p) {
+      Z[i,pop[i]+k*(j-1)] <- X[i,j]
+    }
   }
+  Z
 }
+
+Z <- create.Z(X,k)
+
+colnames(Z) <- c(paste0("z0.",1:k),paste0("z1.",1:k),paste0("z2.",1:k),paste0("z3.",1:k)) # p=4
+
 
 pdf("images/rawData.pdf",width=19,height=13)
   par(mfrow=c(6,2))
     yy <- apply(matrix(uchill),1,function(ct) mean(y[which(chill==ct)]))
-    plot(uchill,yy,main="All Populations",xlab="Chill Time (Weeks)",
-         ylab="Germination Rate",col="purple",pch=20,cex=2,ylim=c(-.1,1.1))
+    arfplot(uchill,yy,main="All Populations",xlab="Chill Time (Weeks)",
+            ylab="Germination Rate",col="purple",pch=20,cex=2,ylim=c(0,1))
     for (pn in 1:k) {
         yy <- apply(matrix(uchill),1,function(ct) {
           mean(y[which(pop==pn & chill==ct)])
         })
         #plot(uchill,yy,main=paste("Population",pn),ylab="Germination Rate",xlab="Chill Time (Weeks)")
-        plot(uchill,yy,main=paste("Population",pn),ylab="",xlab="",pch=20,
-             col="purple",cex=2,ylim=c(-.1,1.1))
+        arfplot(uchill,yy,main=paste("Population",pn),ylab="",xlab="",pch=20,
+                col="purple",cex=2,ylim=c(0,1))
     }
   par(mfrow=c(1,1))
 dev.off()
@@ -71,6 +81,8 @@ gibbs <- function(y,X,Z,n=nrow(X),p=ncol(X),k=ncol(Z),B=1e4,burn=round(B*.1),
   b <- matrix(0,B,p)
   g <- matrix(0,B,k)
   colnames(b) <- paste0("b",0:(p-1))
+  colnames(g) <- c(paste0("g0.",1:(k/p)),paste0("g1.",1:(k/p)),
+                   paste0("g2.",1:(k/p)),paste0("g3.",1:(k/p))) # p=4
   #######################
 
   for (i in 2:B){
@@ -90,33 +102,125 @@ gibbs <- function(y,X,Z,n=nrow(X),p=ncol(X),k=ncol(Z),B=1e4,burn=round(B*.1),
 
 out <- gibbs(y,X,Z,B=1e4)
 plot.posts(out$b,names=c("b0","b1","b2","b3"))
+plot.posts(out$g[,c(1,11,12)])
 b <- apply(out$b,2,mean)
 g <- apply(out$g,2,mean)
-
+B <- out$b
+G <- out$g
 
 compare.chill.effect <- function(G) {
   compare.one.pair <- function(i,j) {
-    diff <- G[,i]-G[,j]
-    ci <- mean(diff) + quantile(diff,c(.05,.95))
-    ci[1] <= 0 && 0 <= ci[2]
+    #diff <- G[,i]-G[,j]
+    #print(paste(i,j))
+    #diff <- apply(G[,c(i+11,i+22,i+33)],1,function(x) sqrt(sum(x^2)))- 
+    #        apply(G[,c(j+11,j+22,j+33)],1,function(x) sqrt(sum(x^2)))
+    diff <- G[,c(i+11,i+22,i+33)]-G[,c(j+11,j+22,j+33)]
+    ci <- t(apply(diff,2,get.hpd))
+    ci[1,1] <= 0 && 0 <= ci[1,2] && 
+    ci[2,1] <= 0 && 0 <= ci[2,2] &&
+    ci[3,1] <= 0 && 0 <= ci[3,2]
   }
 
-  k <- ncol(G)
+  #k <- ncol(G)
   out <- matrix(0,k,k)
   J <- matrix(1:k)
   pairs <- c()
-  for (j in 1:k) {
-    #out[i,] <- apply(J,1,function(j) compare.one.pair(i,j))
+  for (j in 1:k) { # For each population
+    ot <- Sys.time()
     for (i in 1:j) {
       out[i,j] <- compare.one.pair(i,j)
       if (out[i,j]==1 && i!=j) pairs <- c(pairs, paste0("(",i,",",j,")"))
     }
+    count.down(ot,j,k)
   }
 
   list("matrix"=out,"pairs"=pairs)
 }
 
-comp <- compare.chill.effect(cbind(out$g[,12:22],out$b[,2]))
+comp <- compare.chill.effect(cbind(out$g,out$b[,2]))
+# (Last Year) The 9 following pairs behave the most similiarly under different chill times: # (3,2), (4,2), (10,4), (7,6), (10,6), (11,6), (10,7), (11,7), (11,10)
 comp$m
 comp$p
+paste(comp$p,collapse=", ")
+# Populations that have essentially the same chilling effects
+#(1,2), (2,3), (2,4), (3,4), (4,6), (4,7), (6,7), (1,8), (2,8), (4,8), (5,8), (6,8), (7,8), (6,9), (4,10), (6,10), (7,10), (6,11), (7,11), (10,11)
+a.image(cov(out$b),axis.num=F)
+a.image(cov(out$g),axis.num=F)
+
+x0 <- seq(min(uchill),max(uchill),len=100)
+X0 <- cbind(1,bs(x0))
+
+post.pred <- function(x,B,G,k=0,f=mean) {
+  M <- NULL
+  if (k>0) {
+    M <- pnorm(x%*%(t(B)+t(G[,c(k,k+11,k+22,k+33)])))
+  } else {
+    M <- pnorm(x%*%t(B))
+  }
+  apply(M,1,f)
+}
+
+post.pred.all <- function(x,B,G,k=0) {
+  M <- NULL
+  if (k>0) {
+    M <- pnorm(x%*%(t(B)+t(G[,c(k,k+11,k+22,k+33)])))
+  } else {
+    M <- pnorm(x%*%t(B))
+  }
+  M
+}
+
+best.chill.times <- apply(matrix(1:k),1,function(pn) {
+  y0 <- post.pred(X0,B,G,pn)
+  pp <- post.pred.all(X0,B,G,pn)
+  best.chill.xs <- apply(pp,2,which.max)
+  best.chill.x <- x0[mean(best.chill.xs)]
+  best.chill.x
+})
+
+pop.order <- (1:k)[order(best.chill.times)]
+
+
+
+details <- function(pn=0) {
+  y0 <- post.pred(X0,B,G,pn)
+  pp <- post.pred.all(X0,B,G,pn)
+  best.chill.xs <- apply(pp,2,which.max)
+  best.chill.x <- x0[mean(best.chill.xs)]
+  hpd <- get.hpd(best.chill.xs)
+  best.chill.y <- y0[which.min(abs(x0-best.chill.x))]
+  points(best.chill.x,best.chill.y,cex=3,col="blue",pch=20)
+  #lines(x0,y0,lwd=2,col="grey30")
+  lines(x0,y0,lwd=2,col="red")
+  #lines(x0[which(x0<x0[hpd[1]] | x0>x0[hpd[2]])],
+  #      y0[which(x0<x0[hpd[1]] | x0>x0[hpd[2]])],lwd=2,col="grey30")
+  lines(x0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],
+        y0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],lwd=3,col="blue")
+  #lines(c(x0[hpd[1]],x0[hpd[2]]),c(best.chill.y,best.chill.y),col="orange",lwd=3)
+  #lines(c(x0[hpd[1]],x0[hpd[1]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
+  #lines(c(x0[hpd[2]],x0[hpd[2]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
+}
+
+pdf("images/chilleffect.pdf",width=19,height=13) # Posterior Predictive Means
+  par(mfcol=c(6,2))
+    yy <- apply(matrix(uchill),1,function(ct) mean(y[which(chill==ct)])) 
+    arfplot(uchill,yy,main="All Populations",xlab="Chill Time (Weeks)",
+            ylab="Germination Rate",col="grey30",pch=20,cex=2,ylim=c(0,1),
+            vgridlines=7)
+    details(0)
+         
+    for (pn in pop.order) {
+      ot <- Sys.time()
+      yy <- apply(matrix(uchill),1,function(ct) {
+        mean(y[which(pop==pn & chill==ct)])
+      })
+      #plot(uchill,yy,main=paste("Population",pn),ylab="Germination Rate",xlab="Chill Time (Weeks)")
+      arfplot(uchill,yy,main=paste("Population",pn),ylab="",xlab="",pch=20,
+              col="grey30",cex=2,ylim=c(0,1),vgrid=7)
+      details(pn)
+      count.down(ot,pn,k)
+    }
+  par(mfrow=c(1,1))
+dev.off()
+
 
