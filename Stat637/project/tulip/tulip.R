@@ -195,7 +195,7 @@ details <- function(pn=0) {
   #lines(x0[which(x0<x0[hpd[1]] | x0>x0[hpd[2]])],
   #      y0[which(x0<x0[hpd[1]] | x0>x0[hpd[2]])],lwd=2,col="grey30")
   lines(x0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],
-        y0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],lwd=3,col="blue")
+        y0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],lwd=2,col="blue")
   #lines(c(x0[hpd[1]],x0[hpd[2]]),c(best.chill.y,best.chill.y),col="orange",lwd=3)
   #lines(c(x0[hpd[1]],x0[hpd[1]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
   #lines(c(x0[hpd[2]],x0[hpd[2]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
