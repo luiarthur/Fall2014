@@ -38,7 +38,7 @@ Z <- create.Z(X,k)
 
 colnames(Z) <- c(paste0("z0.",1:k),paste0("z1.",1:k),paste0("z2.",1:k),paste0("z3.",1:k)) # p=4
 
-
+system("mkdir -p images")
 pdf("images/rawData.pdf",width=19,height=13)
   par(mfrow=c(6,2))
     yy <- apply(matrix(uchill),1,function(ct) mean(y[which(chill==ct)]))

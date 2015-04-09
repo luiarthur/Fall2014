@@ -1,6 +1,6 @@
 arfplot <- function(x,y=NULL,col="grey35",pch=20,cex=1.2,xaxt="n",yaxt="n",
                     axes=T,vgridlines=4,hgridlines=4,bg="grey90",col.axis="grey30",
-                    cex.lab=1.2,vdigits=1,hdigits=2,family="serif",
+                    cex.lab=1.2,vdigits=1,hdigits=2,family="sans",
                     ylim=range(y),xlim=range(x),
                     mar=c(4.5,3,3,2),mgp=c(1.5,0,0),...) {
                          #B  ,L,T,R    #axes,?,?
