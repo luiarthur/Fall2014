@@ -101,8 +101,11 @@ gibbs <- function(y,X,Z,n=nrow(X),p=ncol(X),k=ncol(Z),B=1e4,burn=round(B*.1),
 }
 
 out <- gibbs(y,X,Z,B=1e4)
-plot.posts(out$b,names=c("b0","b1","b2","b3"))
-plot.posts(out$g[,c(1,11,12)])
+# Plot Posteriors?
+#plot.posts(out$b,names=c("b0","b1","b2","b3"))
+#plot.posts(out$g[,c(1,11,12)])
+#a.image(cov(out$b),axis.num=F)
+#a.image(cov(out$g),axis.num=F)
 b <- apply(out$b,2,mean)
 g <- apply(out$g,2,mean)
 B <- out$b
@@ -144,8 +147,6 @@ comp$p
 paste(comp$p,collapse=", ")
 # Populations that have essentially the same chilling effects
 #(1,2), (2,3), (2,4), (3,4), (4,6), (4,7), (6,7), (1,8), (2,8), (4,8), (5,8), (6,8), (7,8), (6,9), (4,10), (6,10), (7,10), (6,11), (7,11), (10,11)
-a.image(cov(out$b),axis.num=F)
-a.image(cov(out$g),axis.num=F)
 
 x0 <- seq(min(uchill),max(uchill),len=100)
 X0 <- cbind(1,bs(x0))
@@ -179,7 +180,6 @@ best.chill.times <- apply(matrix(1:k),1,function(pn) {
 })
 
 pop.order <- (1:k)[order(best.chill.times)]
-
 
 
 details <- function(pn=0) {
@@ -223,4 +223,4 @@ pdf("images/chilleffect.pdf",width=19,height=13) # Posterior Predictive Means
   par(mfrow=c(1,1))
 dev.off()
 
-
+system("cd latex/report; ./compile")
