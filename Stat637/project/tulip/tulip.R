@@ -43,14 +43,14 @@ pdf("images/rawData.pdf",width=19,height=13)
   par(mfrow=c(6,2))
     yy <- apply(matrix(uchill),1,function(ct) mean(y[which(chill==ct)]))
     arfplot(uchill,yy,main="All Populations",xlab="Chill Time (Weeks)",
-            ylab="Germination Rate",col="purple",pch=20,cex=2,ylim=c(0,1))
+            ylab="Germination Rate",col="grey30",pch=20,cex=2,ylim=c(0,1))
     for (pn in 1:k) {
         yy <- apply(matrix(uchill),1,function(ct) {
           mean(y[which(pop==pn & chill==ct)])
         })
         #plot(uchill,yy,main=paste("Population",pn),ylab="Germination Rate",xlab="Chill Time (Weeks)")
         arfplot(uchill,yy,main=paste("Population",pn),ylab="",xlab="",pch=20,
-                col="purple",cex=2,ylim=c(0,1))
+                col="grey30",cex=2,ylim=c(0,1))
     }
   par(mfrow=c(1,1))
 dev.off()
@@ -191,11 +191,11 @@ details <- function(pn=0) {
   best.chill.y <- y0[which.min(abs(x0-best.chill.x))]
   points(best.chill.x,best.chill.y,cex=3,col="blue",pch=20)
   #lines(x0,y0,lwd=2,col="grey30")
-  lines(x0,y0,lwd=2,col="red")
+  lines(x0,y0,lwd=3,col="red")
   #lines(x0[which(x0<x0[hpd[1]] | x0>x0[hpd[2]])],
   #      y0[which(x0<x0[hpd[1]] | x0>x0[hpd[2]])],lwd=2,col="grey30")
   lines(x0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],
-        y0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],lwd=2,col="blue")
+        y0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],lwd=3,col="blue")
   #lines(c(x0[hpd[1]],x0[hpd[2]]),c(best.chill.y,best.chill.y),col="orange",lwd=3)
   #lines(c(x0[hpd[1]],x0[hpd[1]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
   #lines(c(x0[hpd[2]],x0[hpd[2]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
