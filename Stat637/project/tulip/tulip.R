@@ -39,6 +39,14 @@ Z <- create.Z(X,k)
 colnames(Z) <- c(paste0("z0.",1:k),paste0("z1.",1:k),paste0("z2.",1:k),paste0("z3.",1:k)) # p=4
 
 system("mkdir -p images")
+pdf("images/allPopsData.pdf",width=19,height=13)
+    yy <- apply(matrix(uchill),1,function(ct) mean(y[which(chill==ct)]))
+    arfplot(uchill,yy,main="All Populations",xlab="Chill Time (Weeks)",
+            ylab="Germination Rate",col="grey30",pch=20,cex=4,ylim=c(0,1),
+            vgrid=7)
+dev.off()
+
+
 pdf("images/rawData.pdf",width=19,height=13)
   par(mfrow=c(6,2))
     yy <- apply(matrix(uchill),1,function(ct) mean(y[which(chill==ct)]))
@@ -224,3 +232,4 @@ pdf("images/chilleffect.pdf",width=19,height=13) # Posterior Predictive Means
 dev.off()
 
 #system("cd latex/report; ./compile")
+
