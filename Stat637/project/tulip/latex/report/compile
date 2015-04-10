@@ -9,7 +9,7 @@ sftp sonata.byu.edu <<EOF
   put *.pdf
 EOF
 
-ssh sonata.byu.edu <<EOF1
-mail -s "Tulips Presentation" -a PDF/tulip.pdf luiarthur@gmail.com <<EOF2
-EOF2
-EOF1
+#ssh sonata.byu.edu <<EOF1
+#mail -s "Tulips Presentation" -a PDF/tulip.pdf luiarthur@gmail.com <<EOF2
+#EOF2
+#EOF1

@@ -1,28 +1,33 @@
 \input{header.tex}
+
 \begin{document}
-% my title:                                                               
-  \title{Tulips}
-  \author{Arthur Lui}
+% My Title:
+  \def\mytitle{\textbf{Predicting Germination Rates of Different Tulip Populations}}
+  \title[Tulips]{\mytitle}
+  \author[Arthur Lui]{Arthur Lui}
   \institute{
     Department of Statistics\\
     Brigham Young University
-  }
-\frame{\titlepage}
+  } \frame{\titlepage}
 
 \frame{
   \frametitle{Raw Data}
   \beginmyfig
     \includegraphics[scale=.22]{../../images/rawData.pdf}
     \vspace{-2mm}
-    \caption{Germination rates of each population of tulips by chilling times}
+    \caption{Germination rates of each population of tulips by chilling times
+             (weeks)}
   \endmyfig
 }
 
 \frame{
+  \frametitle{Results}
   \beginmyfig
     \includegraphics[scale=.22]{../../images/chilleffect.pdf}
+    \vspace{-2mm}
+    \caption{Predicted germination rates of each population of tulips by
+             chilling times (weeks)}
   \endmyfig
 }
-
 
 \end{document}

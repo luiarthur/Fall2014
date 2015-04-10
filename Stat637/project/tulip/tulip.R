@@ -182,20 +182,20 @@ best.chill.times <- apply(matrix(1:k),1,function(pn) {
 pop.order <- (1:k)[order(best.chill.times)]
 
 
-details <- function(pn=0) {
+details <- function(pn=0,lwd=1) {
   y0 <- post.pred(X0,B,G,pn)
   pp <- post.pred.all(X0,B,G,pn)
   best.chill.xs <- apply(pp,2,which.max)
   best.chill.x <- x0[mean(best.chill.xs)]
-  hpd <- get.hpd(best.chill.xs)
+  hpd <- get.hpd(best.chill.xs,len=1e4)
   best.chill.y <- y0[which.min(abs(x0-best.chill.x))]
   points(best.chill.x,best.chill.y,cex=3,col="blue",pch=20)
   #lines(x0,y0,lwd=2,col="grey30")
-  lines(x0,y0,lwd=3,col="red")
+  lines(x0,y0,lwd=lwd,col="red")
   #lines(x0[which(x0<x0[hpd[1]] | x0>x0[hpd[2]])],
   #      y0[which(x0<x0[hpd[1]] | x0>x0[hpd[2]])],lwd=2,col="grey30")
   lines(x0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],
-        y0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],lwd=3,col="blue")
+        y0[which(x0>x0[hpd[1]] & x0<x0[hpd[2]])],lwd=lwd,col="blue")
   #lines(c(x0[hpd[1]],x0[hpd[2]]),c(best.chill.y,best.chill.y),col="orange",lwd=3)
   #lines(c(x0[hpd[1]],x0[hpd[1]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
   #lines(c(x0[hpd[2]],x0[hpd[2]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
@@ -207,7 +207,7 @@ pdf("images/chilleffect.pdf",width=19,height=13) # Posterior Predictive Means
     arfplot(uchill,yy,main="All Populations",xlab="Chill Time (Weeks)",
             ylab="Germination Rate",col="grey30",pch=20,cex=2,ylim=c(0,1),
             vgridlines=7)
-    details(0)
+    details(0,lwd=3)
          
     for (pn in pop.order) {
       ot <- Sys.time()
@@ -217,10 +217,10 @@ pdf("images/chilleffect.pdf",width=19,height=13) # Posterior Predictive Means
       #plot(uchill,yy,main=paste("Population",pn),ylab="Germination Rate",xlab="Chill Time (Weeks)")
       arfplot(uchill,yy,main=paste("Population",pn),ylab="",xlab="",pch=20,
               col="grey30",cex=2,ylim=c(0,1),vgrid=7)
-      details(pn)
+      details(pn,lwd=3)
       count.down(ot,pn,k)
     }
   par(mfrow=c(1,1))
 dev.off()
 
-system("cd latex/report; ./compile")
+#system("cd latex/report; ./compile")

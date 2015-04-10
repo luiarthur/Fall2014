@@ -1,11 +1,12 @@
 \documentclass[mathserif,t]{beamer}
 %\usepackage{Sweave}                                                       
+%http://tex.stackexchange.com/questions/105613/footer-in-beamer. Check this out. Frankfurt template.
 \usepackage{amssymb,bm,mathtools,amsmath}                                                      
 \usepackage{graphicx,caption,float}
 \usepackage[UKenglish]{isodate} % for: \today                             
 \cleanlookdateon                % for: \today                             
 
-\def\wl{\par \vspace{\baselineskip}\noindent}                             
+\def\wl{\par\vspace{\baselineskip}\noindent}                             
 \def\beginmyfig{\begin{figure}[ht]\begin{center}}                          
 \def\endmyfig{\end{center}\end{figure}}                                   
 
@@ -19,7 +20,6 @@
 % My Beamer Stuff
   \geometry{vmargin=0.3in} % Formating the top bar
   \newcommand{\m}[1]{\mathbf{\bm{#1}}} % Serif bold math
-  %\beamertemplatenavigationsymbolsempty % To get rid of navigation bar
 
   % My Color Stuff
   \usepackage{xcolor} % http://en.wikibooks.org/wiki/LaTeX/Colors
@@ -28,25 +28,38 @@
     \definecolor{pumpkin}{rgb}{1.0, 0.46, 0.09}
     \definecolor{darktan}{rgb}{1.0, 0.66, 0.07}
     \definecolor{coral}{rgb}{1.0, 0.5, 0.31}
-    \pagecolor{grey} % Sets the bar color.
+    \pagecolor{grey}% Sets the bar color.
 
-  \def\mylitecolor{coral}           % Bullet Color.       CHANGE THIS!
+  \def\mylitecolor{pumpkin}         % Bullet Color.       CHANGE THIS!
   \def\mycolor{\color{pumpkin}}     % Frame Title Color.  CHANGE THIS!
-  \def\mydarkcolor{\color{darktan}} % Figure Color.       CHANGE THIS!
+  \def\mydarkcolor{\color{pumpkin}} % Figure Color.       CHANGE THIS!
     \def\frametitle#1{\vspace{-.32in{\mycolor\textbf{#1}}}}
     \setbeamercolor{itemize item}{fg=\mylitecolor}
     \setbeamercolor{enumerate item}{fg=\mylitecolor}
     \setbeamercolor{itemize subitem}{fg=\mylitecolor}
     \setbeamercolor{itemize subsubitem}{fg=\mylitecolor}
     \setbeamercolor{title}{fg=\mylitecolor}
-    %\setbeamercolor{figure}{fg=\mylitecolor}
+    \setbeamercolor{footlinecolor}{bg=black!93,fg=\mylitecolor}
 
     \usepackage[T1]{fontenc}
-    \DeclareCaptionFont{figcol}{\mydarkcolor} 
+    \DeclareCaptionFont{figcol}{\mydarkcolor} %color of the word Figure: in figure captions
     \captionsetup{
-      labelfont={bf,figcol},
-      %textfont={green}
+      labelfont={bf,figcol}%,textfont={green}
     }
+
+  % Beamer Footer Stuff:
+  %http://tex.stackexchange.com/questions/26476/add-footer-text-to-all-slides-in-beamer
+  %http://tex.stackexchange.com/questions/105613/footer-in-beamer
+  \beamertemplatenavigationsymbolsempty
+  \setbeamertemplate{footline}{
+    \hbox{
+      \hspace{-.17cm}
+      \begin{beamercolorbox}[ht=1.9mm,dp=8.1mm,leftskip=.3cm,rightskip=.3cm]{footlinecolor}%
+        \insertauthor\hfill\insertshorttitle\hfill\insertpagenumber/\inserttotalframenumber
+      \end{beamercolorbox}
+    }
+  }
+
 
   %% my title:                                                               
   %\title[short title]{long title}
@@ -56,6 +69,3 @@
   %  Department of Statistics\\
   %  Brigham Young University
   %}
-
-%%%%%%%%%%%%%%%%
-
