@@ -181,53 +181,123 @@ $\m{\beta}$ and $\m{\gamma}$. $\m{Z}$ will have an IBP($ \alpha$) prior. For
 the hyper parameter $\alpha$, we can use a Gamma prior to make use of Gibbs
 sampling. Succinctly,
 \begin{align*}
-  \m{y} &\sim \text{MVN}(\m{X\beta+Z\gamma},\sigma_\epsilon^2)\\
-  \m{Z} &\sim \text{IBP}(\alpha)\\
+  \m{y|X,\beta,Z,\gamma,}\sigma_\epsilon^2 &\sim \text{MVN}(\m{X\beta+Z\gamma},\sigma_\epsilon^2\m{I}_n)\\
+  \m{Z}|\alpha &\sim \text{IBP}(\alpha)\\
   \alpha &\sim \text{Gamma}(1,1)\\
-  \sigma_\epsilon^2 &\sim \text{InverseGamma}(1,\text{rate}=5)\\
+  \sigma_\epsilon^2 &\sim \text{Inverse-Gamma}(1,\text{rate}=5)\\
+  \m{\beta} &\sim \text{MVN}(\m{0},10\m{I}_p)\\
+  \m{\gamma} &\sim \text{MVN}(\m{0},10\m{I}_k)
 \end{align*}
 
+\noindent
+Note that the dimensions of $\m{\gamma}$ depend on the dimensions of $\m{Z}$. So, we will integrate out 
+$\gamma$. To further speed up computation, we will also integrate out $\beta$. Integrating out these
+parameters is possible because we are using a gaussian likelihood and gaussian priors. Moreover, with
+a likelihood that only depends on $\m{y,X}$,and $\m{Z}$, we can use equation (3) to implement a
+Gibbs sampler to sample from the posterior of $\m{Z}$. Below, we show the marginalized likelihood that
+we will use in our Gibbs sampler.
 \begin{align*}
   \m{[y|Z,X]} &= \int_\beta\int_\gamma 
                    \m{[y|Z,X,\gamma,\beta][\gamma][\beta]}
-                 d\gamma d\beta
+                 d\gamma d\beta\\
+              %&= \int_\beta \m{[\beta]} \left\{
+              %     \int_\gamma
+              %       \m{[y|Z,X,\gamma,\beta][\gamma]}
+              %     d\gamma
+              %   \right\}d\m{\beta}
+              & \vdots \\
+              &= (2\pi\sigma_\epsilon^2)^{-n/2} 
+                 \left(\frac{\sigma_\epsilon^2}{\sigma_\gamma^2}\right)^{k/2}
+                 \left(\frac{\sigma_\epsilon^2}{\sigma_\beta^2}\right)^{p/2}
+                 \m{|M_1||M_2|}
+                 \text{exp}\left(
+                   -\frac{1}{2\sigma_\epsilon^2}\m{y^*}'\left(
+                     \m{I}_n-\m{X^*M_2 X^*}
+                   \right) \m{y^*}
+                 \right),\\
+  \text{where } \m{M_1} &= \left[\m{Z'}\m{Z} + \left(\frac{\sigma_\epsilon^2}{\sigma_\gamma^2}\right)\m{I}_k\right]\inv\\
+                \m{U}   &= \m{I}_n - \m{ZM_1Z'}\\
+                \m{y^*} &= \m{U^{1/2}y}\\
+                \m{X^*} &= \m{U^{1/2}X}\\
+                \m{M_2} &= \left[\m{X^*}'\m{X^*} + \left(\frac{\sigma_\epsilon^2}{\sigma_\beta^2}\right)\m{I}_d\right]\inv\\
 \end{align*}
 
-\section*{Mathematics}
-\section*{Simulation Study}
-  \beginmyfig
-    \includegraphics[scale=.7]{images/agpost.pdf}
-  \endmyfig  
+\section*{Results of Simulation Study}
+Using a Gibbs sampler of 1000 iterations, we obtain draws from the posterior distributions for $\alpha$ and
+$\sigma_\epsilon^2$. This information is shown in Figure 3.\\
+\beginmyfig
+  \includegraphics[scale=.7]{images/agpost.pdf}
+  \caption{Posterior distribution for $\alpha$ and $\sigma_\epsilon^2$}
+\endmyfig
 
-  \beginmyfig
-    \includegraphics[scale=.4]{images/EZpre.pdf}
-    \includegraphics[scale=.4]{images/EZ.pdf}
-    \vspace{-5mm}
-    \caption{Estimated Z matrix (Left). Reparameterized estimated Z matrix (Right).}
-  \endmyfig  
+\noindent
+We desire an estimate for $\m{Z}$ based on its posterior distribution. We can obtain an 
+estimate by summing the matrices drawn, using matrix addition, and then dividing the
+each element of the matrix by the number of draws. We will then set a cell to ``1" if it
+is greater than a threshold, and ``0" otherwise. Here, we choose a threshold of 0.5. 
+We will call this estimate for $\m{Z}$ the posterior mean. In a random intercept model,
+our $\m{Z}$ matrix has only one ``1" in any given row. Therefore, we will reparameterize
+the posterior mean $\m{Z}$ such that each row has only one ``1". This is done by first
+determining the number of unique rows in the posterior mean of $\m{Z}$. In this case, 
+we have three unique rows -- (0,0), (1,1), and (1,0). So, we will set the rows with 
+configutation (0,0) to (1,0,0), (1,1) to (0,1,0), and (1,0) to (0,0,1). This
+reparameterization is shown in figure 4. Note that the algorithm predicted
+each of the clusters with 100\% accuracy.\\
+\beginmyfig
+  \includegraphics[scale=.4]{images/EZpre.pdf}
+  \includegraphics[scale=.4]{images/EZ.pdf}
+  \vspace{-5mm}
+  \caption{Estimated Z matrix (Left). Reparameterized estimated Z matrix (Right).}
+\endmyfig  
 
+\noindent
+Using k-means, we can use the clustering labels to create a $\m{Z}$ matrix also to compare
+our performance with the proposed model. The $\m{Z}$ matrix in Figure 5 represents the
+clustering obtained from k-means. It is clear that the algorithm proposed out-performs
+the k-means algorithm in obtaining the true clustering of our simulated data.
+\beginmyfig
+  \includegraphics[scale=.4]{images/KZ.pdf}
+  \vspace{-5mm}
+  \caption{Z Matrix (K-Means)}
+\endmyfig  
 
+\noindent
+Based on our estimated $\m{Z}$ matrices, we can computed $\beta$ and $\gamma$ using 
+standard LMM approaches. Figure 6 and Tables 1 and 2 summarize our findings. Our proposed
+model estimates $\gamma$ very well, but is lacking in predicting $\beta$'s. I supposed
+this is because our random effects were in reality not random, but fixed. Therefore,
+by construction, we should be modelling with a fixed effect model, with an intercept for
+each cluster in our design matrix. But, the notation we have used for our model resembles an
+LMM.\\
+\beginmyfig
+  \includegraphics[scale=.3]{images/truemm.pdf}
+  \includegraphics[scale=.3]{images/ibpmm.pdf}
+  \includegraphics[scale=.3]{images/KMmm.pdf}
+  \vspace{-5mm}
+  \caption{Comparison of the LMM estimates using different $\m{Z}$ matrices}
+\endmyfig
 
-  \beginmyfig
-    \includegraphics[scale=.4]{images/KZ.pdf}
-    \vspace{-5mm}
-    \caption{Z Matrix (K-Means)}
-  \endmyfig  
-
-  \beginmyfig
-    \includegraphics[scale=.3]{images/truemm.pdf}
-    \includegraphics[scale=.3]{images/ibpmm.pdf}
-    \includegraphics[scale=.3]{images/KMmm.pdf}
-    \vspace{-5mm}
-  \endmyfig
-
-
+\begin{table}
+  \centering
   \input{images/mb.tex}
-  \input{images/mg.tex}     
+  \vspace{-3mm}
+  \caption{Estimates for $\beta$}
+  \vspace{8mm}
+  \input{images/mg.tex}
+  \vspace{-3mm}
+  \caption{Estimates for $\gamma$}
+\end{table}
 
 \section*{Future Work}
-Difficult to integrate out parameters if likelihood is NOT Normal.
-Also difficult to come up with proposal mechanism, but easier. 
-We will come up with proposal mechanism in the summer.
+We have proposed a model to estimate the clusters based on their different
+intercepts using a linear model to inform our algorithm. We simplified 
+computation by using a gaussian likelihood and gaussian priors and integrating
+out nuisance parameters. Of interest would be to substitute the
+likelihood with a distribution from another member of the exponential
+family, and using different priors. For instance, we could use
+an exponential likelihood and gamma priors for the coefficients.
+We would also like to develop a proposal mechanism so that
+we can use standard MCMC algorithms, such as metropolis-hastings,
+to obtain posterior estimates.
 
 \end{document}
