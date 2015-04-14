@@ -1,0 +1,140 @@
+\documentclass[mathserif]{article}
+\usepackage{fullpage}
+\usepackage{pgffor}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{mathtools}
+\usepackage{verbatim}
+\usepackage{appendix}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[UKenglish]{isodate} % for: \today
+\cleanlookdateon                % for: \today
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\def\wl{\par\vspace{\baselineskip}\noindent}
+\def\beginmyfig{\begin{figure}[htbp]\begin{center}}
+\def\endmyfig{\end{center}\end{figure}}
+\def\prodl#1#2#3{\prod\limits_{#1=#2}^{#3}}
+\def\suml#1#2#3{\sum\limits_{#1=#2}^{#3}}
+\def\ds{\displaystyle}
+\def\tbf#1{\textbf{#1}}
+\def\inv{^{\raisebox{.2ex}{$\scriptscriptstyle-1$}}}
+\def\pm{^{\raisebox{.2ex}{$\scriptscriptstyle\prime$}}}
+\newcommand{\m}[1]{\mathbf{\bm{#1}}} % Serif bold math
+
+\begin{document}
+% my title:
+\begin{center}
+  \section*{\textbf{Predicting Germination Rates of Different Tulip
+                    Populations at Various Chilling Times}
+    \footnote{https://github.com/luiarthur/Fall2014/tree/master/Stat637/project/tulip}
+  }
+  \subsection*{\textbf{Arthur Lui}}
+  \subsection*{\noindent\today}
+\end{center}
+
+\section*{Introduction}
+Tulips popularized in the sixteenth century in Holland. During the tulipomania,
+a viceroy bulb could allegedly be exchanged for a basket of goods, some
+furniture, \textit{and} some live stock. Today, nine million bulbs are produced
+annually, and tulips account for 25\% of agricultural exports. Many tourists
+also come to the Netherlands to see the vast tulip fields each year. Since
+tulips are such a prominant part of the Dutch economy, the country is axious
+about maximizing the growth of these beautiful flowers.\\
+
+\noindent
+A major factor that affects the growth of tulips is termed the ``chill time" of
+the tulip seeds. Chill time is defined as the time that a (tulip) seed is
+present in temperatures below 55$^\circ$F, prior to germinating. If
+insufficient chill time is given to tulip seeds, they are not as likely to
+germinate and flower. On the other hand, too much chill time can also adversely
+affect the germination rates of the seeds.  Most tulips need 12-14 weeks of
+chill time. For a given variety of tulip, a population of tulips may exhibit different
+responses to chill times due to its conditioning. That is, some tulip populations
+may be more robust to adverse weather effects than others. Hence, scientists are
+interested in identifying tulip populations that are more resilient so as to 
+breed those types of tulips more widely. Specifically, due to global warming, 
+scientists want to identify the tulip populations that are able thrive most
+in warmer weathers, and require a shorter chill time.\\
+
+\noindent
+In order to identify tulip populations that are most resilient to warm weather
+climates, we were given a dataset from Dr. Matthew Heaton, containing
+information of eleven tulip populations at a research farm in the Netherlands.
+Each tulip population was treated with seven chilling times (0,2,4,6,8,10, and
+12 weeks). These chilling times were artificially created by placing the tulip
+seeds in chillers. For each of the eleven populations, thirty seeds were
+observed for each of the seven chilling times. So, a total of 2310 = 30*7*11
+observations are contained in this dataset. In the dataset, information on each
+of the 2310 tulip seeds is provided. One column indicates weather the seed
+germinated (Y/N). Another column indicates the population the seed belongs to
+(1-11). And yet another column shows the chill time given for each seed
+(0,2,4,6,8,10,12). Two other variables containing the dates the tulip seeds
+were harvests were not used for this study. Figure 1 shows the germination
+rates over all populations at the 7 different chill times (top left), and
+the germination rates for each of the eleven populations at the 7 different
+chill times.\\
+\beginmyfig
+    \includegraphics[scale=.35]{../../images/rawData.pdf}
+    \caption{Germination rates over all populations at the 7 different
+             chill times (top left), and the germination rates for each of 
+             the eleven populations at the 7 different chill times.}
+\endmyfig
+
+\noindent
+For this project, our goal is to identify (1) the effect of chill time for each
+tulip population, (2) the optimal chill time for each population, and (3) how
+the optimal chill times differ by population. To determine these items, we will
+use a bayesian probit model for our data, with chilling time and population as
+our predictors, and whether the seed germinated as our response. We will
+introduce the model in the following section, and provide interpretation the
+results of our analysis in the next section.\\
+
+\section*{Model}
+Since we are modeling (germination) rates, it would be appropriate to use a
+logistic regression or a bayesian probit model. After fitting both models, I
+decided to use the bayesian probit model I decided to use the bayesian probit
+model due to the ease of obtaining interpretable credible intervals. In the 
+following subsection, we outline the model definition.\\
+
+\subsection*{Model Definition}
+We model $y_i$ with a Bernoulli($p_i$) distribution. And place a probit link on 
+$p_i$. That is the link function is the inverse cummulative distribution function
+of the standard normal distribution. We set the link function to be the linear combination
+of the splined covariates $\m{b(x_i)}$ in the design matrix and the coefficients $\m{\beta}$. 
+Here, $\m{x_i'}$ is a vector of length 2, and is (1,$x_i$). We will define $\m{b(x_i')}$ to
+be a vector of length 48. The first element is 1. The next three elements are the
+resulting values of a basis expansion for a cubic polynomial. The next 44 elements
+are either 0,1, or $b(x_i)$, depending on the tulip population $i$. After specifying
+the likelihood, we specify a prior for $\m{\beta}$. We will put a Normal prior on 
+$\m{\beta}$ centered at 0. Below, we outline the model definition in mathematical 
+terms.\\
+\begin{center}
+  \begin{tabular}{rl}
+    $y_i  \sim$& \text{Bernoulli}($p_i$)\\
+    $\Phi\inv(p_i) =$&$ \m{b(x_i')\beta}$ \\
+                  $=$&$ \beta_0 + \suml{j}{1}{3}\beta_j b_j(x_i) +
+                        \suml{k}{1}{11} \beta_{0j}\cdot I\{\text{pop}_i=k\} + $\\
+                $ $  &$ \suml{k}{1}{11} \suml{j}{1}{3}\beta_{1j}\cdot I\{\text{pop}_i=k\} b_j(x_i)$\\
+                 &\\
+    \text{Let $\m{W=b(X)}$}, & \\
+    $\m{\beta}\sim$&$\text{Normal}\left(\m{0},s_b^2\m{(W\pm W)\inv}\right)$
+  \end{tabular}
+\end{center}
+
+\subsection*{Model Diagnostics}
+\subsection*{Model Comparison}
+\subsection*{Model Interpretation / Variable Selection}
+\subsection*{Parameter Interpretation}
+
+\section*{Results}
+\beginmyfig
+  \includegraphics[scale=.35]{../../images/chilleffect.pdf}
+  \vspace{-2mm}
+  \caption{Predicted germination rates of each population of tulips by
+           chilling times (weeks)}
+\endmyfig
+\section*{Conclusion}
+
+\end{document}
