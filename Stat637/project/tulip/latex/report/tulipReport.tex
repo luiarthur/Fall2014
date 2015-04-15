@@ -40,7 +40,7 @@ a viceroy bulb could allegedly be exchanged for a basket of goods, some
 furniture, \textit{and} some live stock. Today, nine million bulbs are produced
 annually, and tulips account for 25\% of agricultural exports. Many tourists
 also come to the Netherlands to see the vast tulip fields each year. Since
-tulips are such a prominant part of the Dutch economy, the country is axious
+tulips are such a prominent part of the Dutch economy, the country is anxious
 about maximizing the growth of these beautiful flowers.\\
 
 \noindent
@@ -86,21 +86,21 @@ chill times.\\
 For this project, our goal is to identify (1) the effect of chill time for each
 tulip population, (2) the optimal chill time for each population, and (3) how
 the optimal chill times differ by population. To determine these items, we will
-use a bayesian probit model for our data, with chilling time and population as
+use a Bayesian probit model for our data, with chilling time and population as
 our predictors, and whether the seed germinated as our response. We will
 introduce the model in the following section, and provide interpretation the
 results of our analysis in the next section.\\
 
 \section*{Model}
 Since we are modeling (germination) rates, it would be appropriate to use a
-logistic regression or a bayesian probit model. After fitting both models, I
-decided to use the bayesian probit model I decided to use the bayesian probit
+logistic regression or a Bayesian probit model. After fitting both models, I
+decided to use the Bayesian probit model I decided to use the Bayesian probit
 model due to the ease of obtaining interpretable credible intervals. In the 
 following subsection, we outline the model definition.\\
 
 \subsection*{Model Definition}
 We model $y_i$ with a Bernoulli($p_i$) distribution. And place a probit link on
-$p_i$. That is the link function is the inverse cummulative distribution
+$p_i$. That is the link function is the inverse cumulative distribution
 function of the standard normal distribution. We set the link function to be
 the linear combination of the splined covariates $\m{b(x_i)}$ in the design
 matrix and the coefficients $\m{\beta}$.  Here, $\m{x_i'}$ is a vector of
@@ -160,7 +160,7 @@ The top left graph shows the original empirical mean germination rates (grey
 dots), with the posterior predictive obtained using the posterior distribution
 of the parameters $\beta$ and $\gamma$. The trend of the line suggests that
 over all populations, as chilling time increases from 0 weeks to 10.7 weeks,
-germination rates increase. But past 10.7 weeks, germination rates deacrease as
+germination rates increase. But past 10.7 weeks, germination rates decrease as
 chilling time increases. The blue point represents the estimated optimal chill
 time over all populations, which is 107 weeks. The blue region is the 95\% HPD
 for the optimal chill time, which is ranges from 9.5 to 12 weeks. At the
@@ -171,7 +171,7 @@ not the most efficient of germination rates.\\
 Similar interpretations can be made for individual populations. We will not
 discuss each of the populations' optimal chill times, but point out a few
 interesting observations. Population 5 has an optimal chill time of 4.3 weeks,
-the 95\% hpd covers 3.8 to 6 weeks. We expect that at the 5\% $\alpha$ level,
+the 95\% HPD covers 3.8 to 6 weeks. We expect that at the 5\% $\alpha$ level,
 there would not be able to germinate significantly more tulips by varying the
 chill time between 3.8 to 6 weeks. Beyond the HPD, germination rates decrease.
 Germination rates for population 5 increase sharpest at the beginning from 0 to
@@ -187,7 +187,7 @@ highest germination rates. In this sense, population 5 is very efficient.\\
 \noindent
 Population 11 appears to have the most well defined optimal chill time. Its HPD
 is relatively short, spanning 9.6 and 10.1 weeks. The estimated optimal chill
-time is 9.8 for that popoulation. At its peak, it a yields 75\% germination rate.\\
+time is 9.8 for that population. At its peak, it a yields 75\% germination rate.\\
 
 \noindent
 Population 9 requires the most amount of chill time. The estimated optimal chill time
@@ -212,7 +212,7 @@ time, which is high at 9 weeks, it yields a 30\% germination rate. Compared to p
 and population 1, which have similar optimal chill times but over double the germination
 rates, it is clear that population 8 is weaker at reproducing and should not be sown as much
 so as to reserve natural resources for other populations. Nevertheless, perhaps population
-8 may have some other desireable properties, such as pleasant fragrances and more attractive
+8 may have some other desirable properties, such as pleasant fragrances and more attractive
 colors. Further investigation is warranted for this population.\\
 
 \noindent 
