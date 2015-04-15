@@ -1,7 +1,8 @@
 arfplot <- function(x,y=NULL,col="grey35",pch=20,cex=1.2,xaxt="n",yaxt="n",
-                    axes=T,vgridlines=4,hgridlines=4,bg="grey90",col.axis="grey30",
+                    vgridlines=4,hgridlines=4,bg="grey90",col.axis="grey30",
                     cex.lab=1.2,vdigits=1,hdigits=2,family="sans",
-                    ylim=range(y),xlim=range(x),
+                    ylim=range(y),xlim=range(x),xaxis=T,yaxis=T,
+                    cex.xaxis=1,cex.yaxis=1,
                     mar=c(4.5,3,3,2),mgp=c(1.5,0,0),...) {
                          #B  ,L,T,R    #axes,?,?
   ##family: serif, sans, mono, courier new
@@ -40,9 +41,11 @@ arfplot <- function(x,y=NULL,col="grey35",pch=20,cex=1.2,xaxt="n",yaxt="n",
        panel.first=c(abline(v=v,col="white"),
                      abline(h=h,col="white")),...)
   
-  if (axes) {
-    axis(1,at=v,lab=round(v,vdigits),tick=F,pos=ylim[1],col.axis=col.axis) #x
-    axis(2,at=h,lab=round(h,hdigits),tick=F,pos=xlim[1],col.axis=col.axis,las=1) #y
+  if (xaxis) {
+    axis(1,at=v,lab=round(v,vdigits),tick=F,pos=ylim[1],col.axis=col.axis,cex.axis=cex.xaxis) #x
+  }  
+  if (yaxis) {  
+    axis(2,at=h,lab=round(h,hdigits),tick=F,pos=xlim[1],col.axis=col.axis,las=1,cex.axis=cex.yaxis) #y
   }
   par("mar"=pmar)
 }

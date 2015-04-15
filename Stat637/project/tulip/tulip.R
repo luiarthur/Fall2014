@@ -209,12 +209,12 @@ details <- function(pn=0,lwd=1) {
   #lines(c(x0[hpd[2]],x0[hpd[2]]),best.chill.y+c(-.1,.1),col="orange",lwd=2)
 }
 
-pdf("images/chilleffect.pdf",width=19,height=13) # Posterior Predictive Means
+pdf("images/chilleffect.pdf",width=19,height=14) # Posterior Predictive Means
   par(mfcol=c(6,2))
     yy <- apply(matrix(uchill),1,function(ct) mean(y[which(chill==ct)])) 
     arfplot(uchill,yy,main="All Populations",xlab="Chill Time (Weeks)",
             ylab="Germination Rate",col="grey30",pch=20,cex=2,ylim=c(0,1),
-            vgridlines=7)
+            vgridlines=7,hgrid=5)
     details(0,lwd=3)
          
     for (pn in pop.order) {
@@ -224,11 +224,25 @@ pdf("images/chilleffect.pdf",width=19,height=13) # Posterior Predictive Means
       })
       #plot(uchill,yy,main=paste("Population",pn),ylab="Germination Rate",xlab="Chill Time (Weeks)")
       arfplot(uchill,yy,main=paste("Population",pn),ylab="",xlab="",pch=20,
-              col="grey30",cex=2,ylim=c(0,1),vgrid=7)
+              col="grey30",cex=2,ylim=c(0,1),vgrid=7,hgrid=5)
       details(pn,lwd=3)
       count.down(ot,pn,k)
     }
   par(mfrow=c(1,1))
+dev.off()
+
+M <- apply(cbind(out$b,out$g),2,mean)
+hpd.param <- t(apply(cbind(out$b,out$g),2,get.hpd))
+hpd.param <- hpd.param[order(M),]
+M <- M[order(M)]
+pdf("images/hpd.pdf",width=19,height=13)
+  arfplot(M,ylab="Posterior Estimates",xlab="",mgp=c(1.5,0,0),xaxis=F,vg=48,xlim=range(hpd.param),
+          cex.lab=2,cex.yaxis=1.5)
+  axis(1,at=1:48,label=names(M),las=2,cex.axis=1.5,tick=F)
+  abline(h=0,col="maroon",lwd=2); axis(4,at=0,label=0,las=1,tick=F,cex.axis=1.5)
+  apply(matrix(1:48),1,function(x) {
+    lines(rep(x,2),hpd.param[x,])
+  })
 dev.off()
 
 #system("cd latex/report; ./compile")
